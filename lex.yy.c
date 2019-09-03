@@ -487,14 +487,13 @@ int lineno = 0;
 
 void set_token(int category)
 {
-    char* text = (yytext) ? yytext : " ";
-    yytoken = create_token(category, filename, lineno, text, 0, 0, yytext);
+    yytoken = create_token(category, filename, yylineno, yytext, 0, 0, "\0");
 }
 
 
-#line 496 "lex.yy.c"
+#line 495 "lex.yy.c"
 #define YY_NO_INPUT 1
-#line 498 "lex.yy.c"
+#line 497 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -709,11 +708,11 @@ YY_DECL
 		}
 
 	{
-#line 27 "vgolex.l"
+#line 26 "vgolex.l"
 
 
 
-#line 717 "lex.yy.c"
+#line 716 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -782,30 +781,30 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 30 "vgolex.l"
+#line 29 "vgolex.l"
 { set_token(LFUNC); return LFUNC; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 31 "vgolex.l"
+#line 30 "vgolex.l"
 { set_token(LLITERAL); return LLITERAL; }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 33 "vgolex.l"
+#line 32 "vgolex.l"
 { ++lineno; }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 35 "vgolex.l"
+#line 34 "vgolex.l"
 return 0;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "vgolex.l"
+#line 35 "vgolex.l"
 ECHO;
 	YY_BREAK
-#line 809 "lex.yy.c"
+#line 808 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1779,6 +1778,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 36 "vgolex.l"
+#line 35 "vgolex.l"
 
 

@@ -12,8 +12,7 @@ int lineno = 0;
 
 void set_token(int category)
 {
-    char* text = (yytext) ? yytext : " ";
-    yytoken = create_token(category, filename, lineno, text, 0, 0, yytext);
+    yytoken = create_token(category, filename, yylineno, yytext, 0, 0, "\0");
 }
 
 

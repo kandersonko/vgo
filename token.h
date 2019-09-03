@@ -34,6 +34,8 @@ void delete_token(token_ptr t);
 
 void delete_list(tokenlist_ptr root);
 
+void copy_token(tokenlist_ptr root, token_ptr t);
+
 void print_list(tokenlist_ptr root);
 
 #endif
