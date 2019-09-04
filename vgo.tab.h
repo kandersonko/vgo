@@ -4,21 +4,21 @@
 #define YY_BUFFER_SIZE 16384
 
 /* adapted from the go 1.2.2 distribution */
-// link: https://github.com/tcolar/golang/blob/master/src/cmd/gc/y.tab.h
 
-/* Tokens.  */ #define LLITERAL 258
-#define LASOP 259
-#define LCOLAS 260
+/* Tokens.  */
+#define LLITERAL 258 /* string literal */
+#define LASOP 259    /* = */
+#define LCOLAS 260   /* := */
 #define LBREAK 261
 #define LCASE 262
 #define LCHAN 263
 #define LCONST 264
 #define LCONTINUE 265
-#define LDDD 266
+#define LDDD 266 /* ... */ // TODO: add to flex file
 #define LDEFAULT 267
 #define LDEFER 268
 #define LELSE 269
-#define LFALL 270
+#define LFALL 270 /* fallthrough */
 #define LFOR 271
 #define LFUNC 272
 #define LGO 273
@@ -36,24 +36,25 @@
 #define LSWITCH 285
 #define LTYPE 286
 #define LVAR 287
-#define LANDAND 288
-#define LANDNOT 289
-#define LBODY 290
-#define LCOMM 291
-#define LDEC 292
-#define LEQ 293
-#define LGE 294
-#define LGT 295
-#define LIGNORE 296
-#define LINC 297
-#define LLE 298
-#define LLSH 299
-#define LLT 300
-#define LNE 301
-#define LOROR 302
-#define LRSH 303
-#define NotPackage 304
-#define NotParen 305
-#define PreferToRightParen 306
+#define LANDAND 288       /* && */
+#define LANDNOT 289       /* &^ */
+#define LBODY 290         /* { */
+#define LCOMM 291         /* <- */
+#define LDEC 292 /* -- */ // ask about vgo support
+#define LEQ 293           /* == */
+#define LGE 294           /* >= */
+#define LGT 295           /* > */
+#define LIGNORE 296       /* */
+#define LINC 297 /* ++ */ // ask about vgo support
+#define LLE 298           /* <= */
+#define LLSH 299          /* << */
+#define LLT 300           /* < */
+#define LNE 301           /* != */
+#define LOROR 302         /* || */
+#define LRSH 303          /* >> */
+
+#define LINVALIDOP 304
+#define LOP 305
+#define LCOMPOP 306
 
 #endif

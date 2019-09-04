@@ -27,15 +27,15 @@ int main(int argc, char **argv)
     argc--;
     argv++;
     int i;
-    int compile_error = 0;
     char *error_file;
     int error_lineno;
+    int tokentype;
+
     for (i = 0; i < argc; i++)
     {
 
         filename = argv[i];
         // TODO: check filename ends with .go or append it
-        int tokentype;
 
         if (!(yyin = fopen(filename, "r")))
         {
@@ -50,11 +50,21 @@ int main(int argc, char **argv)
             root = add_node(root, yytoken);
             error_lineno = yytoken->lineno;
             free(yytoken);
-            if (tokentype == -1)
+            if (tokentype < 0)
             {
-                compile_error = 1;
                 error_file = filename;
-                break;
+                print_list(root);
+                if (tokentype == -1)
+                    fprintf(stderr, "Go keyword not in VGo!\n");
+                else if (tokentype == -2)
+                    fprintf(stderr, "Go operator not in VGo!\n");
+                fprintf(stderr, "ERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
+
+                delete_list(root);
+                fclose(yyin);
+                yylex_destroy();
+
+                return -1;
             }
         }
         fclose(yyin); // not sure
@@ -64,12 +74,6 @@ int main(int argc, char **argv)
 
     delete_list(root);
     yylex_destroy();
-
-    if (compile_error)
-    {
-        fprintf(stderr, "Go keyword not in VGo!\nERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
-        return -1;
-    }
 
     return 0;
 }
