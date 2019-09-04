@@ -6,6 +6,8 @@
 
 #define KEYWORD_NOT_SUPPORTED -1
 #define OPERATOR_NOT_SUPPORTED -2
+#define UNTERMINATED_STRING -3
+
 
 token_ptr yytoken;
 
@@ -13,11 +15,20 @@ extern char* filename;
 
 char *sval = "\0";
 
+
 void set_token(int category)
 {
     yytoken = create_token(category, filename, yylineno, yytext, 0, 0, sval);
 }
 
+char* concat(const char *s1, const char *s2)
+{
+    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    // in real code you would check for errors in malloc here
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}
 
 %}
 %option noyywrap noinput nounput yylineno
@@ -26,6 +37,7 @@ digit           [0-9]
 letter          [a-zA-Z]
 literal         {letter}({letter}|{digit})*
 
+%x comment str
 %%
 
     /* Supported keywords */
@@ -90,7 +102,6 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
     /* Not supported operators */
 "<<"          { set_token(LLSH); return OPERATOR_NOT_SUPPORTED;  }
 ">>"          { set_token(LRSH); return OPERATOR_NOT_SUPPORTED;  }
-"<<"          { set_token(LLSH); return OPERATOR_NOT_SUPPORTED;  }
 "<<="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 ">>="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 "/="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
@@ -109,16 +120,23 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
 
+    /* TODO: handle lexical errors */
+
     /* compound tokens */
-\"([^"\n]|("\\\""))*  { set_token(LFUNC); sval = yytext; return LFUNC; }
 
 
+    /* comments */
+
+
+    /* string constant */
+\"[^\"\n]*\"    { sval = yytext; set_token(LSTRING); return LSTRING; }
+\"[^\"\n]*$     { sval = yytext; set_token(LSTRING); return UNTERMINATED_STRING;}
 
     /* new line, unknown characters, and eof */
 
 .               {  }
 
-\n              { sval = "\0"; }
+[ \t\n]+        { sval = "\0"; }
 
 <<EOF>>         { yylineno = 1; return 0; }
 %%

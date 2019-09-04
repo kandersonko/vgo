@@ -38,7 +38,7 @@
 #define LVAR 287
 #define LANDAND 288       /* && */
 #define LANDNOT 289       /* &^ */
-#define LBODY 290         /* { */
+#define LBODY 290 /* { */ // TODO: add to flex file
 #define LCOMM 291         /* <- */
 #define LDEC 292 /* -- */ // ask about vgo support
 #define LEQ 293           /* == */
@@ -56,5 +56,7 @@
 #define LINVALIDOP 304
 #define LOP 305
 #define LCOMPOP 306
+#define LCOMMENT 307
+#define LSTRING 307
 
 #endif

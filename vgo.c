@@ -58,6 +58,8 @@ int main(int argc, char **argv)
                     fprintf(stderr, "Go keyword not in VGo!\n");
                 else if (tokentype == -2)
                     fprintf(stderr, "Go operator not in VGo!\n");
+                else if (tokentype == -3)
+                    fprintf(stderr, "ERROR: unterminated string found!\n");
                 fprintf(stderr, "ERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
 
                 delete_list(root);
