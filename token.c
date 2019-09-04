@@ -110,6 +110,7 @@ void print_list(tokenlist_ptr root)
     printf("%8s\t%20s\t%10s\t%20s\t%10s\n", "Category", "Text", "Lineno", "Filename", "Ival/Sval");
     while (current != NULL)
     {
+        // TODO: Handle ival/sval ouput
         printf("%8d\t%20s\t%10d\t%20s\t%10d\n",
                current->t->category,
                current->t->text,

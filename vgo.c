@@ -23,18 +23,13 @@ int main(int argc, char **argv)
     }
 
     tokenlist_ptr root = NULL;
-    // root = malloc(sizeof(*root));
-    // if (!root)
-    // {
-    //     perror("malloc");
-    //     return -1;
-    // }
-    // memset(root, 0, sizeof(*root));
-    // token_ptr yytoken = malloc(sizeof(token_ptr));
 
     argc--;
     argv++;
     int i;
+    int compile_error = 0;
+    char *error_file;
+    int error_lineno;
     for (i = 0; i < argc; i++)
     {
 
@@ -53,7 +48,14 @@ int main(int argc, char **argv)
         while ((tokentype = yylex()))
         {
             root = add_node(root, yytoken);
+            error_lineno = yytoken->lineno;
             free(yytoken);
+            if (tokentype == -1)
+            {
+                compile_error = 1;
+                error_file = filename;
+                break;
+            }
         }
         fclose(yyin); // not sure
     }
@@ -62,6 +64,12 @@ int main(int argc, char **argv)
 
     delete_list(root);
     yylex_destroy();
+
+    if (compile_error)
+    {
+        fprintf(stderr, "Go keyword not in VGo!\nERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
+        return -1;
+    }
 
     return 0;
 }
