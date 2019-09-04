@@ -382,10 +382,9 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[18] =
+static const flex_int16_t yy_accept[11] =
     {   0,
-        0,    0,    5,    4,    3,    4,    4,    0,    0,    0,
-        0,    1,    0,    0,    0,    2,    0
+        0,    0,    5,    2,    3,    2,    0,    0,    1,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -399,10 +398,10 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    3,    1,    4,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    3,    1,
 
-        5,    6,    1,    1,    7,    1,    1,    8,    1,    9,
-        1,    1,    1,   10,    1,   11,   12,    1,    1,    1,
+        1,    4,    1,    1,    1,    1,    1,    1,    1,    5,
+        1,    1,    1,    1,    1,    1,    6,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -420,38 +419,33 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[13] =
+static const YY_CHAR yy_meta[7] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1
+        1,    1,    2,    1,    3,    4
     } ;
 
-static const flex_int16_t yy_base[19] =
+static const flex_int16_t yy_base[15] =
     {   0,
-        0,    7,   21,   22,   22,    8,   12,    9,    6,   12,
-        9,   22,    2,    8,    2,   22,   22,    0
+        0,    3,   13,   14,   14,    0,    0,    0,   14,   14,
+        7,    8,    3,    1
     } ;
 
-static const flex_int16_t yy_def[19] =
+static const flex_int16_t yy_def[15] =
     {   0,
-       18,   18,   17,   17,   17,   17,   17,   17,   17,   17,
-       17,   17,   17,   17,   17,   17,    0,   17
+       11,   11,   10,   10,   10,   12,   13,   14,   10,    0,
+       10,   10,   10,   10
     } ;
 
-static const flex_int16_t yy_nxt[35] =
+static const flex_int16_t yy_nxt[21] =
     {   0,
-        4,    5,   17,   17,   17,    6,   17,    7,    5,   16,
-       15,   14,    6,   13,    7,   12,   11,   10,    9,    8,
-       17,    3,   17,   17,   17,   17,   17,   17,   17,   17,
-       17,   17,   17,   17
+       10,    5,    9,    6,    5,    8,    6,    4,    4,    4,
+        4,    7,   10,    3,   10,   10,   10,   10,   10,   10
     } ;
 
-static const flex_int16_t yy_chk[35] =
+static const flex_int16_t yy_chk[21] =
     {   0,
-       18,    1,    0,    0,    0,    1,    0,    1,    2,   15,
-       14,   13,    2,   11,    2,   10,    9,    8,    7,    6,
-        3,   17,   17,   17,   17,   17,   17,   17,   17,   17,
-       17,   17,   17,   17
+        0,    1,   14,    1,    2,   13,    2,   11,   11,   11,
+       11,   12,    3,   10,   10,   10,   10,   10,   10,   10
     } ;
 
 /* Table of booleans, true if rule could match eol. */
@@ -483,17 +477,15 @@ token_ptr yytoken;
 
 extern char* filename;
 
-int lineno = 0;
-
 void set_token(int category)
 {
     yytoken = create_token(category, filename, yylineno, yytext, 0, 0, "\0");
 }
 
 
-#line 495 "lex.yy.c"
+#line 487 "lex.yy.c"
 #define YY_NO_INPUT 1
-#line 497 "lex.yy.c"
+#line 489 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -708,11 +700,11 @@ YY_DECL
 		}
 
 	{
-#line 26 "vgolex.l"
+#line 24 "vgolex.l"
 
 
 
-#line 716 "lex.yy.c"
+#line 708 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -739,13 +731,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 18 )
+				if ( yy_current_state >= 11 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 22 );
+		while ( yy_base[yy_current_state] != 14 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -781,30 +773,30 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 29 "vgolex.l"
+#line 27 "vgolex.l"
 { set_token(LFUNC); return LFUNC; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 30 "vgolex.l"
-{ set_token(LLITERAL); return LLITERAL; }
+#line 29 "vgolex.l"
+{  }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 32 "vgolex.l"
-{ ++lineno; }
+#line 31 "vgolex.l"
+{  }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 34 "vgolex.l"
-return 0;
+#line 33 "vgolex.l"
+{ yylineno = 1; return 0; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 35 "vgolex.l"
+#line 34 "vgolex.l"
 ECHO;
 	YY_BREAK
-#line 808 "lex.yy.c"
+#line 800 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1099,7 +1091,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 18 )
+			if ( yy_current_state >= 11 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1127,11 +1119,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 18 )
+		if ( yy_current_state >= 11 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 17);
+	yy_is_jam = (yy_current_state == 10);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1778,6 +1770,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 35 "vgolex.l"
+#line 34 "vgolex.l"
 
 

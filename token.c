@@ -107,20 +107,16 @@ void copy_token(tokenlist_ptr root, token_ptr t)
 void print_list(tokenlist_ptr root)
 {
     tokenlist_ptr current = root;
-    printf("\n");
+    printf("%8s\t%20s\t%10s\t%20s\t%10s\n", "Category", "Text", "Lineno", "Filename", "Ival/Sval");
     while (current != NULL)
     {
-        printf("[%s, %d, %d, %s, %f, %d, %s] -> ",
-               current->t->filename,
-               current->t->lineno,
+        printf("%8d\t%20s\t%10d\t%20s\t%10d\n",
                current->t->category,
                current->t->text,
-               current->t->dval,
-               current->t->ival,
-               current->t->sval);
-        // printf("[%s] -> ",
-        //    current->t->filename);
+               current->t->lineno,
+               current->t->filename,
+               current->t->ival);
+
         current = current->next;
     }
-    printf("NULL\n\n");
 }

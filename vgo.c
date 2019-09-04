@@ -53,26 +53,15 @@ int main(int argc, char **argv)
         while ((tokentype = yylex()))
         {
             root = add_node(root, yytoken);
-            // printf("yytoken file: %s\n", root->t->filename);
-
-            // printf("yytoken text: %s\n", root->t->text);
-            // printf("yytoken lineno: %d\n", root->t->lineno);
-
-            // free(yytoken->filename);
-            // free(yytoken->text);
-            // free(yytoken->sval);
             free(yytoken);
-
-            // delete_token(yytoken);
         }
         fclose(yyin); // not sure
     }
+
     print_list(root);
-    // delete_token(yytoken);
 
     delete_list(root);
-    // free(yytoken);
-    // yytoken = NULL;
     yylex_destroy();
+
     return 0;
 }
