@@ -141,10 +141,10 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 
     /* integer */
-"-"?[0-9]+ | ("0x")[0-9A-Fa-f]+   { ival = atoi(yytext); set_token(LINT); return LINT; }
+[+-]?[1-9][0-9]*|0|"0x"[0-9A-Fa-f]+  { ival = atoi(yytext); set_token(LINT); return LINT; }
 
     /* identifier */
-[a-zA-Z_][a-zA-Z0-9_]*  { sval = ""; set_token(LNAME); return LNAME; }
+[a-zA-Z_][a-zA-Z0-9_]*  { sval = ""; set_token(LNAME); return LNAME; } 
 
 
 
