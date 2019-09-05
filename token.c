@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "token.h"
+#include "vgo.tab.h"
 
 token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, int dval, char *sval)
 {
@@ -104,19 +105,77 @@ void copy_token(tokenlist_ptr root, token_ptr t)
     root->next = NULL;
 }
 
+char *replace_str(const char *s, const char *oldW,
+                  const char *newW)
+{
+    char *result;
+    int i, cnt = 0;
+    int newWlen = strlen(newW);
+    int oldWlen = strlen(oldW);
+
+    // Counting the number of times old word
+    // occur in the string
+    for (i = 0; s[i] != '\0'; i++)
+    {
+        if (strstr(&s[i], oldW) == &s[i])
+        {
+            cnt++;
+
+            // Jumping to index after the old word.
+            i += oldWlen - 1;
+        }
+    }
+
+    // Making new string of enough length
+    result = (char *)malloc(i + cnt * (newWlen - oldWlen) + 1);
+    if (!result)
+    {
+        perror("malloc");
+        return NULL;
+    }
+
+    i = 0;
+    while (*s)
+    {
+        // compare the substring with the result
+        if (strstr(s, oldW) == s)
+        {
+            strcpy(&result[i], newW);
+            i += newWlen;
+            s += oldWlen;
+        }
+        else
+            result[i++] = *s++;
+    }
+
+    result[i] = '\0';
+    return result;
+}
+
 void print_list(tokenlist_ptr root)
 {
     tokenlist_ptr current = root;
     printf("%8s\t%20s\t%10s\t%20s\t%10s\n", "Category", "Text", "Lineno", "Filename", "Ival/Sval");
+    char *isval;
     while (current != NULL)
     {
+        switch (current->t->category)
+        {
+        case LSTRING:
+            isval = current->t->sval;
+            break;
+
+        default:
+            isval = " ";
+            break;
+        }
         // TODO: Handle ival/sval ouput
-        printf("%8d\t%20s\t%10d\t%20s\t%10d\n",
+        printf("%8d\t%20s\t%10d\t%20s\t%10s\n",
                current->t->category,
                current->t->text,
                current->t->lineno,
                current->t->filename,
-               current->t->ival);
+               isval);
 
         current = current->next;
     }

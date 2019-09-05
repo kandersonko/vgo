@@ -14,6 +14,8 @@ extern FILE *yyin;
 
 char *filename;
 
+int yylex_destroy();
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -54,12 +56,16 @@ int main(int argc, char **argv)
             {
                 error_file = filename;
                 print_list(root);
-                if (tokentype == -1)
+                if (tokentype == KEYWORD_NOT_SUPPORTED)
                     fprintf(stderr, "Go keyword not in VGo!\n");
-                else if (tokentype == -2)
+                else if (tokentype == OPERATOR_NOT_SUPPORTED)
                     fprintf(stderr, "Go operator not in VGo!\n");
-                else if (tokentype == -3)
+                else if (tokentype == UNTERMINATED_STRING)
                     fprintf(stderr, "ERROR: unterminated string found!\n");
+                else if (tokentype == CCOMMENT_NOT_ALLOWED)
+                    fprintf(stderr, "C comments not allowed in VGo!\n");
+                else if (tokentype == UNTERMINATED_CCOMMENT)
+                    fprintf(stderr, "Unterminated C comments!\nC comments not allowed in VGo!\n");
                 fprintf(stderr, "ERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
 
                 delete_list(root);

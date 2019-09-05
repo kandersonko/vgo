@@ -4,9 +4,6 @@
 #include "vgo.tab.h"
 #include "token.h"
 
-#define KEYWORD_NOT_SUPPORTED -1
-#define OPERATOR_NOT_SUPPORTED -2
-#define UNTERMINATED_STRING -3
 
 
 token_ptr yytoken;
@@ -21,13 +18,16 @@ void set_token(int category)
     yytoken = create_token(category, filename, yylineno, yytext, 0, 0, sval);
 }
 
-char* concat(const char *s1, const char *s2)
+char* strip_chars(char* text)
 {
-    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
-    // in real code you would check for errors in malloc here
-    strcpy(result, s1);
-    strcat(result, s2);
-    return result;
+    char *s1, *s2, *s3;
+    s1 = replace_str(text, "\\t", " ");
+    s2 = (s1 != NULL) ? replace_str(s1, "\\n", "") : text;
+    s3 = (s2 != NULL) ? replace_str(s2, "\"", "") : text;
+    
+    free(s1);
+    free(s2);
+    return s3;
 }
 
 %}
@@ -127,10 +127,17 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
     /* comments */
 
+"/*" { BEGIN(comment); }
+<comment>"*/" {  BEGIN(INITIAL); set_token(LCCOMMENT); return CCOMMENT_NOT_ALLOWED; }
+<comment>([^*]|\n)+|.
+<comment><<EOF>> {  sval = yytext; set_token(LCCOMMENT); return UNTERMINATED_CCOMMENT; }
+ /* C++ comment, a common extension */
+"//".*\n    {  sval = yytext; set_token(LCOMMENT); return LCOMMENT; }
+
 
     /* string constant */
-\"[^\"\n]*\"    { sval = yytext; set_token(LSTRING); return LSTRING; }
-\"[^\"\n]*$     { sval = yytext; set_token(LSTRING); return UNTERMINATED_STRING;}
+\"[^\"\n]*\"    { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
+\"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 
     /* new line, unknown characters, and eof */
 

@@ -36,6 +36,9 @@ void delete_list(tokenlist_ptr root);
 
 void copy_token(tokenlist_ptr root, token_ptr t);
 
+char *replace_str(const char *s, const char *oldW,
+                  const char *newW);
+
 void print_list(tokenlist_ptr root);
 
 #endif

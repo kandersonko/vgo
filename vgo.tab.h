@@ -3,6 +3,12 @@
 
 #define YY_BUFFER_SIZE 16384
 
+#define KEYWORD_NOT_SUPPORTED -1
+#define OPERATOR_NOT_SUPPORTED -2
+#define UNTERMINATED_STRING -3
+#define CCOMMENT_NOT_ALLOWED -4
+#define UNTERMINATED_CCOMMENT -5
+
 /* adapted from the go 1.2.2 distribution */
 
 /* Tokens.  */
@@ -57,6 +63,7 @@
 #define LOP 305
 #define LCOMPOP 306
 #define LCOMMENT 307
-#define LSTRING 307
+#define LCCOMMENT 308
+#define LSTRING 309
 
 #endif
