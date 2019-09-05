@@ -24,7 +24,7 @@ typedef struct tokenlist *tokenlist_ptr;
 
 extern token_ptr yytoken;
 
-token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, int dval, char *sval);
+token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval);
 
 tokenlist_ptr create_node(token_ptr t);
 

@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     {
 
         filename = argv[i];
-        // TODO: check filename ends with .go or append it
+        // TODO: check filename ends with .go or append it. if the filename contains a dot "." stop and print invalid filename
 
         if (!(yyin = fopen(filename, "r")))
         {

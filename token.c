@@ -4,7 +4,7 @@
 #include "token.h"
 #include "vgo.tab.h"
 
-token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, int dval, char *sval)
+token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval)
 {
     token_ptr temp;
     temp = malloc(sizeof(*temp));
@@ -165,22 +165,25 @@ void print_list(tokenlist_ptr root)
 {
     tokenlist_ptr current = root;
     printf("%8s\t%20s\t%10s\t%20s\t%10s\n", "Category", "Text", "Lineno", "Filename", "Ival/Sval");
-    char *isval;
     while (current != NULL)
     {
         print_node(current);
+        // TODO: Handle ival/sval ouput
         switch (current->t->category)
         {
         case LSTRING:
-            isval = current->t->sval;
-            printf("%10s\n", isval);
+            printf("%10s\n", current->t->sval);
+            break;
+        case LINT:
+            printf("%10d\n", current->t->ival);
+            break;
+        case LREAL:
+            printf("%10f\n", current->t->dval);
             break;
         default:
-            isval = " ";
-            printf("%10s\n", isval);
+            printf("%10s\n", " ");
             break;
         }
-        // TODO: Handle ival/sval ouput
 
         current = current->next;
     }

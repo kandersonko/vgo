@@ -11,12 +11,13 @@ token_ptr yytoken;
 extern char* filename;
 
 char *sval = "\0";
-int ival = 0;
+int ival;
+double dval;
 
 
 void set_token(int category)
 {
-    yytoken = create_token(category, filename, yylineno, yytext, ival, 0, sval);
+    yytoken = create_token(category, filename, yylineno, yytext, ival, dval, sval);
 }
 
 char* strip_chars(char* text)
@@ -141,7 +142,12 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 
     /* integer */
-[+-]?[0-9]+|"0x"[0-9A-Fa-f]+  { ival = atoi(yytext); set_token(LINT); return LINT; }
+[+-]?[0-9]+  { ival = atoi(yytext); set_token(LINT); return LINT; }
+"0x"[0-9A-Fa-f]+  { ival = (int)strtol(yytext, NULL, 16); set_token(LINT); return LINT; }
+
+    /* real */
+[+-]?[0-9]*"."[0-9]+  { dval = atof(yytext); set_token(LREAL); return LREAL; }
+
 
     /* identifier */
 [a-zA-Z_][a-zA-Z0-9_]*  { sval = ""; set_token(LNAME); return LNAME; } 
@@ -149,7 +155,7 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* new line, unknown characters, and eof */
-
+    /* print lexical error not recognized! */
 .               {  }
 
 [ \t\n]+        { sval = "\0"; }
