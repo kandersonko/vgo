@@ -4,5 +4,6 @@ func main()
 {
 	var x int
 	x = 15
+	var y = -13;
 	
 }

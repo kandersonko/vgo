@@ -152,6 +152,15 @@ char *replace_str(const char *s, const char *oldW,
     return result;
 }
 
+static void print_node(tokenlist_ptr current)
+{
+    printf("%8d\t%20s\t%10d\t%20s\t",
+           current->t->category,
+           current->t->text,
+           current->t->lineno,
+           current->t->filename);
+}
+
 void print_list(tokenlist_ptr root)
 {
     tokenlist_ptr current = root;
@@ -159,23 +168,19 @@ void print_list(tokenlist_ptr root)
     char *isval;
     while (current != NULL)
     {
+        print_node(current);
         switch (current->t->category)
         {
         case LSTRING:
             isval = current->t->sval;
+            printf("%10s\n", isval);
             break;
-
         default:
             isval = " ";
+            printf("%10s\n", isval);
             break;
         }
         // TODO: Handle ival/sval ouput
-        printf("%8d\t%20s\t%10d\t%20s\t%10s\n",
-               current->t->category,
-               current->t->text,
-               current->t->lineno,
-               current->t->filename,
-               isval);
 
         current = current->next;
     }

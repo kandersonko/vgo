@@ -65,5 +65,7 @@
 #define LCOMMENT 307
 #define LCCOMMENT 308
 #define LSTRING 309
+#define LINT 310
+#define LREAL 311
 
 #endif

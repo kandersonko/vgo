@@ -11,11 +11,12 @@ token_ptr yytoken;
 extern char* filename;
 
 char *sval = "\0";
+int ival = 0;
 
 
 void set_token(int category)
 {
-    yytoken = create_token(category, filename, yylineno, yytext, 0, 0, sval);
+    yytoken = create_token(category, filename, yylineno, yytext, ival, 0, sval);
 }
 
 char* strip_chars(char* text)
@@ -138,6 +139,14 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
     /* string constant */
 \"[^\"\n]*\"    { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
 \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
+
+    /* integer */
+"-"?[0-9]+ | ("0x")[0-9A-Fa-f]+   { ival = atoi(yytext); set_token(LINT); return LINT; }
+
+    /* identifier */
+[a-zA-Z_][a-zA-Z0-9_]*  { sval = ""; set_token(LNAME); return LNAME; }
+
+
 
     /* new line, unknown characters, and eof */
 
