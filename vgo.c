@@ -16,6 +16,8 @@ char *filename;
 
 int yylex_destroy();
 
+void print_error(int tokentype);
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -56,16 +58,7 @@ int main(int argc, char **argv)
             {
                 error_file = filename;
                 print_list(root);
-                if (tokentype == KEYWORD_NOT_SUPPORTED)
-                    fprintf(stderr, "Go keyword not in VGo!\n");
-                else if (tokentype == OPERATOR_NOT_SUPPORTED)
-                    fprintf(stderr, "Go operator not in VGo!\n");
-                else if (tokentype == UNTERMINATED_STRING)
-                    fprintf(stderr, "ERROR: unterminated string found!\n");
-                else if (tokentype == CCOMMENT_NOT_ALLOWED)
-                    fprintf(stderr, "C comments not allowed in VGo!\n");
-                else if (tokentype == UNTERMINATED_CCOMMENT)
-                    fprintf(stderr, "Unterminated C comments!\nC comments not allowed in VGo!\n");
+                print_error(tokentype);
                 fprintf(stderr, "ERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
 
                 delete_list(root);
@@ -84,4 +77,36 @@ int main(int argc, char **argv)
     yylex_destroy();
 
     return 0;
+}
+
+void print_error(int tokentype)
+{
+    switch (tokentype)
+    {
+    case KEYWORD_NOT_SUPPORTED:
+        fprintf(stderr, "Go keyword not in VGo!\n");
+        break;
+    case OPERATOR_NOT_SUPPORTED:
+        fprintf(stderr, "Go operator not in VGo!\n");
+        break;
+    case UNTERMINATED_STRING:
+        fprintf(stderr, "ERROR: unterminated string found!\n");
+        break;
+    case CCOMMENT_NOT_ALLOWED:
+        fprintf(stderr, "C comments not allowed in VGo!\n");
+        break;
+    case UNTERMINATED_CCOMMENT:
+        fprintf(stderr, "Unterminated C comments!\nC comments not allowed in VGo!\n");
+    case INVALID_CHARACTER:
+        fprintf(stderr, "Invalid character, not allowed in VGo!\n");
+        break;
+    case ILLEGAL_RUNE:
+        fprintf(stderr, "Invalid rune literal, not allowed in VGo!\n");
+        break;
+    case INVALID_VARNAME:
+        fprintf(stderr, "Invalid variable length, a length greater than 12 is not allowed in VGo!\n");
+        break;
+    default:
+        break;
+    }
 }

@@ -100,7 +100,21 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 "++"           { set_token(LINC); return LINC; }
 "--"           { set_token(LDEC); return LDEC; }
 "..."           { set_token(LDDD); return LDDD; }
-
+";"           { set_token(LSEMICOLON); return LSEMICOLON; }
+"."           { set_token(LDOT); return LDOT; }
+"{"           { set_token(LLBODY); return LLBODY; }
+"}"           { set_token(LRBODY); return LRBODY; }
+"("           { set_token(LLPAREN); return LLPAREN; }
+")"           { set_token(LRPAREN); return LRPAREN; }
+"["           { set_token(LLBRACKET); return LLBRACKET; }
+"]"           { set_token(LRBRACKET); return LRBRACKET; }
+"+"           { set_token(LPLUS); return LPLUS; }
+"-"           { set_token(LMINUS); return LMINUS; }
+"/"           { set_token(LDIV); return LDIV; }
+"*"           { set_token(LMUL); return LMUL; }
+"%"           { set_token(LMOD); return LMOD; }
+"!"           { set_token(LNOT); return LNOT; }
+","           { set_token(LCOMMA); return LCOMMA; }
 
 
     /* Not supported operators */
@@ -110,7 +124,7 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 ">>="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 "/="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 "%="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"<-"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+"<-"          { set_token(LCOMM); return LCOMM;  }
 ":"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 "&"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 "&^"          { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
@@ -143,6 +157,9 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 \"[^\"\n]*\"    { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
 \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 
+    /* runes */
+"\'"\\u[0-9a-fA-F]{4}|"\'"\\U[0-9a-fA-F]{8} { set_token(LRUNE); return ILLEGAL_RUNE; }
+
     /* integer */
 [+-]?[0-9]+  { ival = atoi(yytext); set_token(LINT); return LINT; }
 "0x"[0-9A-Fa-f]+  { ival = (int)strtol(yytext, NULL, 16); set_token(LINT); return LINT; }
@@ -152,15 +169,17 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* identifier */
-[a-zA-Z_][a-zA-Z0-9_]*  { sval = ""; set_token(LNAME); return LNAME; } 
+[a-zA-Z_][a-zA-Z0-9_]{0,12}  { sval = ""; set_token(LNAME); return LNAME; } 
+[a-zA-Z_][a-zA-Z0-9_]{12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
 
 
 
     /* new line, unknown characters, and eof */
     /* print lexical error not recognized! */
-.               {  }
 
 [ \t\n]+        { sval = "\0"; }
+
+.               { set_token(LINVALIDCHAR); return INVALID_CHARACTER; }
 
 <<EOF>>         { yylineno = 1; return 0; }
 %%
