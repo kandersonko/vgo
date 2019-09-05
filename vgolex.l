@@ -97,7 +97,9 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 "="          { set_token(LASOP); return LASOP;  }
 "+="          { set_token(LCOMPOP); return LCOMPOP;  }
 "-="          { set_token(LCOMPOP); return LCOMPOP;  }
-
+"++"           { set_token(LINC); return LINC; }
+"--"           { set_token(LDEC); return LDEC; }
+"..."           { set_token(LDDD); return LDDD; }
 
 
 
