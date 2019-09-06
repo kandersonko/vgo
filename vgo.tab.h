@@ -11,6 +11,7 @@
 #define INVALID_CHARACTER -6
 #define ILLEGAL_RUNE -7
 #define INVALID_VARNAME -8
+#define IMAGINARY_NOT_SUPPORTED -9
 
 /* adapted from the go 1.2.2 distribution */
 
@@ -86,5 +87,9 @@
 #define LNOT 325
 #define LCOMMA 326
 #define LINVALIDCHAR 327
+#define LIMAGINARY 328
+#define LHEX 329
+#define LBINARY 330
+#define LOCTAL 331
 
 #endif

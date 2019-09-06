@@ -4,7 +4,7 @@ OBJ=vgo.o lex.yy.o token.o
 # DEPS=token.c
 DEPS=
 
-
+# remove lex.yy.c
 
 vgo: $(OBJ)
 	$(CC) -o vgo $(OBJ) $(DEPS)

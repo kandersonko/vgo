@@ -32,14 +32,27 @@ char* strip_chars(char* text)
     return s3;
 }
 
+// TODO: handle hex, binary, octal integers (0x23, 0b101, 0o35)
+
+
 %}
 %option noyywrap noinput nounput yylineno
 
-digit           [0-9]
-letter          [a-zA-Z]
-literal         {letter}({letter}|{digit})*
+digit           [0-9]+
+binary          "0"("b"|"B")(0|1)+
+octal           "0"("o"|"O")([0-7])+
+hex             "0"("x"|"X")[0-9A-Fa-f]+
+integer         [+-]?[0-9]+
+real            [+-]?[0-9]*"."[0-9]+ 
+number          {digit}|{integer}|{binary}|{octal}|{hex}|{real}
+invalid_runes           "\'\\"[xu][0-9a-fA-F]{4}"\'"|"\'\\U"[0-9a-fA-F]{8}"\'"|"\'\\"[abfrv]"\'"
+runes           "\'\\"[nt\\']"\'"
+imaginary   ({number})"i"
 
-%x comment str
+
+
+
+%x comment
 %%
 
     /* Supported keywords */
@@ -150,7 +163,7 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 <comment>([^*]|\n)+|.
 <comment><<EOF>> {  sval = yytext; set_token(LCCOMMENT); return UNTERMINATED_CCOMMENT; }
  /* C++ comment, a common extension */
-"//".*\n    {  sval = yytext; set_token(LCOMMENT); return LCOMMENT; }
+"//".*\n    {  }
 
 
     /* string constant */
@@ -158,21 +171,21 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 
     /* runes */
-"\'"\\u[0-9a-fA-F]{4}|"\'"\\U[0-9a-fA-F]{8} { set_token(LRUNE); return ILLEGAL_RUNE; }
-
-    /* integer */
-[+-]?[0-9]+  { ival = atoi(yytext); set_token(LINT); return LINT; }
-"0x"[0-9A-Fa-f]+  { ival = (int)strtol(yytext, NULL, 16); set_token(LINT); return LINT; }
-
-    /* real */
-[+-]?[0-9]*"."[0-9]+  { dval = atof(yytext); set_token(LREAL); return LREAL; }
+{invalid_runes}  { set_token(LRUNE); return ILLEGAL_RUNE; }
+{runes}  { set_token(LRUNE); return LRUNE; }
 
 
     /* identifier */
-[a-zA-Z_][a-zA-Z0-9_]{0,12}  { sval = ""; set_token(LNAME); return LNAME; } 
-[a-zA-Z_][a-zA-Z0-9_]{12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { sval = ""; set_token(LNAME); return LNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
 
-
+    /* numbers */
+{imaginary}     { set_token(LIMAGINARY); return IMAGINARY_NOT_SUPPORTED; }
+{hex}  { ival = (int)strtol(yytext, NULL, 16); set_token(LHEX); return LHEX; }
+{binary}  { ival = (int)strtol(yytext, NULL, 2); set_token(LBINARY); return LBINARY; }
+{octal}  { ival = (int)strtol(yytext, NULL, 8); set_token(LOCTAL); return LOCTAL; }
+{integer}  { ival = atoi(yytext); set_token(LINT); return LINT; }
+{real}  { dval = atof(yytext); set_token(LREAL); return LREAL; }
 
     /* new line, unknown characters, and eof */
     /* print lexical error not recognized! */

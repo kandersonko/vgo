@@ -105,6 +105,7 @@ void copy_token(tokenlist_ptr root, token_ptr t)
     root->next = NULL;
 }
 
+// code found from Geeks for Geeks website
 char *replace_str(const char *s, const char *oldW,
                   const char *newW)
 {
@@ -175,6 +176,9 @@ void print_list(tokenlist_ptr root)
             printf("%10s\n", current->t->sval);
             break;
         case LINT:
+        case LBINARY:
+        case LOCTAL:
+        case LHEX:
             printf("%10d\n", current->t->ival);
             break;
         case LREAL:
