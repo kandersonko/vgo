@@ -5,11 +5,6 @@
 #include <string.h>
 
 extern int yylex();
-extern int yylineno;
-extern char *yytext;
-
-extern int yyleng;
-extern int yylineno;
 
 extern FILE *yyin;
 
@@ -47,7 +42,6 @@ int main(int argc, char **argv)
         {
             return -1;
         }
-        // TODO: check filename ends with .go or append it. if the filename contains a dot "." stop and print invalid filename
 
         if (!(yyin = fopen(filename, "r")))
         {
@@ -55,7 +49,6 @@ int main(int argc, char **argv)
             perror(argv[i]);
             return -1;
         }
-        // yypush_buffer_state(yy_create_buffer(yyin, YY_BUFFER_SIZE));
 
         while ((tokentype = yylex()))
         {
@@ -76,15 +69,13 @@ int main(int argc, char **argv)
                 return -1;
             }
         }
-        fclose(yyin); // not sure
+        fclose(yyin);
     }
 
     print_list(root);
 
     delete_list(root);
     yylex_destroy();
-
-    // free(filename);
 
     return 0;
 }
@@ -123,9 +114,9 @@ void print_error(int tokentype)
         break;
     }
 }
-// TODO: example -> no example.go, example.c -> wrong extension or usage for extension
 
 // code found on stackoverflow
+// get a file extension from the filename
 const char *get_filename_ext(const char *filename)
 {
     const char *dot = strrchr(filename, '.');
@@ -158,4 +149,3 @@ char *rename_go_file(char *name)
     fprintf(stderr, "ERROR: invalid file extension \".%s\"\n", ext);
     return NULL;
 }
-// TODO: add comment about external codes

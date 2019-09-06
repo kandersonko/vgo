@@ -3,6 +3,7 @@
 
 #define YY_BUFFER_SIZE 16384
 
+// error codes
 #define KEYWORD_NOT_SUPPORTED -1
 #define OPERATOR_NOT_SUPPORTED -2
 #define UNTERMINATED_STRING -3

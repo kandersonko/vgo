@@ -1,10 +1,8 @@
 CC=gcc
 CFLAGS=-c -g -Wall
 OBJ=vgo.o lex.yy.o token.o
-# DEPS=token.c
-DEPS=
-
-# remove lex.yy.c
+binaries=vgo
+files=vgo.c token.c token.h vgo.tab.h vgolex.l makefile
 
 vgo: $(OBJ)
 	$(CC) -o vgo $(OBJ) $(DEPS)
@@ -21,9 +19,11 @@ lex.yy.c: vgolex.l vgo.tab.h
 token.o: token.c
 	$(CC) $(CFLAGS) token.c
 
+
+deploy:
+	zip -r hw1.zip $(files)
+
 .PHONY: clean
 
-binaries: vgo
-
 clean:
-	rm -f $(binaries) *.o
+	rm -f $(binaries) *.o lex.yy.c

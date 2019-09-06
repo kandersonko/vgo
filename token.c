@@ -4,6 +4,7 @@
 #include "token.h"
 #include "vgo.tab.h"
 
+// create a token struct
 token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval)
 {
     token_ptr temp;
@@ -24,6 +25,7 @@ token_ptr create_token(int category, char *filename, int lineno, char *text, int
     return temp;
 }
 
+// create a node of the linkedlist
 tokenlist_ptr create_node(token_ptr t)
 {
     tokenlist_ptr temp;
@@ -34,11 +36,11 @@ tokenlist_ptr create_node(token_ptr t)
         return NULL;
     }
     memset(temp, 0, sizeof(*temp));
-    // temp->t = t;
     copy_token(temp, t);
     return temp;
 }
 
+// add a node to the end of the linkedlist
 tokenlist_ptr add_node(tokenlist_ptr root, token_ptr t)
 {
     tokenlist_ptr temp = create_node(t);
@@ -56,6 +58,7 @@ tokenlist_ptr add_node(tokenlist_ptr root, token_ptr t)
     return root;
 }
 
+// delete the token struct
 void delete_token(token_ptr t)
 {
     if (t == NULL)
@@ -70,6 +73,7 @@ void delete_token(token_ptr t)
     t = NULL;
 }
 
+// delete the linkedlist
 void delete_list(tokenlist_ptr root)
 {
     tokenlist_ptr temp;
@@ -79,13 +83,13 @@ void delete_list(tokenlist_ptr root)
         temp = root;
         root = root->next;
         delete_token(temp->t);
-        // free(temp->t);
         free(temp);
     }
     free(root);
     root = NULL;
 }
 
+// copy a token struct to a node of the linkedlist
 void copy_token(tokenlist_ptr root, token_ptr t)
 {
     root->t = malloc(sizeof(*root->t));
@@ -106,6 +110,7 @@ void copy_token(tokenlist_ptr root, token_ptr t)
 }
 
 // code found from Geeks for Geeks website
+// replace a set of characters of the old string from characters from the new string
 char *replace_str(const char *s, const char *oldW,
                   const char *newW)
 {
@@ -153,6 +158,7 @@ char *replace_str(const char *s, const char *oldW,
     return result;
 }
 
+// print a node (token struct) of the linkedlist
 static void print_node(tokenlist_ptr current)
 {
     printf("%8d\t%20s\t%10d\t%20s\t",
@@ -162,6 +168,7 @@ static void print_node(tokenlist_ptr current)
            current->t->filename);
 }
 
+// print the linkedlist
 void print_list(tokenlist_ptr root)
 {
     tokenlist_ptr current = root;
@@ -169,7 +176,7 @@ void print_list(tokenlist_ptr root)
     while (current != NULL)
     {
         print_node(current);
-        // TODO: Handle ival/sval ouput
+        // Handle ival/sval output
         switch (current->t->category)
         {
         case LSTRING:

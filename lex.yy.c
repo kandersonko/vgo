@@ -393,24 +393,24 @@ static const flex_int16_t yy_accept[248] =
         0,   69,   39,    0,   88,   37,   40,   38,    0,   89,
        74,    0,   61,   88,    0,    0,    0,   84,   72,   63,
        57,   31,   28,   32,   58,   82,   82,   82,   82,   82,
-       82,   82,   82,   82,   82,   82,   82,   23,   10,   82,
+       82,   82,   82,   82,   82,   82,   82,   25,   12,   82,
 
        82,   82,   82,   82,   82,   82,   82,   82,   82,   82,
        82,   70,   35,   76,   76,   75,   67,    0,    0,    0,
         0,   41,    0,   77,   86,   87,   85,   59,   60,   82,
-       82,   82,   82,   82,   82,   82,   82,   82,   82,    9,
-       82,   82,   82,   27,    2,   82,   82,   82,   82,   82,
-       82,   82,   82,    8,   81,    0,   80,    0,   82,   27,
-       82,   14,   15,   82,   82,   82,   82,   11,   82,   82,
-       82,    1,   20,   82,   82,   82,   82,   82,   82,   82,
-       82,   82,   26,    4,    0,    0,   82,   13,    5,   82,
-       82,   19,   82,   26,   82,   82,   82,   82,   21,   82,
+       82,   82,   82,   82,   82,   82,   82,   82,   82,   11,
+       82,   82,   82,    2,    4,   82,   82,   82,   82,   82,
+       82,   82,   82,   10,   81,    0,   80,    0,   82,    2,
+       82,   16,   17,   82,   82,   82,   82,   13,   82,   82,
+       82,    3,   22,   82,   82,   82,   82,   82,   82,   82,
+       82,   82,    1,    6,    0,    0,   82,   15,    7,   82,
+       82,   21,   82,    1,   82,   82,   82,   82,   23,   82,
 
        82,   82,   82,   82,    0,    0,   82,   82,   82,   82,
-       82,    7,   82,   82,   12,   25,   27,    3,   24,    0,
-        0,   82,   82,   18,   82,   27,   82,    6,    0,   82,
-       17,   82,   82,    0,   82,   82,   22,    0,   82,   82,
-        0,   82,   16,   82,   83,   83,    0
+       82,    9,   82,   82,   14,   27,    2,    5,   26,    0,
+        0,   82,   82,   20,   82,    2,   82,    8,    0,   82,
+       19,   82,   82,    0,   82,   82,   24,    0,   82,   82,
+        0,   82,   18,   82,   83,   83,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -677,6 +677,7 @@ void set_token(int category)
     yytoken = create_token(category, filename, yylineno, yytext, ival, dval, sval);
 }
 
+// remove \t \n and quotes (") from string
 char* strip_chars(char* text)
 {
     char *s1, *s2, *s3;
@@ -689,13 +690,11 @@ char* strip_chars(char* text)
     return s3;
 }
 
-// TODO: handle hex, binary, octal integers (0x23, 0b101, 0o35)
 
-
-#line 696 "lex.yy.c"
+#line 695 "lex.yy.c"
 #define YY_NO_INPUT 1
 
-#line 699 "lex.yy.c"
+#line 698 "lex.yy.c"
 
 #define INITIAL 0
 #define comment 1
@@ -911,12 +910,12 @@ YY_DECL
 		}
 
 	{
-#line 56 "vgolex.l"
+#line 55 "vgolex.l"
 
 
-#line 59 "vgolex.l"
-    /* Supported keywords */
-#line 920 "lex.yy.c"
+#line 58 "vgolex.l"
+    /* types */
+#line 919 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -985,376 +984,376 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 60 "vgolex.l"
-{ set_token(LFUNC); return LFUNC; }
+#line 59 "vgolex.l"
+{ set_token(LBOOL); return LBOOL; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 62 "vgolex.l"
-{ set_token(LMAP); return LMAP; }
+#line 60 "vgolex.l"
+{ set_token(LVARTYPE); return LVARTYPE; }
 	YY_BREAK
+/* Supported keywords */
 case 3:
 YY_RULE_SETUP
 #line 64 "vgolex.l"
-{ set_token(LSTRUCT); return LSTRUCT; }
+{ set_token(LFUNC); return LFUNC; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 66 "vgolex.l"
-{ set_token(LTYPE); return LTYPE; }
+{ set_token(LMAP); return LMAP; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 68 "vgolex.l"
-{ set_token(LCONST); return LCONST; }
+{ set_token(LSTRUCT); return LSTRUCT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 70 "vgolex.l"
-{ set_token(LPACKAGE); return LPACKAGE; }
+{ set_token(LTYPE); return LTYPE; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 72 "vgolex.l"
-{ set_token(LIMPORT); return LIMPORT; }
+{ set_token(LCONST); return LCONST; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 74 "vgolex.l"
-{ set_token(LVAR); return LVAR; }
+{ set_token(LPACKAGE); return LPACKAGE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 76 "vgolex.l"
-{ set_token(LFOR); return LFOR; }
+{ set_token(LIMPORT); return LIMPORT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 78 "vgolex.l"
-{ set_token(LIF); return LIF; }
+{ set_token(LVAR); return LVAR; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 80 "vgolex.l"
-{ set_token(LELSE); return LELSE; }
+{ set_token(LFOR); return LFOR; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 82 "vgolex.l"
-{ set_token(LRETURN); return LRETURN; }
+{ set_token(LIF); return LIF; }
 	YY_BREAK
-/* Not supported keywords */
 case 13:
 YY_RULE_SETUP
-#line 86 "vgolex.l"
-{ set_token(LBREAK); return KEYWORD_NOT_SUPPORTED; }
+#line 84 "vgolex.l"
+{ set_token(LELSE); return LELSE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 87 "vgolex.l"
-{ set_token(LCASE); return KEYWORD_NOT_SUPPORTED; }
+#line 86 "vgolex.l"
+{ set_token(LRETURN); return LRETURN; }
 	YY_BREAK
+/* Not supported keywords */
 case 15:
 YY_RULE_SETUP
-#line 88 "vgolex.l"
-{ set_token(LCHAN); return KEYWORD_NOT_SUPPORTED; }
+#line 90 "vgolex.l"
+{ set_token(LBREAK); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 89 "vgolex.l"
-{ set_token(LFALL); return KEYWORD_NOT_SUPPORTED; }
+#line 91 "vgolex.l"
+{ set_token(LCASE); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 90 "vgolex.l"
-{ set_token(LCONTINUE); return KEYWORD_NOT_SUPPORTED; }
+#line 92 "vgolex.l"
+{ set_token(LCHAN); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 91 "vgolex.l"
-{ set_token(LDEFAULT); return KEYWORD_NOT_SUPPORTED; }
+#line 93 "vgolex.l"
+{ set_token(LFALL); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 92 "vgolex.l"
-{ set_token(LDEFER); return KEYWORD_NOT_SUPPORTED; }
+#line 94 "vgolex.l"
+{ set_token(LCONTINUE); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 93 "vgolex.l"
-{ set_token(LGOTO); return KEYWORD_NOT_SUPPORTED; }
+#line 95 "vgolex.l"
+{ set_token(LDEFAULT); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 94 "vgolex.l"
-{ set_token(LRANGE); return KEYWORD_NOT_SUPPORTED; }
+#line 96 "vgolex.l"
+{ set_token(LDEFER); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 95 "vgolex.l"
-{ set_token(LINTERFACE); return KEYWORD_NOT_SUPPORTED; }
+#line 97 "vgolex.l"
+{ set_token(LGOTO); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 96 "vgolex.l"
-{ set_token(LGO); return KEYWORD_NOT_SUPPORTED; }
+#line 98 "vgolex.l"
+{ set_token(LRANGE); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 97 "vgolex.l"
-{ set_token(LSWITCH); return KEYWORD_NOT_SUPPORTED; }
+#line 99 "vgolex.l"
+{ set_token(LINTERFACE); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 98 "vgolex.l"
-{ set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
+#line 100 "vgolex.l"
+{ set_token(LGO); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
-/* types */
 case 26:
 YY_RULE_SETUP
 #line 101 "vgolex.l"
-{ set_token(LBOOL); return LBOOL; }
+{ set_token(LSWITCH); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 102 "vgolex.l"
-{ set_token(LVARTYPE); return LVARTYPE; }
+{ set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 	YY_BREAK
 /* Supported operators */
 case 28:
 YY_RULE_SETUP
-#line 106 "vgolex.l"
+#line 107 "vgolex.l"
 { set_token(LEQ); return LEQ;  }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 107 "vgolex.l"
+#line 108 "vgolex.l"
 { set_token(LLT); return LLT;  }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 108 "vgolex.l"
+#line 109 "vgolex.l"
 { set_token(LGT); return LGT;  }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 109 "vgolex.l"
+#line 110 "vgolex.l"
 { set_token(LLE); return LLE;  }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 110 "vgolex.l"
+#line 111 "vgolex.l"
 { set_token(LGE); return LGE;  }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 111 "vgolex.l"
+#line 112 "vgolex.l"
 { set_token(LNE); return LNE;  }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 112 "vgolex.l"
+#line 113 "vgolex.l"
 { set_token(LANDAND); return LANDAND;  }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 113 "vgolex.l"
+#line 114 "vgolex.l"
 { set_token(LOROR); return LOROR;  }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 114 "vgolex.l"
+#line 115 "vgolex.l"
 { set_token(LASOP); return LASOP;  }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 115 "vgolex.l"
+#line 116 "vgolex.l"
 { set_token(LCOMPOP); return LCOMPOP;  }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 116 "vgolex.l"
+#line 117 "vgolex.l"
 { set_token(LCOMPOP); return LCOMPOP;  }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 117 "vgolex.l"
+#line 118 "vgolex.l"
 { set_token(LINC); return LINC; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 118 "vgolex.l"
+#line 119 "vgolex.l"
 { set_token(LDEC); return LDEC; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 119 "vgolex.l"
+#line 120 "vgolex.l"
 { set_token(LDDD); return LDDD; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 120 "vgolex.l"
+#line 121 "vgolex.l"
 { set_token(LSEMICOLON); return LSEMICOLON; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 121 "vgolex.l"
+#line 122 "vgolex.l"
 { set_token(LDOT); return LDOT; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 122 "vgolex.l"
+#line 123 "vgolex.l"
 { set_token(LLBODY); return LLBODY; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 123 "vgolex.l"
+#line 124 "vgolex.l"
 { set_token(LRBODY); return LRBODY; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 124 "vgolex.l"
+#line 125 "vgolex.l"
 { set_token(LLPAREN); return LLPAREN; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 125 "vgolex.l"
+#line 126 "vgolex.l"
 { set_token(LRPAREN); return LRPAREN; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 126 "vgolex.l"
+#line 127 "vgolex.l"
 { set_token(LLBRACKET); return LLBRACKET; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 127 "vgolex.l"
+#line 128 "vgolex.l"
 { set_token(LRBRACKET); return LRBRACKET; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 128 "vgolex.l"
+#line 129 "vgolex.l"
 { set_token(LPLUS); return LPLUS; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 129 "vgolex.l"
+#line 130 "vgolex.l"
 { set_token(LMINUS); return LMINUS; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 130 "vgolex.l"
+#line 131 "vgolex.l"
 { set_token(LDIV); return LDIV; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 131 "vgolex.l"
+#line 132 "vgolex.l"
 { set_token(LMUL); return LMUL; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 132 "vgolex.l"
+#line 133 "vgolex.l"
 { set_token(LMOD); return LMOD; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 133 "vgolex.l"
+#line 134 "vgolex.l"
 { set_token(LNOT); return LNOT; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 134 "vgolex.l"
+#line 135 "vgolex.l"
 { set_token(LCOMMA); return LCOMMA; }
 	YY_BREAK
 /* Not supported operators */
 case 57:
 YY_RULE_SETUP
-#line 138 "vgolex.l"
+#line 139 "vgolex.l"
 { set_token(LLSH); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 139 "vgolex.l"
+#line 140 "vgolex.l"
 { set_token(LRSH); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 140 "vgolex.l"
+#line 141 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 141 "vgolex.l"
+#line 142 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 142 "vgolex.l"
+#line 143 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 143 "vgolex.l"
+#line 144 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 144 "vgolex.l"
+#line 145 "vgolex.l"
 { set_token(LCOMM); return LCOMM;  }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 145 "vgolex.l"
+#line 146 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 146 "vgolex.l"
+#line 147 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 147 "vgolex.l"
+#line 148 "vgolex.l"
 { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 148 "vgolex.l"
+#line 149 "vgolex.l"
 { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 149 "vgolex.l"
+#line 150 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 150 "vgolex.l"
+#line 151 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 151 "vgolex.l"
+#line 152 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 152 "vgolex.l"
+#line 153 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 153 "vgolex.l"
+#line 154 "vgolex.l"
 { set_token(LCOLAS); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 154 "vgolex.l"
+#line 155 "vgolex.l"
 { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
 	YY_BREAK
 /* TODO: handle lexical errors */
 /* compound tokens */
-/* comments */
+/* multiline comments */
 case 74:
 YY_RULE_SETUP
 #line 165 "vgolex.l"
@@ -1375,17 +1374,17 @@ case YY_STATE_EOF(comment):
 #line 168 "vgolex.l"
 {  sval = yytext; set_token(LCCOMMENT); return UNTERMINATED_CCOMMENT; }
 	YY_BREAK
-/* C++ comment, a common extension */
+/* single line comment */
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 170 "vgolex.l"
+#line 171 "vgolex.l"
 {  }
 	YY_BREAK
-/* string constant */
+/* string constants */
 case 78:
 YY_RULE_SETUP
-#line 174 "vgolex.l"
+#line 175 "vgolex.l"
 { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
 	YY_BREAK
 case 79:
@@ -1393,85 +1392,85 @@ case 79:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 175 "vgolex.l"
+#line 176 "vgolex.l"
 { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
 	YY_BREAK
 /* runes */
 case 80:
 YY_RULE_SETUP
-#line 178 "vgolex.l"
+#line 180 "vgolex.l"
 { set_token(LRUNE); return ILLEGAL_RUNE; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 179 "vgolex.l"
+#line 181 "vgolex.l"
 { set_token(LRUNE); return LRUNE; }
 	YY_BREAK
-/* identifier */
+/* identifiers */
 case 82:
 YY_RULE_SETUP
-#line 183 "vgolex.l"
+#line 185 "vgolex.l"
 { sval = ""; set_token(LNAME); return LNAME; } 
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 184 "vgolex.l"
+#line 186 "vgolex.l"
 { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
 	YY_BREAK
 /* numbers */
 case 84:
 YY_RULE_SETUP
-#line 187 "vgolex.l"
+#line 190 "vgolex.l"
 { set_token(LIMAGINARY); return IMAGINARY_NOT_SUPPORTED; }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 188 "vgolex.l"
+#line 191 "vgolex.l"
 { ival = (int)strtol(yytext, NULL, 16); set_token(LHEX); return LHEX; }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 189 "vgolex.l"
+#line 192 "vgolex.l"
 { ival = (int)strtol(yytext, NULL, 2); set_token(LBINARY); return LBINARY; }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 190 "vgolex.l"
+#line 193 "vgolex.l"
 { ival = (int)strtol(yytext, NULL, 8); set_token(LOCTAL); return LOCTAL; }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 191 "vgolex.l"
+#line 194 "vgolex.l"
 { ival = atoi(yytext); set_token(LINT); return LINT; }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 192 "vgolex.l"
+#line 195 "vgolex.l"
 { dval = atof(yytext); set_token(LREAL); return LREAL; }
 	YY_BREAK
 /* new line, unknown characters, and eof */
-/* print lexical error not recognized! */
 case 90:
 /* rule 90 can match eol */
 YY_RULE_SETUP
-#line 197 "vgolex.l"
+#line 199 "vgolex.l"
 { sval = "\0"; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 199 "vgolex.l"
+#line 201 "vgolex.l"
 { set_token(LINVALIDCHAR); return INVALID_CHARACTER; }
 	YY_BREAK
+/* end of file */
 case YY_STATE_EOF(INITIAL):
-#line 201 "vgolex.l"
+#line 204 "vgolex.l"
 { yylineno = 1; return 0; }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 202 "vgolex.l"
+#line 205 "vgolex.l"
 ECHO;
 	YY_BREAK
-#line 1475 "lex.yy.c"
+#line 1474 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2445,7 +2444,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 202 "vgolex.l"
+#line 205 "vgolex.l"
 
 
 
