@@ -70,7 +70,7 @@
 #define LCCOMMENT 308
 #define LSTRING 309
 #define LINT 310
-#define LREAL 311
+#define LREAL 311 /* float64 */
 #define LRUNE 312
 #define LSEMICOLON 313
 #define LDOT 314
@@ -91,5 +91,7 @@
 #define LHEX 329
 #define LBINARY 330
 #define LOCTAL 331
+#define LBOOL 332
+#define LVARTYPE 333
 
 #endif

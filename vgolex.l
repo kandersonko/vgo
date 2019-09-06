@@ -96,6 +96,9 @@ go                { set_token(LGO); return KEYWORD_NOT_SUPPORTED; }
 switch          { set_token(LSWITCH); return KEYWORD_NOT_SUPPORTED; }
 select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
+    /* types */
+"true"|"false"  { set_token(LBOOL); return LBOOL; }
+"bool"|"int"|"float64"|"string"  { set_token(LVARTYPE); return LVARTYPE; }
 
     /* Supported operators */
 
