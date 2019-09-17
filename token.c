@@ -4,6 +4,8 @@
 #include "token.h"
 #include "vgo.tab.h"
 
+void yyerror(char *s);
+
 // create a token struct
 token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval)
 {

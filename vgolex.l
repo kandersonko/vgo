@@ -1,23 +1,25 @@
 
 %{
 #include<stdlib.h>
-#include "vgo.tab.h"
+#include "go.tab.h"
 #include "token.h"
+#include "tree.h"
+#include "utils.h"
 
 
 
-token_ptr yytoken;
+// token_ptr yytoken;
 
-extern char* filename;
+char* filename;
 
-char *sval = "\0";
-int ival;
-double dval;
-
+// char *sval = NULL;
+// int ival;
+// double dval;
 
 void set_token(int category)
 {
-    yytoken = create_token(category, filename, yylineno, yytext, ival, dval, sval);
+    printf("yylval: %s\n", yylval.sval);
+    // yylval->t = create_token(yylval->t->category, filename, yylineno, yytext, yylval->t->ival, yylval->t->dval, yylval->t->sval);
 }
 
 // remove \t \n and quotes (") from string
@@ -33,9 +35,11 @@ char* strip_chars(char* text)
     return s3;
 }
 
+// TODO: declare union type for yylval
 
 %}
 %option noyywrap noinput nounput yylineno
+
 
 digit           [0-9]+
 binary          "0"("b"|"B")(0|1)+
@@ -55,8 +59,8 @@ imaginary   ({number})"i"
 %%
 
     /* types */
-"true"|"false"  { set_token(LBOOL); return LBOOL; }
-"bool"|"int"|"float64"|"string"  { set_token(LVARTYPE); return LVARTYPE; }
+    /* "true"|"false"  { set_token(LBOOL); return LBOOL; }
+    "bool"|"int"|"float64"|"string"  { set_token(LVARTYPE); return LVARTYPE; } */
 
 
     /* Supported keywords */
@@ -103,55 +107,57 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* Supported operators */
-"=="          { set_token(LEQ); return LEQ;  }
-"<"          { set_token(LLT); return LLT;  }
-">"          { set_token(LGT); return LGT;  }
-"<="          { set_token(LLE); return LLE;  }
-">="          { set_token(LGE); return LGE;  }
-"!="          { set_token(LNE); return LNE;  }
-"&&"          { set_token(LANDAND); return LANDAND;  }
-"||"          { set_token(LOROR); return LOROR;  }
-"="          { set_token(LASOP); return LASOP;  }
-"+="          { set_token(LCOMPOP); return LCOMPOP;  }
-"-="          { set_token(LCOMPOP); return LCOMPOP;  }
-"++"           { set_token(LINC); return LINC; }
-"--"           { set_token(LDEC); return LDEC; }
-"..."           { set_token(LDDD); return LDDD; }
-";"           { set_token(LSEMICOLON); return LSEMICOLON; }
-"."           { set_token(LDOT); return LDOT; }
-"{"           { set_token(LLBODY); return LLBODY; }
-"}"           { set_token(LRBODY); return LRBODY; }
-"("           { set_token(LLPAREN); return LLPAREN; }
-")"           { set_token(LRPAREN); return LRPAREN; }
-"["           { set_token(LLBRACKET); return LLBRACKET; }
-"]"           { set_token(LRBRACKET); return LRBRACKET; }
-"+"           { set_token(LPLUS); return LPLUS; }
-"-"           { set_token(LMINUS); return LMINUS; }
-"/"           { set_token(LDIV); return LDIV; }
-"*"           { set_token(LMUL); return LMUL; }
-"%"           { set_token(LMOD); return LMOD; }
-"!"           { set_token(LNOT); return LNOT; }
-","           { set_token(LCOMMA); return LCOMMA; }
+    /*
+    "=="          { set_token(LEQ); return LEQ;  }
+    "<"          { set_token(LLT); return LLT;  }
+    ">"          { set_token(LGT); return LGT;  }
+    "<="          { set_token(LLE); return LLE;  }
+    ">="          { set_token(LGE); return LGE;  }
+    "!="          { set_token(LNE); return LNE;  }
+    "&&"          { set_token(LANDAND); return LANDAND;  }
+    "||"          { set_token(LOROR); return LOROR;  }
+    "="          { set_token(LASOP); return LASOP;  }
+    "+="          { set_token(LCOMPOP); return LCOMPOP;  }
+    "-="          { set_token(LCOMPOP); return LCOMPOP;  }
+    "++"           { set_token(LINC); return LINC; }
+    "--"           { set_token(LDEC); return LDEC; }
+    "..."           { set_token(LDDD); return LDDD; }
+    ";"           { set_token(LSEMICOLON); return LSEMICOLON; }
+    "."           { set_token(LDOT); return LDOT; }
+    "{"           { set_token(LLBODY); return LLBODY; }
+    "}"           { set_token(LRBODY); return LRBODY; }
+    "("           { set_token(LLPAREN); return LLPAREN; }
+    ")"           { set_token(LRPAREN); return LRPAREN; }
+    "["           { set_token(LLBRACKET); return LLBRACKET; }
+    "]"           { set_token(LRBRACKET); return LRBRACKET; }
+    "+"           { set_token(LPLUS); return LPLUS; }
+    "-"           { set_token(LMINUS); return LMINUS; }
+    "/"           { set_token(LDIV); return LDIV; }
+    "*"           { set_token(LMUL); return LMUL; }
+    "%"           { set_token(LMOD); return LMOD; }
+    "!"           { set_token(LNOT); return LNOT; }
+    ","           { set_token(LCOMMA); return LCOMMA; } */
 
 
-    /* Not supported operators */
-"<<"          { set_token(LLSH); return OPERATOR_NOT_SUPPORTED;  }
-">>"          { set_token(LRSH); return OPERATOR_NOT_SUPPORTED;  }
-"<<="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-">>="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"/="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"%="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"<-"          { set_token(LCOMM); return LCOMM;  }
-":"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"&"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"&^"          { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
-"&^="          { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
-"&="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"*="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"|="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-"|"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
-":="          { set_token(LCOLAS); return OPERATOR_NOT_SUPPORTED;  }
-"^"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+        /* Not supported operators */
+    /*
+    "<<"          { set_token(LLSH); return OPERATOR_NOT_SUPPORTED;  }
+    ">>"          { set_token(LRSH); return OPERATOR_NOT_SUPPORTED;  }
+    "<<="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    ">>="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "/="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "%="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "<-"          { set_token(LCOMM); return LCOMM;  }
+    ":"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "&"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "&^"          { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
+    "&^="          { set_token(LANDNOT); return OPERATOR_NOT_SUPPORTED;  }
+    "&="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "*="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "|="          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    "|"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  }
+    ":="          { set_token(LCOLAS); return OPERATOR_NOT_SUPPORTED;  }
+    "^"          { set_token(LINVALIDOP); return OPERATOR_NOT_SUPPORTED;  } */
 
 
 
@@ -161,43 +167,47 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* multiline comments */
-"/*" { BEGIN(comment); }
-<comment>"*/" {  BEGIN(INITIAL); set_token(LCCOMMENT); return CCOMMENT_NOT_ALLOWED; }
-<comment>([^*]|\n)+|.
-<comment><<EOF>> {  sval = yytext; set_token(LCCOMMENT); return UNTERMINATED_CCOMMENT; }
+    "/*" { BEGIN(comment); }
+    <comment>"*/" {  BEGIN(INITIAL); return CCOMMENT_NOT_ALLOWED; }
+    <comment>([^*]|\n)+|.
+    <comment><<EOF>> { return UNTERMINATED_CCOMMENT; }
 
  /* single line comment */
 "//".*\n    {  }
 
 
     /* string constants */
-\"[^\"\n]*\"    { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
-\"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
-
+    /*
+    \"[^\"\n]*\"    { sval = strip_chars(yytext); set_token(LSTRING); free(sval); return LSTRING; }
+    \"[^\"\n]*$     { sval = " "; set_token(LSTRING); return UNTERMINATED_STRING;}
+    */
 
     /* runes */
-{invalid_runes}  { set_token(LRUNE); return ILLEGAL_RUNE; }
-{runes}  { set_token(LRUNE); return LRUNE; }
+    /*
+    {invalid_runes}  { set_token(LRUNE); return ILLEGAL_RUNE; }
+    {runes}  { set_token(LRUNE); return LRUNE; }
+    */
 
 
     /* identifiers */
-[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { sval = ""; set_token(LNAME); return LNAME; } 
-[a-zA-Z_]([a-zA-Z0-9_]){12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { yylval.sval = ""; set_token(LNAME); return LNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){12,}  { yylval.sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
 
 
     /* numbers */
-{imaginary}     { set_token(LIMAGINARY); return IMAGINARY_NOT_SUPPORTED; }
-{hex}  { ival = (int)strtol(yytext, NULL, 16); set_token(LHEX); return LHEX; }
-{binary}  { ival = (int)strtol(yytext, NULL, 2); set_token(LBINARY); return LBINARY; }
-{octal}  { ival = (int)strtol(yytext, NULL, 8); set_token(LOCTAL); return LOCTAL; }
-{integer}  { ival = atoi(yytext); set_token(LINT); return LINT; }
-{real}  { dval = atof(yytext); set_token(LREAL); return LREAL; }
+    /*
+    {imaginary}     { set_token(LIMAGINARY); return IMAGINARY_NOT_SUPPORTED; }
+    {hex}  { ival = (int)strtol(yytext, NULL, 16); set_token(LHEX); return LHEX; }
+    {binary}  { ival = (int)strtol(yytext, NULL, 2); set_token(LBINARY); return LBINARY; }
+    {octal}  { ival = (int)strtol(yytext, NULL, 8); set_token(LOCTAL); return LOCTAL; }
+    {integer}  { ival = atoi(yytext); set_token(LINT); return LINT; }
+    {real}  { dval = atof(yytext); set_token(LREAL); return LREAL; } */
 
 
     /* new line, unknown characters, and eof */
-[ \t\n]+        { sval = "\0"; }
+[ \t\n]+        { yylval.sval = "\0"; }
 
-.               { set_token(LINVALIDCHAR); return INVALID_CHARACTER; }
+.               { set_token(LNAME); return INVALID_CHARACTER; }
 
     /* end of file */
 <<EOF>>         { yylineno = 1; return 0; }

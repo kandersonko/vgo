@@ -3,6 +3,9 @@
 
 #define YY_BUFFER_SIZE 16384
 
+// TODO: yylex should always return positive numbers
+// zero or negative means EOF
+
 // error codes
 #define KEYWORD_NOT_SUPPORTED -1
 #define OPERATOR_NOT_SUPPORTED -2

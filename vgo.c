@@ -6,6 +6,8 @@
 
 extern int yylex();
 
+int yyparse();
+
 extern FILE *yyin;
 
 char *filename;
@@ -17,6 +19,11 @@ void print_error(int tokentype);
 const char *get_filename_ext(const char *filename);
 
 char *rename_go_file(char *name);
+
+void yyerror(char const *s)
+{
+    fprintf(stderr, "%s\n", s);
+}
 
 int main(int argc, char **argv)
 {
@@ -31,9 +38,6 @@ int main(int argc, char **argv)
     argc--;
     argv++;
     int i;
-    char *error_file;
-    int error_lineno;
-    int tokentype;
 
     for (i = 0; i < argc; i++)
     {
@@ -50,24 +54,14 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        while ((tokentype = yylex()))
+        int parse_result = yyparse();
+        if (parse_result == 0)
         {
-            root = add_node(root, yytoken);
-            error_lineno = yytoken->lineno;
-            free(yytoken);
-            if (tokentype < 0)
-            {
-                error_file = filename;
-                print_list(root);
-                print_error(tokentype);
-                fprintf(stderr, "ERROR: found in file \"%s\" at line %d!\n", error_file, error_lineno);
-
-                delete_list(root);
-                fclose(yyin);
-                yylex_destroy();
-
-                return -1;
-            }
+            // parse successfull
+        }
+        else
+        {
+            // parse failed due to error
         }
         fclose(yyin);
     }
@@ -78,41 +72,6 @@ int main(int argc, char **argv)
     yylex_destroy();
 
     return 0;
-}
-
-void print_error(int tokentype)
-{
-    switch (tokentype)
-    {
-    case KEYWORD_NOT_SUPPORTED:
-        fprintf(stderr, "Go keyword not in VGo!\n");
-        break;
-    case OPERATOR_NOT_SUPPORTED:
-        fprintf(stderr, "Go operator not in VGo!\n");
-        break;
-    case UNTERMINATED_STRING:
-        fprintf(stderr, "ERROR: unterminated string found!\n");
-        break;
-    case CCOMMENT_NOT_ALLOWED:
-        fprintf(stderr, "C comments not allowed in VGo!\n");
-        break;
-    case UNTERMINATED_CCOMMENT:
-        fprintf(stderr, "Unterminated C comments!\nC comments not allowed in VGo!\n");
-    case INVALID_CHARACTER:
-        fprintf(stderr, "Invalid character, not allowed in VGo!\n");
-        break;
-    case ILLEGAL_RUNE:
-        fprintf(stderr, "Invalid rune literal, not allowed in VGo!\n");
-        break;
-    case INVALID_VARNAME:
-        fprintf(stderr, "Invalid variable length, a length greater than 12 is not allowed in VGo!\n");
-        break;
-    case IMAGINARY_NOT_SUPPORTED:
-        fprintf(stderr, "Imaginary numbers are not allowed in VGo!\n");
-        break;
-    default:
-        break;
-    }
 }
 
 // code found on stackoverflow
