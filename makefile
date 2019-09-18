@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-c -g -Wall
-OBJ=vgo.o lex.yy.o token.o go.tab.o
+OBJ=vgo.o lex.yy.o token.o tree.o utils.o go.tab.o
 binaries=vgo
 files=vgo.c token.c token.h go.tab.h vgolex.l makefile
 
@@ -18,6 +18,12 @@ lex.yy.c: vgolex.l go.tab.h
 
 token.o: token.c
 	$(CC) $(CFLAGS) token.c
+
+tree.o: tree.c
+	$(CC) $(CFLAGS) tree.c
+
+utils.o: utils.c
+	$(CC) $(CFLAGS) utils.c
 
 go.tab.o: go.tab.c
 	$(CC) $(CFLAGS) go.tab.c

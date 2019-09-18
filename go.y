@@ -41,13 +41,15 @@ int yyprev;
 // } YYLTYPE;
 
 enum ErrorCode error_code;
+char* yyfilename;
+int yylineno;
+char* yytext;
 
 // void yyerror(char *s)
 // {
 //    fprintf(stderr, "%s:%d: %s before '%s' token\n",
 // 	   yyfilename, yylineno, s, yytext);
 // }
-
 
 
 %}

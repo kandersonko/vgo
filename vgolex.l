@@ -10,11 +10,18 @@
 
 // token_ptr yytoken;
 
-char* filename;
+extern char* yyfilename;
 
 // char *sval = NULL;
 // int ival;
 // double dval;
+
+// void yyerror(char *s)
+// {
+//    fprintf(stderr, "%s:%d: %s before '%s' token\n",
+// 	   yyfilename, yylineno, s, yytext);
+// }
+
 
 void set_token(int category)
 {

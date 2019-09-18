@@ -86,6 +86,9 @@ int yyprev;
 // } YYLTYPE;
 
 enum ErrorCode error_code;
+char* yyfilename;
+int yylineno;
+char* yytext;
 
 // void yyerror(char *s)
 // {
@@ -95,8 +98,7 @@ enum ErrorCode error_code;
 
 
 
-
-#line 100 "go.tab.c" /* yacc.c:339  */
+#line 102 "go.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -188,7 +190,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 56 "go.y" /* yacc.c:355  */
+#line 58 "go.y" /* yacc.c:355  */
 
 	struct tree* ast;
 	struct token* t;
@@ -197,7 +199,7 @@ union YYSTYPE
 	double dval;
 	int ival;
 
-#line 201 "go.tab.c" /* yacc.c:355  */
+#line 203 "go.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -214,7 +216,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 218 "go.tab.c" /* yacc.c:358  */
+#line 220 "go.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -516,40 +518,40 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   151,   151,   154,   159,   162,   163,   166,   167,   168,
-     172,   176,   177,   181,   182,   183,   187,   190,   191,   195,
-     201,   205,   206,   207,   212,   219,   220,   221,   222,   223,
-     224,   225,   226,   227,   228,   232,   236,   237,   238,   242,
-     243,   247,   248,   249,   253,   261,   265,   266,   267,   268,
-     269,   270,   274,   275,   276,   277,   281,   287,   286,   313,
-     314,   318,   323,   324,   328,   329,   330,   334,   338,   343,
-     344,   349,   356,   360,   361,   364,   365,   369,   375,   383,
-     384,   385,   386,   387,   388,   389,   390,   391,   392,   393,
-     394,   395,   396,   397,   398,   399,   400,   401,   402,   404,
-     408,   409,   410,   411,   412,   413,   414,   418,   419,   427,
-     428,   429,   433,   434,   435,   436,   437,   438,   439,   440,
-     441,   442,   443,   444,   445,   449,   452,   459,   463,   464,
-     468,   469,   473,   474,   478,   479,   482,   485,   486,   495,
-     499,   502,   503,   507,   508,   509,   513,   514,   518,   522,
-     535,   539,   543,   544,   545,   546,   547,   548,   552,   553,
-     554,   555,   559,   560,   561,   562,   563,   567,   568,   571,
-     575,   576,   577,   578,   579,   583,   584,   588,   589,   590,
-     591,   592,   593,   594,   598,   602,   606,   607,   611,   612,
-     620,   624,   625,   629,   630,   634,   637,   638,   642,   643,
-     644,   648,   652,   653,   661,   662,   666,   667,   671,   672,
-     676,   677,   681,   682,   686,   687,   691,   692,   693,   694,
-     695,   696,   700,   701,   705,   709,   710,   711,   715,   722,
-     723,   724,   725,   729,   730,   733,   734,   740,   741,   742,
-     743,   744,   748,   749,   750,   751,   752,   753,   755,   756,
-     757,   758,   759,   760,   761,   765,   766,   770,   771,   775,
-     776,   780,   781,   785,   786,   793,   794,   795,   796,   799,
-     800,   806,   807,   810,   811,   814,   815,   818,   819,   822,
-     823,   826,   827,   830,   831,   834,   835,   838,   839,   846,
-     847,   848,   849,   850,   851,   855,   859,   867,   868,   869,
-     873,   874,   878,   879,   880,   881,   882,   883,   884,   885,
-     886,   887,   888,   892,   896,   900,   901,   905,   909,   910,
-     913,   914,   918,   919,   927,   928,   929,   933,   934,   937,
-     938,   942,   943,   947,   948,   952,   953
+       0,   153,   153,   156,   161,   164,   165,   168,   169,   170,
+     174,   178,   179,   183,   184,   185,   189,   192,   193,   197,
+     203,   207,   208,   209,   214,   221,   222,   223,   224,   225,
+     226,   227,   228,   229,   230,   234,   238,   239,   240,   244,
+     245,   249,   250,   251,   255,   263,   267,   268,   269,   270,
+     271,   272,   276,   277,   278,   279,   283,   289,   288,   315,
+     316,   320,   325,   326,   330,   331,   332,   336,   340,   345,
+     346,   351,   358,   362,   363,   366,   367,   371,   377,   385,
+     386,   387,   388,   389,   390,   391,   392,   393,   394,   395,
+     396,   397,   398,   399,   400,   401,   402,   403,   404,   406,
+     410,   411,   412,   413,   414,   415,   416,   420,   421,   429,
+     430,   431,   435,   436,   437,   438,   439,   440,   441,   442,
+     443,   444,   445,   446,   447,   451,   454,   461,   465,   466,
+     470,   471,   475,   476,   480,   481,   484,   487,   488,   497,
+     501,   504,   505,   509,   510,   511,   515,   516,   520,   524,
+     537,   541,   545,   546,   547,   548,   549,   550,   554,   555,
+     556,   557,   561,   562,   563,   564,   565,   569,   570,   573,
+     577,   578,   579,   580,   581,   585,   586,   590,   591,   592,
+     593,   594,   595,   596,   600,   604,   608,   609,   613,   614,
+     622,   626,   627,   631,   632,   636,   639,   640,   644,   645,
+     646,   650,   654,   655,   663,   664,   668,   669,   673,   674,
+     678,   679,   683,   684,   688,   689,   693,   694,   695,   696,
+     697,   698,   702,   703,   707,   711,   712,   713,   717,   724,
+     725,   726,   727,   731,   732,   735,   736,   742,   743,   744,
+     745,   746,   750,   751,   752,   753,   754,   755,   757,   758,
+     759,   760,   761,   762,   763,   767,   768,   772,   773,   777,
+     778,   782,   783,   787,   788,   795,   796,   797,   798,   801,
+     802,   808,   809,   812,   813,   816,   817,   820,   821,   824,
+     825,   828,   829,   832,   833,   836,   837,   840,   841,   848,
+     849,   850,   851,   852,   853,   857,   861,   869,   870,   871,
+     875,   876,   880,   881,   882,   883,   884,   885,   886,   887,
+     888,   889,   890,   894,   898,   902,   903,   907,   911,   912,
+     915,   916,   920,   921,   929,   930,   931,   935,   936,   939,
+     940,   944,   945,   949,   950,   954,   955
 };
 #endif
 
@@ -2083,51 +2085,51 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 155 "go.y" /* yacc.c:1646  */
+#line 157 "go.y" /* yacc.c:1646  */
     {
 		yyerror("package statement must be first");
 		exit(1);
 	}
-#line 2092 "go.tab.c" /* yacc.c:1646  */
+#line 2094 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 201 "go.y" /* yacc.c:1646  */
+#line 203 "go.y" /* yacc.c:1646  */
     {
 		yyerror("empty top-level declaration");
 		// $$ = nil;
 	}
-#line 2101 "go.tab.c" /* yacc.c:1646  */
+#line 2103 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 208 "go.y" /* yacc.c:1646  */
+#line 210 "go.y" /* yacc.c:1646  */
     {
 		yyerror("non-declaration statement outside function body");
 		// $$ = nil;
 	}
-#line 2110 "go.tab.c" /* yacc.c:1646  */
+#line 2112 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 213 "go.y" /* yacc.c:1646  */
+#line 215 "go.y" /* yacc.c:1646  */
     {
 		// $$ = nil;
 	}
-#line 2118 "go.tab.c" /* yacc.c:1646  */
+#line 2120 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 254 "go.y" /* yacc.c:1646  */
+#line 256 "go.y" /* yacc.c:1646  */
     {
 		// the name becomes visible right here, not at the end
 		// of the declaration.
 	}
-#line 2127 "go.tab.c" /* yacc.c:1646  */
+#line 2129 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 287 "go.y" /* yacc.c:1646  */
+#line 289 "go.y" /* yacc.c:1646  */
     {
 		// If the last token read by the lexer was consumed
 		// as part of the case, clear it (parser has cleared yychar).
@@ -2137,11 +2139,11 @@ yyreduce:
 		// the case tokens if the stmt_list is empty.
 		yylast = yychar;
 	}
-#line 2141 "go.tab.c" /* yacc.c:1646  */
+#line 2143 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 297 "go.y" /* yacc.c:1646  */
+#line 299 "go.y" /* yacc.c:1646  */
     {
 		int last;
 
@@ -2157,44 +2159,44 @@ yyreduce:
 		if(last > 0 && last != ';' && yychar != '}')
 			yyerror("missing statement after label");
 	}
-#line 2161 "go.tab.c" /* yacc.c:1646  */
+#line 2163 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 106:
-#line 415 "go.y" /* yacc.c:1646  */
+#line 417 "go.y" /* yacc.c:1646  */
     {
 		yyerror("the bitwise complement operator is ^");
 	}
-#line 2169 "go.tab.c" /* yacc.c:1646  */
+#line 2171 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 446 "go.y" /* yacc.c:1646  */
+#line 448 "go.y" /* yacc.c:1646  */
     {
 		yyerror("cannot parenthesize type in composite literal");
 	}
-#line 2177 "go.tab.c" /* yacc.c:1646  */
+#line 2179 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 126:
-#line 452 "go.y" /* yacc.c:1646  */
+#line 454 "go.y" /* yacc.c:1646  */
     {
 		// composite expression.
 		// make node early so we get the right line number.
 	}
-#line 2186 "go.tab.c" /* yacc.c:1646  */
+#line 2188 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 150:
-#line 536 "go.y" /* yacc.c:1646  */
+#line 538 "go.y" /* yacc.c:1646  */
     {
 		yyerror("final argument in variadic function missing type");
 	}
-#line 2194 "go.tab.c" /* yacc.c:1646  */
+#line 2196 "go.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2198 "go.tab.c" /* yacc.c:1646  */
+#line 2200 "go.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2422,5 +2424,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 956 "go.y" /* yacc.c:1906  */
+#line 958 "go.y" /* yacc.c:1906  */
 

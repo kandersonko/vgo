@@ -102,7 +102,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 56 "go.y" /* yacc.c:1909  */
+#line 58 "go.y" /* yacc.c:1909  */
 
 	struct tree* ast;
 	struct token* t;
