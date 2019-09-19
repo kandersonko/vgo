@@ -8,25 +8,18 @@
 
 
 
-// token_ptr yytoken;
+token_ptr yytoken;
 
-extern char* yyfilename;
+char* yyfilename = NULL;
+char* yytext;
 
-// char *sval = NULL;
-// int ival;
-// double dval;
-
-// void yyerror(char *s)
-// {
-//    fprintf(stderr, "%s:%d: %s before '%s' token\n",
-// 	   yyfilename, yylineno, s, yytext);
-// }
-
+char *sval = "\0";
+int ival;
+double dval;
 
 void set_token(int category)
 {
-    printf("yylval: %s\n", yylval.sval);
-    // yylval->t = create_token(yylval->t->category, filename, yylineno, yytext, yylval->t->ival, yylval->t->dval, yylval->t->sval);
+    yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, dval, sval);
 }
 
 // remove \t \n and quotes (") from string
@@ -112,7 +105,7 @@ switch          { set_token(LSWITCH); return KEYWORD_NOT_SUPPORTED; }
 select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
-
+";"           { set_token(';'); return ';'; }
     /* Supported operators */
     /*
     "=="          { set_token(LEQ); return LEQ;  }
@@ -197,8 +190,8 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* identifiers */
-[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { yylval.sval = ""; set_token(LNAME); return LNAME; } 
-[a-zA-Z_]([a-zA-Z0-9_]){12,}  { yylval.sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { sval = ""; set_token(LNAME); return LNAME; } 
+[a-zA-Z_]([a-zA-Z0-9_]){12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
 
 
     /* numbers */
@@ -212,7 +205,7 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* new line, unknown characters, and eof */
-[ \t\n]+        { yylval.sval = "\0"; }
+[ \t\n]+        { sval = "\0"; }
 
 .               { set_token(LNAME); return INVALID_CHARACTER; }
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "token.h"
+#include "tree.h"
 #include "vgo.tab.h"
 #include <string.h>
 
@@ -10,7 +11,7 @@ int yyparse();
 
 extern FILE *yyin;
 
-char *filename;
+extern char *yyfilename;
 
 int yylex_destroy();
 
@@ -20,11 +21,6 @@ const char *get_filename_ext(const char *filename);
 
 char *rename_go_file(char *name);
 
-void yyerror(char const *s)
-{
-    fprintf(stderr, "%s\n", s);
-}
-
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -33,7 +29,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    tokenlist_ptr root = NULL;
+    tree_ptr ast = NULL;
 
     argc--;
     argv++;
@@ -41,34 +37,36 @@ int main(int argc, char **argv)
 
     for (i = 0; i < argc; i++)
     {
-        filename = rename_go_file(argv[i]);
-        if (!filename)
+        yyfilename = rename_go_file(argv[i]);
+        if (!yyfilename)
         {
             return -1;
         }
 
-        if (!(yyin = fopen(filename, "r")))
+        if (!(yyin = fopen(yyfilename, "r")))
         {
-            printf("ERROR: could not open file \"%s\"!\n", filename);
+            printf("ERROR: could not open file \"%s\"!\n", yyfilename);
             perror(argv[i]);
             return -1;
         }
 
-        int parse_result = yyparse();
-        if (parse_result == 0)
+        ast = yyparse();
+        if (!ast)
         {
             // parse successfull
+
+            print_tree(ast, 0);
+
+            delete_tree(ast);
         }
         else
         {
             // parse failed due to error
+            printf("ERROR: parsing failed for file \"%s\"!\n", yyfilename);
         }
         fclose(yyin);
     }
 
-    print_list(root);
-
-    delete_list(root);
     yylex_destroy();
 
     return 0;

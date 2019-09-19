@@ -21,12 +21,16 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "token.h"
 #include "tree.h"
 #include "utils.h"
 
+// #define YYDEBUG 1
+// int yydebug=1;
+
 int yylex (void);
-void yyerror (char const *);
+// void yyerror (char const *);
 
 int yylast;
 int yyprev;
@@ -45,11 +49,14 @@ char* yyfilename;
 int yylineno;
 char* yytext;
 
-// void yyerror(char *s)
-// {
-//    fprintf(stderr, "%s:%d: %s before '%s' token\n",
-// 	   yyfilename, yylineno, s, yytext);
-// }
+void yyerror(const char *s)
+{
+	fprintf(stderr, "%s\n", s);
+	
+   fprintf(stderr, "syntax error: unespected '%s' token in file %s, line %d\n",
+	   yytext,yyfilename, yylineno);
+}
+
 
 
 %}
@@ -58,13 +65,9 @@ char* yytext;
 %union {
 	struct tree* ast;
 	struct token* t;
-
-	char *sval;
-	double dval;
-	int ival;
 }
 
-%token<sval>		LLITERAL
+%token<t>		LLITERAL
 %token<t>		LASOP LCOLAS
 %token<t>		LBREAK LCASE LCHAN LCONST LCONTINUE LDDD
 %token<t>		LDEFAULT LDEFER LELSE LFALL LFOR LFUNC LGO LGOTO
@@ -75,9 +78,14 @@ char* yytext;
 %token<t>		LANDAND LANDNOT LBODY LCOMM LDEC LEQ LGE LGT
 %token<t>		LIGNORE LINC LLE LLSH LLT LNE LOROR LRSH
 
+
+%type<t>		sym packname
+%type<ast>		package
+%type<t>		hidden_importsym hidden_pkg_importsym
+%type<ast>		file
+
 /*
 %type		lbrace import_here
-%type		sym packname
 %type		oliteral
 
 %type		stmt ntype
@@ -107,7 +115,6 @@ char* yytext;
 %type		indcl interfacetype structtype ptrtype
 %type		recvchantype non_recvchantype othertype fnret_type fntype
 
-%type		hidden_importsym hidden_pkg_importsym
 
 %type		hidden_constant hidden_literal hidden_funarg
 %type		hidden_interfacedcl hidden_structdcl
@@ -149,8 +156,18 @@ char* yytext;
 
 %error-verbose
 
+%token END 0 "end of file"
+
 %%
-file:	package	imports	xdcl_list ;
+file:	package
+{
+	// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
+	// struct tree **create_tree_kids(int nkids, ...)
+	struct tree** kids = create_tree_kids(1, $1);
+	$$ = new_tree_node(@$.first_line, "file", 1, kids, NULL);
+	print_tree($$, 0);
+}
+;
 
 package:
 	%prec NotPackage 
@@ -158,11 +175,18 @@ package:
 		yyerror("package statement must be first");
 		exit(1);
 	}
-|	LPACKAGE sym ';'
-	;
+|	LPACKAGE ';' END 
+	{ 
+		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
+		// struct tree **create_tree_kids(int nkids, ...)
+		struct tree** kids = NULL;
+		$$ = new_tree_node(@$.first_line, "package", 0, kids, $1);
+		// print_tree($$, 0);
+	}
+;
 
 imports:
-|	imports import ';'
+|	imports import ';' 
 
 import:
 	LIMPORT import_stmt
@@ -508,12 +532,20 @@ onew_name:
 sym:
 	LNAME
 |	hidden_importsym
-|	'?'
+|	'?' { $$ = NULL; }
 	;
 
 hidden_importsym:
 	'@' LLITERAL '.' LNAME
+	{
+		$2->sval = strcat($2->sval, $4->sval);
+		$2->text = strcat($2->text, $4->text);
+		$$ = $2;
+	}
 |	'@' LLITERAL '.' '?'
+	{
+		$$ = $2;
+	}
 	;
 
 name:
