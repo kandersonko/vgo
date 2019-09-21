@@ -10,7 +10,7 @@ void print_tree(tree_ptr ast, int depth)
     int i;
     printf("Printing tree:\n");
 
-    printf("rule %d:%s \t nkids: %d \t depth: %d\n", ast->prodrule, ast->prodname, ast->nkids, depth);
+    printf("rule %d:%s \tnkids: %d \tdepth: %d\n", ast->prodrule, ast->prodname, ast->nkids, depth);
     if (ast->leaf)
     {
         printf("\tleaf:");

@@ -21,81 +21,33 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "token.h"
-#include "tree.h"
-#include "utils.h"
-
-// #define YYDEBUG 1
-// int yydebug=1;
-
-struct tree* ast_root;
-
-int yylex (void);
-// void yyerror (char const *);
-
-int yylast;
-int yyprev;
-
-// for location tracking
-// typedef struct YYLTYPE
-// {
-// 	int first_line;
-// 	int first_column;
-// 	int last_line;
-// 	int last_column;
-// } YYLTYPE;
-
-enum ErrorCode error_code;
-char* yyfilename;
-int yylineno;
-char* yytext;
-
-int ruleno = 0;
-
-void yyerror(const char *s)
-{
-	fprintf(stderr, "%s\n", s);
-	
-   fprintf(stderr, "syntax error: unespected '%s' token in file %s, line %d\n",
-	   yytext,yyfilename, yylineno);
-}
-
-
-
+int yylex();
+int yyerror();
+#define YYDEBUG 1
 %}
 
-// specify union types
+/*
 %union {
-	struct tree* ast;
-	struct token* t;
+ struct token *t;
+ struct treenode *n;
 }
+*/
 
-%token<t>		LLITERAL
-%token<t>		LASOP LCOLAS
-%token<t>		LBREAK LCASE LCHAN LCONST LCONTINUE LDDD
-%token<t>		LDEFAULT LDEFER LELSE LFALL LFOR LFUNC LGO LGOTO
-%token<t>		LIF LIMPORT LINTERFACE LMAP LNAME
-%token<t>		LPACKAGE LRANGE LRETURN LSELECT LSTRUCT LSWITCH
-%token<t>		LTYPE LVAR
+%token 		LLITERAL
+%token		LASOP LCOLAS
+%token		LBREAK LCASE LCHAN LCONST LCONTINUE LDDD
+%token		LDEFAULT LDEFER LELSE LFALL LFOR LFUNC LGO LGOTO
+%token		LIF LIMPORT LINTERFACE LMAP LNAME
+%token		LPACKAGE LRANGE LRETURN LSELECT LSTRUCT LSWITCH
+%token		LTYPE LVAR
 
-%token<t>		LANDAND LANDNOT LBODY LCOMM LDEC LEQ LGE LGT
-%token<t>		LIGNORE LINC LLE LLSH LLT LNE LOROR LRSH
+%token		LANDAND LANDNOT LCOMM LDEC LEQ LGE LGT
+%token		LIGNORE LINC LLE LLSH LLT LNE LOROR LRSH
 
-
-%type<ast>		sym packname
-%type<ast>		package
-%type<ast>		hidden_importsym hidden_pkg_importsym hidden_import_list
-%type<ast>		file
-
-%type<ast> 		imports import import_stmt import_safety 
-%type<ast> 		import_here import_there import_stmt_list import_package
-%type<ast>		osemi
-
-%type<ast>		xdcl
 
 /*
-%type		lbrace import_here
+%type 		lbrace import_here
+%type		sym packname
 %type		oliteral
 
 %type		stmt ntype
@@ -103,7 +55,7 @@ void yyerror(const char *s)
 %type		case caseblock
 %type		compound_stmt dotname embed expr complitexpr bare_complitexpr
 %type		expr_or_type
-%type		fndcl hidden_fndcl fnliteral
+%type		fndcl fnliteral
 %type		for_body for_header for_stmt if_header if_stmt non_dcl_stmt
 %type		interfacedcl keyval labelname name
 %type		name_or_type non_expr_type
@@ -125,22 +77,10 @@ void yyerror(const char *s)
 %type		indcl interfacetype structtype ptrtype
 %type		recvchantype non_recvchantype othertype fnret_type fntype
 
-
-%type		hidden_constant hidden_literal hidden_funarg
-%type		hidden_interfacedcl hidden_structdcl
-
-%type		hidden_funres
-%type		ohidden_funres
-%type		hidden_funarg_list ohidden_funarg_list
-%type		hidden_interfacedcl_list ohidden_interfacedcl_list
-%type		hidden_structdcl_list ohidden_structdcl_list
-
-%type		hidden_type hidden_type_misc hidden_pkgtype
-%type		hidden_type_func
-%type		hidden_type_recv_chan hidden_type_non_recv_chan
+%type		hidden_importsym
 */
 
-%left		LCOMM	/* outside the usual hierarchy; here for good error<token> messages */
+%left		LCOMM	/* outside the usual hierarchy; here for good error messages */
 
 %left		LOROR
 %left		LANDAND
@@ -164,174 +104,69 @@ void yyerror(const char *s)
 %left		')'
 %left		PreferToRightParen
 
-%error-verbose
-
-%token END 0 "end of file"
-
 %%
-file:	package imports
-	{
-		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
-		// struct tree **create_tree_kids(int nkids, ...)
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "file", nkids, kids, leaf);
-		// print_tree($$, 0);
-		ast_root = $$;
-	}
-;
+file:	package	imports	xdcl_list ;
 
 package:
-	%empty %prec NotPackage 
+	%prec NotPackage 
 	{
 		yyerror("package statement must be first");
 		exit(1);
 	}
-|	LPACKAGE sym ';' 
-	{ 
-		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
-		// struct tree **create_tree_kids(int nkids, ...)
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "package", nkids, kids, $1);
-		// print_tree($$, 0);
-	}
-;
+|	LPACKAGE sym ';'
+	;
 
 imports:
-	%empty
-	{
-		$$ = new_tree_node(++ruleno, "imports", 0, NULL, NULL);
-	}	
-|	imports import ';' 
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "imports", nkids, kids, leaf);
-	}
-;
+|	imports import ';'
 
 import:
 	LIMPORT import_stmt
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
-	}
 |	LIMPORT '(' import_stmt_list osemi ')'
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $4);
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
-	}
 |	LIMPORT '(' ')'
-	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
-	}
-;
+	;
 
 import_stmt:
 	import_here import_package
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "import_stmt", nkids, kids, leaf);
-	}
-;
+|	import_here
+	;
 
 import_stmt_list:
 	import_stmt
-	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "import_stmt_list", nkids, kids, leaf);
-	}
 |	import_stmt_list ';' import_stmt
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "import_stmt_list", nkids, kids, leaf);
-	}
-;
+	;
 
 import_here:
 	LLITERAL
-	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
-	}
 |	sym LLITERAL
-	{
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
-	}
 |	'.' LLITERAL
-	{
-		struct token *leaf = $2;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
-	}
-;
+	;
 
 import_package:
 	LPACKAGE LNAME import_safety ';'
-	{
-		// TODO: concat package and name
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "import_package", nkids, kids, leaf);
-	}
-;
+	;
 
 import_safety:
-	%empty
-	{
-		$$ = new_tree_node(++ruleno, "import_safety", 0, NULL, NULL);
-	}
 |	LNAME
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_safety", nkids, kids, leaf);
-	}
-;
+	;
 
 /*
  * declarations
  */
 xdcl:
-	%empty 
 	{
 		yyerror("empty top-level declaration");
-		$$ = NULL;
+		$$ = 0;
 	}
 |	common_dcl
 |	xfndcl
 |	non_dcl_stmt
 	{
 		yyerror("non-declaration statement outside function body");
-		$$ = NULL;
+		$$ = 0;
 	}
 |	error
 	{
-		$$ = NULL;
+		$$ = 0;
 	}
 	;
 
@@ -411,11 +246,11 @@ caseblock:
 		// leave it alone (parser has it cached in yychar).
 		// This is so that the stmt_list action doesn't look at
 		// the case tokens if the stmt_list is empty.
-		yylast = yychar;
+		// yylast = yychar;
 	}
 	stmt_list
 	{
-		int last;
+//		int last;
 
 		// This is the only place in the language where a statement
 		// list is not allowed to drop the final semicolon, because
@@ -424,10 +259,10 @@ caseblock:
 
 		// Find the final token of the statement list.
 		// yylast is lookahead; yyprev is last of stmt_list
-		last = yyprev;
+		// last = yyprev;
 
-		if(last > 0 && last != ';' && yychar != '}')
-			yyerror("missing statement after label");
+		// if(last > 0 && last != ';' && yychar != '}')
+		//	yyerror("missing statement after label");
 	}
 
 caseblock_list:
@@ -435,7 +270,7 @@ caseblock_list:
 	;
 
 loop_body:
-	LBODY
+	'{'
 	stmt_list '}'
 	;
 
@@ -488,12 +323,12 @@ else:
 switch_stmt:
 	LSWITCH
 	if_header
-	LBODY caseblock_list '}'
+	'{' caseblock_list '}'
 	;
 
 select_stmt:
 	LSELECT
-	LBODY caseblock_list '}'
+	'{' caseblock_list '}'
 	;
 
 /*
@@ -549,6 +384,14 @@ pseudocall:
 |	pexpr '(' expr_or_type_list LDDD ocomma ')'
 	;
 
+/*
+   The following were deleted in order to allow deletion of LBODY hack:
+  |	pexpr_no_paren '{' start_complit braced_keyval_list '}'
+  |	'(' expr_or_type ')' '{' start_complit braced_keyval_list '}'
+	{
+		yyerror("cannot parenthesize type in composite literal");
+	}
+ */
 pexpr_no_paren:
 	LLITERAL
 |	name
@@ -561,11 +404,6 @@ pexpr_no_paren:
 |	pseudocall
 |	convtype '(' expr ocomma ')'
 |	comptype lbrace start_complit braced_keyval_list '}'
-|	pexpr_no_paren '{' start_complit braced_keyval_list '}'
-|	'(' expr_or_type ')' '{' start_complit braced_keyval_list '}'
-	{
-		yyerror("cannot parenthesize type in composite literal");
-	}
 |	fnliteral
 
 start_complit:
@@ -602,8 +440,7 @@ name_or_type:
 	ntype
 
 lbrace:
-	LBODY
-|	'{'
+	'{'
 	;
 
 /*
@@ -625,37 +462,13 @@ onew_name:
 
 sym:
 	LNAME
-	{
-		struct token* leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
-	}
 |	hidden_importsym
-	{
-		struct token* leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
-	}
 |	'?'
-{
-	struct token* leaf = NULL;
-	int nkids = 0;
-	struct tree** kids = NULL;
-	$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
-}
-;
+	;
 
 hidden_importsym:
 	'@' LLITERAL '.' LNAME
-	{
-		$$ = $4;
-	}
 |	'@' LLITERAL '.' '?'
-	{
-		$$ = $2;
-	}
 	;
 
 name:
@@ -769,11 +582,6 @@ fndcl:
 |	'(' oarg_type_list_ocomma ')' sym '(' oarg_type_list_ocomma ')' fnres
 	;
 
-hidden_fndcl:
-	hidden_pkg_importsym '(' ohidden_funarg_list ')' ohidden_funres
-|	'(' hidden_funarg_list ')' sym '(' ohidden_funarg_list ')' ohidden_funres
-	;
-
 fntype:
 	LFUNC '(' oarg_type_list_ocomma ')' fnres
 	;
@@ -842,20 +650,8 @@ structdcl:
 
 packname:
 	LNAME
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
-	}
 |	LNAME '.' sym
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
-	}
-;
+	;
 
 embed:
 	packname
@@ -961,9 +757,6 @@ braced_keyval_list:
  */
 osemi:
 |	';'
-	{
-		$$ = new_tree_node(++ruleno, "osemi", 0, NULL, NULL);
-	}
 	;
 
 ocomma:
@@ -982,134 +775,8 @@ osimple_stmt:
 |	simple_stmt
 	;
 
-ohidden_funarg_list:
-|	hidden_funarg_list
-	;
-
-ohidden_structdcl_list:
-|	hidden_structdcl_list
-	;
-
-ohidden_interfacedcl_list:
-|	hidden_interfacedcl_list
-	;
-
 oliteral:
 |	LLITERAL
-	;
-
-/*
- * import syntax from package header
- */
-hidden_import:
-	LIMPORT LNAME LLITERAL ';'
-|	LVAR hidden_pkg_importsym hidden_type ';'
-|	LCONST hidden_pkg_importsym '=' hidden_constant ';'
-|	LCONST hidden_pkg_importsym hidden_type '=' hidden_constant ';'
-|	LTYPE hidden_pkgtype hidden_type ';'
-|	LFUNC hidden_fndcl fnbody ';'
-	;
-
-hidden_pkg_importsym:
-	hidden_importsym
-	;
-
-hidden_pkgtype:
-	hidden_pkg_importsym
-	;
-
-/*
- *  importing types
- */
-
-hidden_type:
-	hidden_type_misc
-|	hidden_type_recv_chan
-|	hidden_type_func
-	;
-
-hidden_type_non_recv_chan:
-	hidden_type_misc
-|	hidden_type_func
-	;
-
-hidden_type_misc:
-	hidden_importsym
-|	LNAME
-|	'[' ']' hidden_type
-|	'[' LLITERAL ']' hidden_type
-|	LMAP '[' hidden_type ']' hidden_type
-|	LSTRUCT '{' ohidden_structdcl_list '}'
-|	LINTERFACE '{' ohidden_interfacedcl_list '}'
-|	'*' hidden_type
-|	LCHAN hidden_type_non_recv_chan
-|	LCHAN '(' hidden_type_recv_chan ')'
-|	LCHAN LCOMM hidden_type
-	;
-
-hidden_type_recv_chan:
-	LCOMM LCHAN hidden_type
-	;
-
-hidden_type_func:
-	LFUNC '(' ohidden_funarg_list ')' ohidden_funres
-	;
-
-hidden_funarg:
-	sym hidden_type oliteral
-|	sym LDDD hidden_type oliteral
-	;
-
-hidden_structdcl:
-	sym hidden_type oliteral
-	;
-
-hidden_interfacedcl:
-	sym '(' ohidden_funarg_list ')' ohidden_funres
-|	hidden_type
-	;
-
-ohidden_funres:
-|	hidden_funres
-	;
-
-hidden_funres:
-	'(' ohidden_funarg_list ')'
-|	hidden_type
-	;
-
-/*
- *  importing constants
- */
-
-hidden_literal:
-	LLITERAL
-|	'-' LLITERAL
-|	sym
-	;
-
-hidden_constant:
-	hidden_literal
-|	'(' hidden_literal '+' hidden_literal ')'
-	;
-
-hidden_import_list:
-|	hidden_import_list hidden_import
-	;
-
-hidden_funarg_list:
-	hidden_funarg
-|	hidden_funarg_list ',' hidden_funarg
-	;
-
-hidden_structdcl_list:
-	hidden_structdcl
-|	hidden_structdcl_list ';' hidden_structdcl
-	;
-
-hidden_interfacedcl_list:
-	hidden_interfacedcl
-|	hidden_interfacedcl_list ';' hidden_interfacedcl
 	;
 
 %%

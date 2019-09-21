@@ -5,6 +5,8 @@
 #include "vgo.tab.h"
 #include <string.h>
 
+extern struct tree *ast_root;
+
 extern int yylex();
 
 int yyparse();
@@ -50,12 +52,12 @@ int main(int argc, char **argv)
             return -1;
         }
 
-        ast = yyparse();
-        if (!ast)
+        int failed = yyparse();
+        if (!failed)
         {
             // parse successfull
 
-            print_tree(ast, 0);
+            print_tree(ast_root, 0);
 
             delete_tree(ast);
         }

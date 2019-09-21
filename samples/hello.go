@@ -1,1 +1,2 @@
-package;
+package main
+import ("encoding/json")

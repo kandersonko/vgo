@@ -6,7 +6,9 @@
 #include "tree.h"
 #include "utils.h"
 
-
+int lasttoken;
+int isender(int);
+int tok(int);
 
 token_ptr yytoken;
 
@@ -53,6 +55,9 @@ runes           "\'\\"[nt\\']"\'"
 imaginary   ({number})"i"
 
 
+float				([0-9]*\.[0-9]+)|([0-9]+\.)
+exponent			[eE][-+]?[0-9]+
+
 
 
 %x comment
@@ -64,49 +69,51 @@ imaginary   ({number})"i"
 
 
     /* Supported keywords */
-func          { set_token(LFUNC); return LFUNC; }
+func          { set_token(LFUNC); return tok(LFUNC); }
 
-map          { set_token(LMAP); return LMAP; }
+map          { set_token(LMAP); return tok(LMAP); }
 
-struct          { set_token(LSTRUCT); return LSTRUCT; }
+struct          { set_token(LSTRUCT); return tok(LSTRUCT); }
 
-type          { set_token(LTYPE); return LTYPE; }
+type          { set_token(LTYPE); return tok(LTYPE); }
 
-const          { set_token(LCONST); return LCONST; }
+const          { set_token(LCONST); return tok(LCONST); }
 
-package          { set_token(LPACKAGE); return LPACKAGE; }
+package          { set_token(LPACKAGE); return tok(LPACKAGE); }
 
-import          { set_token(LIMPORT); return LIMPORT; }
+import          { set_token(LIMPORT); return tok(LIMPORT); }
 
-var          { set_token(LVAR); return LVAR; }
+var          { set_token(LVAR); return tok(LVAR); }
 
-for          { set_token(LFOR); return LFOR; }
+for          { set_token(LFOR); return tok(LFOR); }
 
-if          { set_token(LIF); return LIF; }
+if          { set_token(LIF); return tok(LIF); }
 
-else          { set_token(LELSE); return LELSE; }
+else          { set_token(LELSE); return tok(LELSE); }
 
-return          { set_token(LRETURN); return LRETURN; }
+return          { set_token(LRETURN); return tok(LRETURN); }
 
 
     /* Not supported keywords */
-break          { set_token(LBREAK); return KEYWORD_NOT_SUPPORTED; }
-case          { set_token(LCASE); return KEYWORD_NOT_SUPPORTED; }
-chan          { set_token(LCHAN); return KEYWORD_NOT_SUPPORTED; }
-fallthrough          { set_token(LFALL); return KEYWORD_NOT_SUPPORTED; }
-continue          { set_token(LCONTINUE); return KEYWORD_NOT_SUPPORTED; }
-default          { set_token(LDEFAULT); return KEYWORD_NOT_SUPPORTED; }
-defer          { set_token(LDEFER); return KEYWORD_NOT_SUPPORTED; }
-goto          { set_token(LGOTO); return KEYWORD_NOT_SUPPORTED; }
-range          { set_token(LRANGE); return KEYWORD_NOT_SUPPORTED; }
-interface          { set_token(LINTERFACE); return KEYWORD_NOT_SUPPORTED; }
-go                { set_token(LGO); return KEYWORD_NOT_SUPPORTED; }
-switch          { set_token(LSWITCH); return KEYWORD_NOT_SUPPORTED; }
-select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
-
-
-";"           { set_token(';'); return ';'; }
+break          { set_token(LBREAK); return tok(KEYWORD_NOT_SUPPORTED); }
+case          { set_token(LCASE); return tok(KEYWORD_NOT_SUPPORTED); }
+chan          { set_token(LCHAN); return tok(KEYWORD_NOT_SUPPORTED); }
+fallthrough          { set_token(LFALL); return tok(KEYWORD_NOT_SUPPORTED); }
+continue          { set_token(LCONTINUE); return tok(KEYWORD_NOT_SUPPORTED); }
+default          { set_token(LDEFAULT); return tok(KEYWORD_NOT_SUPPORTED); }
+defer          { set_token(LDEFER); return tok(KEYWORD_NOT_SUPPORTED); }
+goto          { set_token(LGOTO); return tok(KEYWORD_NOT_SUPPORTED); }
+range          { set_token(LRANGE); return tok(KEYWORD_NOT_SUPPORTED); }
+interface          { set_token(LINTERFACE); return tok(KEYWORD_NOT_SUPPORTED); }
+go                { set_token(LGO); return tok(KEYWORD_NOT_SUPPORTED); }
+switch          { set_token(LSWITCH); return tok(KEYWORD_NOT_SUPPORTED); }
+select          { set_token(LSELECT); return tok(KEYWORD_NOT_SUPPORTED); }
+    
+    
     /* Supported operators */
+";"           { set_token(';'); return tok(';'); }
+"("           { set_token('('); return tok('('); }
+")"           { set_token(')'); return tok(')'); }
     /*
     "=="          { set_token(LEQ); return LEQ;  }
     "<"          { set_token(LLT); return LLT;  }
@@ -122,7 +129,6 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
     "++"           { set_token(LINC); return LINC; }
     "--"           { set_token(LDEC); return LDEC; }
     "..."           { set_token(LDDD); return LDDD; }
-    ";"           { set_token(LSEMICOLON); return LSEMICOLON; }
     "."           { set_token(LDOT); return LDOT; }
     "{"           { set_token(LLBODY); return LLBODY; }
     "}"           { set_token(LRBODY); return LRBODY; }
@@ -190,8 +196,8 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* identifiers */
-[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { sval = ""; set_token(LNAME); return LNAME; } 
-[a-zA-Z_]([a-zA-Z0-9_]){12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; } 
+    /*[a-zA-Z_]([a-zA-Z0-9_]){0,11}  { sval = ""; set_token(LNAME); return LNAME; } 
+    [a-zA-Z_]([a-zA-Z0-9_]){12,}  { sval = ""; set_token(LNAME); return INVALID_VARNAME; }*/
 
 
     /* numbers */
@@ -205,11 +211,43 @@ select          { set_token(LSELECT); return KEYWORD_NOT_SUPPORTED; }
 
 
     /* new line, unknown characters, and eof */
-[ \t\n]+        { sval = "\0"; }
+        /*[ \t\n]+        { sval = "\0"; } */
+"\n"					{ sval = "\0"; if(isender(lasttoken)) return tok(';'); }
+[\t\f\v\r ]+				{ /* Ignore whitespace. */ }
 
-.               { set_token(LNAME); return INVALID_CHARACTER; }
+        /*.               { set_token(LNAME); return INVALID_CHARACTER; }*/
+[a-zA-Z_][a-zA-Z_0-9]*			{ set_token(LNAME); return tok(LNAME); }
 
+"0"[xX][0-9a-fA-F]+			{ set_token(LLITERAL); return tok(LLITERAL); }
+"0"[0-7]+				{ set_token(LLITERAL); return tok(LLITERAL); }
+[0-9]+					{ return tok(LLITERAL); }
+
+{float}{exponent}?			{ set_token(LLITERAL); return tok(LLITERAL); }
+[0-9]+{exponent}			{ set_token(LLITERAL); return tok(LLITERAL); }
+
+"'"(\\.|[^\\"])"'"			{ set_token(LLITERAL); return tok(LLITERAL); }
+
+"\""(\\.|[^\\"])*"\""			{ set_token(LLITERAL); return tok(LLITERAL); }
+
+.					{ fprintf(stderr, "%d: unexpected character `%c'\n", yylineno, yytext[0]); exit(1); }
     /* end of file */
-<<EOF>>         { yylineno = 1; return 0; }
+<<EOF>>         { yylineno = 1; return tok(0); }
 %%
 
+
+/* return true for tokens that require a newline to insert a semi-colon */
+int isender(int i)
+{
+	switch(i) {
+	case LNAME: case LLITERAL: case ')': case '}': case ']':
+	     return 1;
+	}
+	return 0;
+}
+
+
+int tok(int i)
+{
+   lasttoken = i;
+   return i;
+}
