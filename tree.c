@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include "tree.h"
 #include "utils.h"
@@ -7,8 +9,8 @@ void print_tree(tree_ptr ast, int depth)
 {
     if (!ast)
         return;
-    int i;
-    printf("Printing tree:\n");
+
+    // TODO: indent by depth number
 
     printf("rule %d:%s \tnkids: %d \tdepth: %d\n", ast->prodrule, ast->prodname, ast->nkids, depth);
     if (ast->leaf)
@@ -23,6 +25,7 @@ void print_tree(tree_ptr ast, int depth)
     else
         printf("\tNo leaves!\n");
 
+    int i;
     for (i = 0; i < ast->nkids; i++)
         print_tree(ast->kids[i], depth + 1);
 }
@@ -42,6 +45,18 @@ void print_kids(struct tree **kids, int nkids)
 
 void delete_tree(tree_ptr ast)
 {
+    if (!ast)
+        return;
+
+    printf("delete tree: %s\n", ast->prodname);
+
+    if (ast->leaf)
+        delete_token(ast->leaf);
+    int i;
+    for (i = 0; i < ast->nkids; i++)
+        delete_tree(ast->kids[i]);
+    free(ast);
+    ast = NULL;
 }
 
 struct tree **create_tree_kids(int nkids, ...)

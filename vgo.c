@@ -56,10 +56,8 @@ int main(int argc, char **argv)
         if (!failed)
         {
             // parse successfull
-
-            print_tree(ast_root, 0);
-
             delete_tree(ast);
+            print_tree(ast_root, 0);
         }
         else
         {
