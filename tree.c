@@ -12,18 +12,19 @@ void print_tree(tree_ptr ast, int depth)
 
     // TODO: indent by depth number
 
-    printf("rule %d:%s \tnkids: %d \tdepth: %d\n", ast->prodrule, ast->prodname, ast->nkids, depth);
+    printf("%*d:%s | rule: %d | nkids: %d\n", depth + 1, depth, ast->prodname, ast->prodrule, ast->nkids);
+
     if (ast->leaf)
     {
-        printf("\tleaf:");
-        printf("\tcat: %d, \ttext: %s, \tlineno: %d, \tfile: %s\n",
+        printf("%*d\tleaf:", depth + 1, depth);
+        printf("%*d\tcat: %d, \ttext: %s, \tlineno: %d, \tfile: %s\n", depth + 1, depth,
                ast->leaf->category,
                ast->leaf->text,
                ast->leaf->lineno,
                ast->leaf->filename);
     }
     else
-        printf("\tNo leaves!\n");
+        printf("%*d\tNo leaves!\n", depth + 1, depth);
 
     int i;
     for (i = 0; i < ast->nkids; i++)

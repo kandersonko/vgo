@@ -26,8 +26,8 @@
 #include "tree.h"
 #include "utils.h"
 
-#define YYDEBUG 1
-int yydebug=1;
+// #define YYDEBUG 1
+// int yydebug=1;
 
 struct tree* ast_root;
 
