@@ -12,7 +12,7 @@ int isender(int);
 int tok(int);
 
 
-char* yyfilename = NULL;
+char* yyfilename;
 char* yytext;
 
 char *sval = "\0";
@@ -59,6 +59,9 @@ float				([0-9]*\.[0-9]+)|([0-9]+\.)
 exponent			[eE][-+]?[0-9]+
 
 
+invalid_ops     "<<"|">>"|"<<="|">>="|"/="|"%="|"<-"|":"|"&"|"&^"|"&^="|"&="|"*="|"|="|"|"|":="|"^"
+
+invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"defer"|"goto"|"range"|"interface"|"go"|"switch"|"select"
 
 %x comment
 %%
@@ -67,88 +70,69 @@ exponent			[eE][-+]?[0-9]+
 "/*"([^*]|"*"+[^*/])*"*"+"/"		{ /* C comment */ }
 "//".*					{ /* C++ comment */ }
 
-"{"					{ return tok('{'); }
-"}"					{ return tok('}'); }
-"["					{ return tok('['); }
-"]"					{ return tok(']'); }
-"("					{ return tok('('); }
-")"					{ return tok(')'); }
-";"					{ return tok(';'); }
-":"					{ return tok(':'); }
-"?"					{ return tok('?'); }
-"."					{ return tok('.'); }
-"..."					{ return tok(LDDD); }
-"+"					{ return tok('+'); }
-"-"					{ return tok('-'); }
-"*"					{ return tok('*'); }
-"/"					{ return tok('/'); }
-"%"					{ return tok('%'); }
-"^"					{ return tok('^'); }
-"&"					{ return tok('&'); }
-"|"					{ return tok('|'); }
-"~"					{ return tok('~'); }
-"!"					{ return tok('!'); }
-"="					{ return tok(LASOP); }
-":="					{ return tok(LCOLAS); }
-"<"					{ return tok(LLT); }
-">"					{ return tok(LGT); }
-"+="					{ return tok(LASOP); }
-"-="					{ return tok(LASOP); }
-"*="					{ return tok(LASOP); }
-"/="					{ return tok(LASOP); }
-"%="					{ return tok(LASOP); }
-"^="					{ return tok(LASOP); }
-"&="					{ return tok(LASOP); }
-"|="					{ return tok(LASOP); }
-"<<"					{ return tok(LLSH); }
-">>"					{ return tok(LRSH); }
-"=="					{ return tok(LEQ); }
-"!="					{ return tok(LNE); }
-"<="					{ return tok(LLE); }
-">="					{ return tok(LGE); }
-"&&"					{ return tok(LANDAND); }
-"&^"					{ return tok(LANDNOT); }
-"||"					{ return tok(LOROR); }
-"++"					{ return tok(LINC); }
-"--"					{ return tok(LDEC); }
-","					{ return tok(','); }
-"<-"					{ return tok(LCOMM); }
+    /* Supported operators */
+"=="          { return tok(LEQ); }
+"<"          { tok(LLT);   }
+">"          { return tok(LGT);  }
+"<="          { return tok(LLE);  }
+">="          { return tok(LGE);  }
+"!="          { return tok(LNE);  }
+"&&"          { return tok(LANDAND);   }
+"||"          { return tok(LOROR);  }
+"="          { return tok(LASOP);   }
+"+="          { return tok(LASOP);   }
+"-="          { return tok(LASOP);   }
+"++"           { return tok(LINC); }
+"--"           { return tok(LDEC); }
+"..."           { return tok(LDDD); }
+";"           { return tok(';');  }
+"."           { return tok('.');  }
+"{"           { return tok('{'); }
+"}"           { return tok('}');  }
+"("           { return tok('(');  }
+")"           { return tok(')'); }
+"["           { return tok('['); }
+"]"           { return tok(']');  }
+"+"           { return tok('+');  }
+"-"           { return tok('-'); }
+"/"           { return tok('/');  }
+"*"           { return tok('*');  }
+"%"           { return tok('%');  }
+"!"           { return tok('!');  }
+","           { return tok(','); }
 
+
+    /* Not supported operators */
+{invalid_ops} { fprintf(stderr, "ERROR: invalid VGO operator `%s` at line %d in file `%s`\n", yytext, yylineno, yyfilename); exit(1);}
+
+
+    /* supported keywords */
 "bool"					{ return tok(LNAME); }
-"break"					{ return tok(LBREAK); }
-"case"					{ return tok(LCASE); }
-"chan"					{ return tok(LCHAN); }
 "const"					{ return tok(LCONST); }
-"continue"				{ return tok(LCONTINUE); }
-"default"				{ return tok(LDEFAULT); }
-"defer"					{ return tok(LDEFER); }
 "else"					{ return tok(LELSE); }
-"fallthrough"				{ return tok(LFALL); }
 "float64"				{ return tok(LNAME); }
 "for"					{ return tok(LFOR); }
 "func"					{ return tok(LFUNC); }
-"go"					{ return tok(LGO); }
-"goto"					{ return tok(LGOTO); }
 "if"					{ return tok(LIF); }
 "import"				{ return tok(LIMPORT); }
 "int"					{ return tok(LNAME); }
-"interface"				{ return tok(LINTERFACE); }
 "map"					{ return tok(LMAP); }
 "package"				{ return tok(LPACKAGE); }
-"range"					{ return tok(LRANGE); }
 "return"				{ return tok(LRETURN); }
-"select"				{ return tok(LSELECT); }
 "struct"				{ return tok(LSTRUCT); }
-"switch"				{ return tok(LSWITCH); }
 "type"					{ return tok(LTYPE); }
 "var"					{ return tok(LVAR); }
 
+    /* Not supported keywords */
+{invalid_keywords}  { fprintf(stderr, "ERROR: invalid VGO keyword `%s` at line %d in file `%s`\n", yytext, yylineno, yyfilename); exit(1);}
 
 
 "\n"					{ sval = "\0"; if(isender(lasttoken)) return tok(';'); }
 [\t\f\v\r ]+				{ /* Ignore whitespace. */ }
 
-        /*.               { set_token(LNAME); return INVALID_CHARACTER; }*/
+
+{invalid_runes}     {fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
+
 [a-zA-Z_][a-zA-Z_0-9]*			{ return tok(LNAME); }
 
 "0"[xX][0-9a-fA-F]+			{ return tok(LLITERAL); }
@@ -158,11 +142,11 @@ exponent			[eE][-+]?[0-9]+
 {float}{exponent}?			{ return tok(LLITERAL); }
 [0-9]+{exponent}			{ return tok(LLITERAL); }
 
-"'"(\\.|[^\\"])"'"			{ return tok(LLITERAL); }
+"\'"(\\.|[^\\"])"\'"			{ return tok(LLITERAL); }
 
 "\""(\\.|[^\\"])*"\""			{ return tok(LLITERAL); }
 
-.					{ fprintf(stderr, "%d: unexpected character `%c'\n", yylineno, yytext[0]); exit(1); }
+.					{ fprintf(stderr, "ERROR: unexpected character `%c` at line %d in file %s\n", yytext[0], yylineno, yyfilename); exit(1); }
     /* end of file */
 <<EOF>>         { yylineno = 1; return tok(0); }
 %%

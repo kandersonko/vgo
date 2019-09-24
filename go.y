@@ -56,11 +56,9 @@ int ruleno = 0;
 void yyerror(const char *s)
 {
 	fprintf(stderr, "%s\n", s);
-	
-   fprintf(stderr, "syntax error: unespected '%s' token in file %s, line %d\n",
+	fprintf(stderr, "syntax error: unexpected '%s' token in file %s, line %d\n",
 	   yytext,yyfilename, yylineno);
 }
-
 
 
 %}
