@@ -137,7 +137,7 @@ void yyerror(const char *s)
 %left		'+' '-' '|' '^'
 %left		'*' '/' '%' '&' LLSH LRSH LANDNOT
 
-%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`'
+%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`' '.'
 
 /*
  * manual override of shift/reduce conflicts.
@@ -159,6 +159,8 @@ void yyerror(const char *s)
 %error-verbose
 
 %token END 0 "end of file"
+
+// TODO: free unused token to prevent memory leak
 
 %%
 file:	package imports xdcl_list

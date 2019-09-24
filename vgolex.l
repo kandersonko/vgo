@@ -1,5 +1,6 @@
 
 %{
+#include <stdio.h>
 #include<stdlib.h>
 #include "go.tab.h"
 #include "token.h"
@@ -10,7 +11,6 @@ int lasttoken;
 int isender(int);
 int tok(int);
 
-token_ptr yytoken;
 
 char* yyfilename = NULL;
 char* yytext;

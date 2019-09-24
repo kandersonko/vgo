@@ -10,6 +10,8 @@ void print_tree(tree_ptr ast, int depth)
     if (!ast)
         return;
 
+    // TODO: maybe print only node with a leaf node
+
     // TODO: indent by depth number
 
     printf("%*d:%s | rule: %d | nkids: %d\n", depth + 1, depth, ast->prodname, ast->prodrule, ast->nkids);
@@ -17,8 +19,7 @@ void print_tree(tree_ptr ast, int depth)
     if (ast->leaf)
     {
         printf("%*d\tleaf:", depth + 1, depth);
-        printf("%*d\tcat: %d, \ttext: %s, \tlineno: %d, \tfile: %s\n", depth + 1, depth,
-               ast->leaf->category,
+        printf("\tcat: %d, \ttext: %s, \tlineno: %d, \tfile: %s\n", ast->leaf->category,
                ast->leaf->text,
                ast->leaf->lineno,
                ast->leaf->filename);
@@ -47,15 +48,17 @@ void print_kids(struct tree **kids, int nkids)
 void delete_tree(tree_ptr ast)
 {
     if (!ast)
+    {
         return;
+    }
 
-    printf("delete tree: %s\n", ast->prodname);
-
-    if (ast->leaf)
-        delete_token(ast->leaf);
     int i;
     for (i = 0; i < ast->nkids; i++)
         delete_tree(ast->kids[i]);
+
+    delete_token(ast->leaf);
+    free(ast->kids);
+    free(ast->prodname);
     free(ast);
     ast = NULL;
 }
@@ -82,7 +85,7 @@ tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **ki
 {
     tree_ptr ast = safe_malloc(sizeof(*ast));
     ast->prodrule = prodrule;
-    ast->prodname = prodname;
+    ast->prodname = strdup(prodname);
     ast->leaf = leaf;
     ast->nkids = nkids;
     ast->kids = kids;

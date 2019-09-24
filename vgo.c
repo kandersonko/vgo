@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "vgo.tab.h"
 #include <string.h>
+#include <unistd.h>
 
 extern struct tree *ast_root;
 
@@ -31,8 +32,6 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    tree_ptr ast = NULL;
-
     argc--;
     argv++;
     int i;
@@ -56,7 +55,6 @@ int main(int argc, char **argv)
         if (!failed)
         {
             // parse successfull
-            delete_tree(ast);
             print_tree(ast_root, 0);
         }
         else
@@ -67,6 +65,7 @@ int main(int argc, char **argv)
         fclose(yyin);
     }
 
+    delete_tree(ast_root);
     yylex_destroy();
 
     return 0;
@@ -84,25 +83,33 @@ const char *get_filename_ext(const char *filename)
 
 char *rename_go_file(char *name)
 {
-    const char *ext = get_filename_ext(name);
-    if (!strcmp(ext, "go"))
+    // check if file exists
+    if (access(name, F_OK) != -1)
     {
-        return name;
-    }
-    if (!strcmp(ext, ""))
-    {
-        char *newname = malloc(sizeof(*newname));
-        strcpy(newname, name);
-        strcat(newname, ".go");
-        if (rename(name, newname))
+        // file exists
+        const char *ext = get_filename_ext(name);
+        if (!strcmp(ext, "go"))
         {
-            fprintf(stderr, "Could not rename file!\n");
-            return NULL;
+            return name;
         }
-        free(newname);
-        strcat(name, ".go");
-        return name;
+        if (!strcmp(ext, ""))
+        {
+            // rename file
+            char *newname = malloc(sizeof(*newname));
+            strcpy(newname, name);
+            strcat(newname, ".go");
+            if (rename(name, newname))
+            {
+                fprintf(stderr, "Could not rename file!\n");
+                return NULL;
+            }
+            free(newname);
+            strcat(name, ".go");
+            return name;
+        }
+        fprintf(stderr, "ERROR: invalid file extension \".%s\"\n", ext);
+        return NULL;
     }
-    fprintf(stderr, "ERROR: invalid file extension \".%s\"\n", ext);
+    fprintf(stderr, "ERROR: invalid file name \"%s\"\n", name);
     return NULL;
 }

@@ -31,11 +31,11 @@ token_ptr create_token(int category, char *filename, int lineno, char *text, int
 // delete the token struct
 void delete_token(token_ptr t)
 {
-    if (t == NULL)
+    if (!t)
     {
-        free(t);
         return;
     }
+
     free(t->filename);
     free(t->text);
     free(t->sval);
