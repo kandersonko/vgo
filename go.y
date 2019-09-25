@@ -29,6 +29,8 @@
 // #define YYDEBUG 1
 // int yydebug=1;
 
+// TODO: Remove all warnings (useless rule, etc)
+
 struct tree* ast_root;
 
 int yylex (void);
@@ -84,34 +86,31 @@ void yyerror(const char *s)
 
 %type<ast>		file
 
-%type<ast>		hidden_fndcl hidden_type_misc hidden_type_recv_chan
-
-%type<ast>		package lconst hidden_interfacedcl_list hidden_type
-%type<ast>		hidden_pkg_importsym hidden_import_list hidden_import
+%type<ast>		package lconst
 
 %type<ast> 		imports import import_stmt import_safety 
-%type<ast> 		import_stmt_list import_package hidden_funarg_list
-%type<ast>		osemi ohidden_funarg_list ohidden_funres ohidden_structdcl_list
+%type<ast> 		import_stmt_list import_package
+%type<ast>		osemi
 
-%type<ast> 		lbrace import_here hidden_structdcl_list
-%type<ast>		sym packname fnlitdcl
+%type<ast> 		lbrace import_here
+%type<ast>		sym packname fnlitdcl 
 %type<ast>		oliteral error
 
 %type<ast>		stmt ntype 
-%type<ast>		arg_type hidden_pkgtype 
-%type<ast>		case caseblock hidden_funarg
+%type<ast>		arg_type 
+%type<ast>		case caseblock
 %type<ast>		compound_stmt dotname embed expr complitexpr bare_complitexpr
-%type<ast>		expr_or_type hidden_structdcl
-%type<ast>		fndcl fnliteral hidden_type_non_recv_chan
+%type<ast>		expr_or_type
+%type<ast>		fndcl fnliteral
 %type<ast>		for_body for_header for_stmt if_header if_stmt non_dcl_stmt
 %type<ast>		interfacedcl keyval labelname name
 %type<ast>		name_or_type non_expr_type
 %type<ast>		new_name dcl_name oexpr typedclname
-%type<ast>		onew_name hidden_interfacedcl
+%type<ast>		onew_name
 %type<ast>		osimple_stmt pexpr pexpr_no_paren
 %type<ast>		pseudocall range_stmt select_stmt
-%type<ast>		simple_stmt hidden_funres hidden_literal
-%type<ast>		switch_stmt uexpr hidden_type_func
+%type<ast>		simple_stmt 
+%type<ast>		switch_stmt uexpr 
 %type<ast>		xfndcl typedcl start_complit
 
 %type<ast>		xdcl fnbody fnres loop_body dcl_name_list
@@ -120,11 +119,11 @@ void yyerror(const char *s)
 %type<ast>		interfacedcl_list vardcl vardcl_list structdcl structdcl_list
 %type<ast>		common_dcl constdcl constdcl1 constdcl_list typedcl_list
 
-%type<ast>		convtype comptype dotdotdot hidden_constant
+%type<ast>		convtype comptype dotdotdot
 %type<ast>		indcl interfacetype structtype ptrtype
 %type<ast>		recvchantype non_recvchantype othertype fnret_type fntype
 
-%type<ast>		hidden_importsym ohidden_interfacedcl_list
+%type<ast>		hidden_importsym
 
 
 
@@ -1601,22 +1600,6 @@ fndcl:
 	}
 ;
 
-hidden_fndcl:
-	hidden_pkg_importsym '(' ohidden_funarg_list ')' ohidden_funres
-	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "hidden_fndcl", nkids, kids, leaf);
-	}
-|	'(' hidden_funarg_list ')' sym '(' ohidden_funarg_list ')' ohidden_funres
-	{
-		struct token *leaf = NULL;
-		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $2, $4, $6, %8);
-		$$ = new_tree_node(++ruleno, "hidden_fndcl", nkids, kids, leaf);
-	}
-;
 
 fntype:
 	LFUNC '(' oarg_type_list_ocomma ')' fnres
@@ -2198,38 +2181,6 @@ osimple_stmt:
 	}
 ;
 
-ohidden_funarg_list:
-	%empty
-	{
-		$$ = NULL;
-	}
-|	hidden_funarg_list
-	{
-		$$ = $1;
-	}
-;
-
-ohidden_structdcl_list:
-	%empty
-	{
-		$$ = NULL;
-	}
-|	hidden_structdcl_list
-	{
-		$$ = $1;
-	}
-;
-
-ohidden_interfacedcl_list:
-	%empty
-	{
-		$$ = NULL;
-	}	
-|	hidden_interfacedcl_list
-	{
-		$$ = $1;
-	}
-;
 
 oliteral:
 	%empty
@@ -2248,336 +2199,16 @@ oliteral:
 /*
  * import syntax from package header
  */
-hidden_import:
-	LIMPORT LNAME LLITERAL ';'
-	{
-		struct token *leaf = $1; // TODO: concat tokens ?
-		$$ = new_tree_node(++ruleno, "hidden_import", 0, NULL, leaf);
-	}
-|	LVAR hidden_pkg_importsym hidden_type ';'
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "hidden_import", nkids, kids, leaf);
-	}
-|	LCONST hidden_pkg_importsym '=' hidden_constant ';'
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $4);
-		$$ = new_tree_node(++ruleno, "hidden_import", nkids, kids, leaf);
-	}
-|	LCONST hidden_pkg_importsym hidden_type '=' hidden_constant ';'
-	{
-		struct token *leaf = $1;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $2, $3, $5);
-		$$ = new_tree_node(++ruleno, "hidden_import", nkids, kids, leaf);
-	}
-|	LTYPE hidden_pkgtype hidden_type ';'
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "hidden_import", nkids, kids, leaf);
-	}
-|	LFUNC hidden_fndcl fnbody ';'
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "hidden_import", nkids, kids, leaf);
-	}
-;
 
-hidden_pkg_importsym:
-	hidden_importsym
-	{
-		$$ = $1;
-	}
-	;
-
-hidden_pkgtype:
-	hidden_pkg_importsym
-	{
-		$$ = $1;
-	}
-;
 
 /*
  *  importing types
  */
 
-hidden_type:
-	hidden_type_misc
-	{
-		$$ = $1;
-	}
-|	hidden_type_recv_chan
-	{
-		$$ = $1;
-	}
-|	hidden_type_func
-	{
-		$$ = $1;
-	}
-;
-
-hidden_type_non_recv_chan:
-	hidden_type_misc
-	{
-		$$ = $1;
-	}	
-|	hidden_type_func
-	{
-		$$ = $1;
-	}
-;
-
-hidden_type_misc:
-	hidden_importsym
-	{
-		$$ = $1;
-	}
-|	LNAME
-	{
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", 0, NULL, $1);
-	}
-|	'[' ']' hidden_type
-	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	'[' LLITERAL ']' hidden_type
-	{
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $4);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	LMAP '[' hidden_type ']' hidden_type
-	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $5);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	LSTRUCT '{' ohidden_structdcl_list '}'
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	LINTERFACE '{' ohidden_interfacedcl_list '}'
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	'*' hidden_type
-	{
-		$$ = $2;
-	}
-|	LCHAN hidden_type_non_recv_chan
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	LCHAN '(' hidden_type_recv_chan ')'
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-|	LCHAN LCOMM hidden_type
-	{
-		struct token *leaf = $1; // TODO: concat tokens ?
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_misc", nkids, kids, leaf);
-	}
-;
-
-hidden_type_recv_chan:
-	LCOMM LCHAN hidden_type
-	{
-		struct token *leaf = $1; // TODO: concat tokens ?
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "hidden_type_recv_chan", nkids, kids, leaf);
-	}
-;
-
-hidden_type_func:
-	LFUNC '(' ohidden_funarg_list ')' ohidden_funres
-	{
-		struct token *leaf = $1; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $5);
-		$$ = new_tree_node(++ruleno, "hidden_type_func", nkids, kids, leaf);
-	}
-;
-
-hidden_funarg:
-	sym hidden_type oliteral
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "hidden_funarg", nkids, kids, leaf);
-	}
-|	sym LDDD hidden_type oliteral
-	{
-		struct token *leaf = $2; 
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $4);
-		$$ = new_tree_node(++ruleno, "hidden_funarg", nkids, kids, leaf);
-	}
-;
-
-hidden_structdcl:
-	sym hidden_type oliteral
-	{
-		struct token *leaf = NULL; 
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $2, $3);
-		$$ = new_tree_node(++ruleno, "hidden_structdcl", nkids, kids, leaf);
-	}
-;
-
-hidden_interfacedcl:
-	sym '(' ohidden_funarg_list ')' ohidden_funres
-	{
-		struct token *leaf = NULL; 
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "hidden_interfacedcl", nkids, kids, leaf);
-	}
-|	hidden_type
-	{
-		$$ = $1;
-	}
-;
-
-ohidden_funres:
-	%empty
-	{
-		$$ = NULL;
-	}
-|	hidden_funres
-	{
-		$$ = $1;
-	}
-;
-
-hidden_funres:
-	'(' ohidden_funarg_list ')'
-	{
-		$$ = $2;
-	}
-|	hidden_type
-	{
-		$$ = $1;
-	}
-;
 
 /*
  *  importing constants
  */
 
-hidden_literal:
-	LLITERAL
-	{
-		struct token *leaf = $1; 
-		$$ = new_tree_node(++ruleno, "hidden_literal", 0, NULL, leaf);
-	}
-|	'-' LLITERAL
-	{
-		struct token *leaf = $2; 
-		$$ = new_tree_node(++ruleno, "hidden_literal", 0, NULL, leaf);
-	}
-|	sym
-	{
-		$$ = $1;
-	}
-;
-
-hidden_constant:
-	hidden_literal
-	{
-		$$ = $1;
-	}
-|	'(' hidden_literal '+' hidden_literal ')'
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $4);
-		$$ = new_tree_node(++ruleno, "hidden_constant", nkids, kids, leaf);
-	}
-;
-
-hidden_import_list:
-	%empty
-	{
-		$$ = NULL;
-	}
-|	hidden_import_list hidden_import
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "hidden_import_list", nkids, kids, leaf);
-	}
-;
-
-hidden_funarg_list:
-	hidden_funarg
-	{
-		$$ = $1;
-	}
-|	hidden_funarg_list ',' hidden_funarg
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "hidden_funarg_list", nkids, kids, leaf);
-	}
-;
-
-hidden_structdcl_list:
-	hidden_structdcl
-	{
-		$$ = $1;
-	}
-|	hidden_structdcl_list ';' hidden_structdcl
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "hidden_structdcl_list", nkids, kids, leaf);
-	}
-;
-
-hidden_interfacedcl_list:
-	hidden_interfacedcl
-	{
-		$$ = $1;
-	}
-|	hidden_interfacedcl_list ';' hidden_interfacedcl
-	{
-		struct token *leaf = NULL; 
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "hidden_interfacedcl_list", nkids, kids, leaf);
-	}
-;
 
 %%

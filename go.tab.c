@@ -74,6 +74,8 @@
 // #define YYDEBUG 1
 // int yydebug=1;
 
+// TODO: Remove all warnings (useless rule, etc)
+
 struct tree* ast_root;
 
 int yylex (void);
@@ -108,7 +110,7 @@ void yyerror(const char *s)
 
 
 
-#line 112 "go.tab.c" /* yacc.c:339  */
+#line 114 "go.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -201,12 +203,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 68 "go.y" /* yacc.c:355  */
+#line 70 "go.y" /* yacc.c:355  */
 
 	struct tree* ast;
 	struct token* t;
 
-#line 210 "go.tab.c" /* yacc.c:355  */
+#line 212 "go.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -223,7 +225,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 227 "go.tab.c" /* yacc.c:358  */
+#line 229 "go.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -525,35 +527,35 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   165,   165,   178,   184,   196,   200,   210,   217,   224,
-     234,   241,   248,   252,   262,   269,   276,   286,   297,   301,
-     314,   319,   323,   327,   332,   339,   346,   353,   360,   367,
-     374,   381,   388,   395,   402,   412,   422,   429,   436,   446,
-     453,   463,   467,   474,   481,   490,   500,   504,   511,   518,
-     525,   532,   542,   549,   556,   564,   574,   586,   585,   619,
-     623,   633,   644,   651,   661,   668,   672,   679,   689,   700,
-     704,   715,   728,   739,   743,   753,   757,   767,   779,   793,
-     797,   804,   811,   818,   825,   832,   839,   846,   853,   860,
-     867,   874,   881,   888,   895,   902,   909,   916,   923,   931,
-     941,   945,   952,   959,   966,   973,   980,   988,   995,  1009,
-    1016,  1023,  1033,  1040,  1044,  1051,  1058,  1065,  1072,  1079,
-    1086,  1090,  1097,  1104,  1111,  1120,  1127,  1136,  1146,  1150,
-    1160,  1164,  1174,  1178,  1188,  1192,  1202,  1210,  1217,  1232,
-    1239,  1246,  1250,  1257,  1264,  1268,  1278,  1285,  1295,  1305,
-    1321,  1330,  1340,  1344,  1348,  1352,  1356,  1360,  1370,  1374,
-    1378,  1382,  1392,  1396,  1400,  1404,  1408,  1415,  1419,  1426,
-    1433,  1437,  1441,  1445,  1449,  1456,  1460,  1470,  1477,  1484,
-    1491,  1498,  1505,  1509,  1516,  1524,  1540,  1547,  1557,  1564,
-    1578,  1588,  1595,  1622,  1632,  1636,  1643,  1647,  1651,  1658,
-    1665,  1672,  1687,  1691,  1701,  1705,  1715,  1719,  1729,  1733,
-    1743,  1747,  1757,  1761,  1771,  1778,  1785,  1792,  1799,  1806,
-    1816,  1823,  1833,  1840,  1847,  1851,  1858,  1871,  1875,  1882,
-    1889,  1896,  1900,  1910,  1914,  1927,  1931,  1935,  1939,  1943,
-    1950,  1955,  1960,  1964,  1968,  1972,  1980,  1987,  1994,  2001,
-    2008,  2015,  2022,  2032,  2036,  2046,  2050,  2060,  2064,  2074,
-    2078,  2088,  2092,  2105,  2109,  2113,  2120,  2130,  2134,  2147,
-    2151,  2158,  2162,  2169,  2173,  2180,  2184,  2191,  2195,  2235,
-    2239
+       0,   164,   164,   177,   183,   195,   199,   209,   216,   223,
+     233,   240,   247,   251,   261,   268,   275,   285,   296,   300,
+     313,   318,   322,   326,   331,   338,   345,   352,   359,   366,
+     373,   380,   387,   394,   401,   411,   421,   428,   435,   445,
+     452,   462,   466,   473,   480,   489,   499,   503,   510,   517,
+     524,   531,   541,   548,   555,   563,   573,   585,   584,   618,
+     622,   632,   643,   650,   660,   667,   671,   678,   688,   699,
+     703,   714,   727,   738,   742,   752,   756,   766,   778,   792,
+     796,   803,   810,   817,   824,   831,   838,   845,   852,   859,
+     866,   873,   880,   887,   894,   901,   908,   915,   922,   930,
+     940,   944,   951,   958,   965,   972,   979,   987,   994,  1008,
+    1015,  1022,  1032,  1039,  1043,  1050,  1057,  1064,  1071,  1078,
+    1085,  1089,  1096,  1103,  1110,  1119,  1126,  1135,  1145,  1149,
+    1159,  1163,  1173,  1177,  1187,  1191,  1201,  1209,  1216,  1231,
+    1238,  1245,  1249,  1256,  1263,  1267,  1277,  1284,  1294,  1304,
+    1320,  1329,  1339,  1343,  1347,  1351,  1355,  1359,  1369,  1373,
+    1377,  1381,  1391,  1395,  1399,  1403,  1407,  1414,  1418,  1425,
+    1432,  1436,  1440,  1444,  1448,  1455,  1459,  1469,  1476,  1483,
+    1490,  1497,  1504,  1508,  1515,  1523,  1539,  1546,  1556,  1563,
+    1577,  1587,  1594,  1605,  1615,  1619,  1626,  1630,  1634,  1641,
+    1648,  1655,  1670,  1674,  1684,  1688,  1698,  1702,  1712,  1716,
+    1726,  1730,  1740,  1744,  1754,  1761,  1768,  1775,  1782,  1789,
+    1799,  1806,  1816,  1823,  1830,  1834,  1841,  1854,  1858,  1865,
+    1872,  1879,  1883,  1893,  1897,  1910,  1914,  1918,  1922,  1926,
+    1933,  1938,  1943,  1947,  1951,  1955,  1963,  1970,  1977,  1984,
+    1991,  1998,  2005,  2015,  2019,  2029,  2033,  2043,  2047,  2057,
+    2061,  2071,  2075,  2088,  2092,  2096,  2103,  2113,  2117,  2130,
+    2134,  2141,  2145,  2152,  2156,  2163,  2167,  2174,  2178,  2186,
+    2190
 };
 #endif
 
@@ -1974,7 +1976,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 166 "go.y" /* yacc.c:1646  */
+#line 165 "go.y" /* yacc.c:1646  */
     {
 		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
 		// struct tree **create_tree_kids(int nkids, ...)
@@ -1984,21 +1986,21 @@ yyreduce:
 		(yyval.ast) = new_tree_node(++ruleno, "file", nkids, kids, leaf);
 		ast_root = (yyval.ast);
 	}
-#line 1988 "go.tab.c" /* yacc.c:1646  */
+#line 1990 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 179 "go.y" /* yacc.c:1646  */
+#line 178 "go.y" /* yacc.c:1646  */
     {
 		yyerror("package statement must be first");
 		(yyval.ast) = NULL;
 		exit(2);
 	}
-#line 1998 "go.tab.c" /* yacc.c:1646  */
+#line 2000 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 185 "go.y" /* yacc.c:1646  */
+#line 184 "go.y" /* yacc.c:1646  */
     { 
 		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
 		// struct tree **create_tree_kids(int nkids, ...)
@@ -2007,134 +2009,134 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "package", nkids, kids, leaf);
 	}
-#line 2011 "go.tab.c" /* yacc.c:1646  */
+#line 2013 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 197 "go.y" /* yacc.c:1646  */
+#line 196 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 2019 "go.tab.c" /* yacc.c:1646  */
+#line 2021 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 201 "go.y" /* yacc.c:1646  */
+#line 200 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "imports", nkids, kids, leaf);
 	}
-#line 2030 "go.tab.c" /* yacc.c:1646  */
+#line 2032 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 211 "go.y" /* yacc.c:1646  */
+#line 210 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import", nkids, kids, leaf);
 	}
-#line 2041 "go.tab.c" /* yacc.c:1646  */
+#line 2043 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 218 "go.y" /* yacc.c:1646  */
+#line 217 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import", nkids, kids, leaf);
 	}
-#line 2052 "go.tab.c" /* yacc.c:1646  */
+#line 2054 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 225 "go.y" /* yacc.c:1646  */
+#line 224 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "import", nkids, kids, leaf);
 	}
-#line 2063 "go.tab.c" /* yacc.c:1646  */
+#line 2065 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 235 "go.y" /* yacc.c:1646  */
+#line 234 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import_stmt", nkids, kids, leaf);
 	}
-#line 2074 "go.tab.c" /* yacc.c:1646  */
+#line 2076 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 242 "go.y" /* yacc.c:1646  */
+#line 241 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2082 "go.tab.c" /* yacc.c:1646  */
+#line 2084 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 249 "go.y" /* yacc.c:1646  */
+#line 248 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2090 "go.tab.c" /* yacc.c:1646  */
+#line 2092 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 253 "go.y" /* yacc.c:1646  */
+#line 252 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import_stmt_list", nkids, kids, leaf);
 	}
-#line 2101 "go.tab.c" /* yacc.c:1646  */
+#line 2103 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 263 "go.y" /* yacc.c:1646  */
+#line 262 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
 	}
-#line 2112 "go.tab.c" /* yacc.c:1646  */
+#line 2114 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 270 "go.y" /* yacc.c:1646  */
+#line 269 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
 	}
-#line 2123 "go.tab.c" /* yacc.c:1646  */
+#line 2125 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 277 "go.y" /* yacc.c:1646  */
+#line 276 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
 	}
-#line 2134 "go.tab.c" /* yacc.c:1646  */
+#line 2136 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 287 "go.y" /* yacc.c:1646  */
+#line 286 "go.y" /* yacc.c:1646  */
     {
 		// TODO: concat package and name
 		struct token *leaf = (yyvsp[-2].t);
@@ -2142,381 +2144,381 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "import_package", nkids, kids, leaf);
 	}
-#line 2146 "go.tab.c" /* yacc.c:1646  */
+#line 2148 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 298 "go.y" /* yacc.c:1646  */
+#line 297 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 2154 "go.tab.c" /* yacc.c:1646  */
+#line 2156 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 302 "go.y" /* yacc.c:1646  */
+#line 301 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 1;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "import_safety", nkids, kids, leaf);
 	}
-#line 2165 "go.tab.c" /* yacc.c:1646  */
+#line 2167 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 315 "go.y" /* yacc.c:1646  */
+#line 314 "go.y" /* yacc.c:1646  */
     {
 		yyerror("empty top-level declaration");
 		(yyval.ast) = NULL;
 	}
-#line 2174 "go.tab.c" /* yacc.c:1646  */
+#line 2176 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 320 "go.y" /* yacc.c:1646  */
+#line 319 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2182 "go.tab.c" /* yacc.c:1646  */
+#line 2184 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 324 "go.y" /* yacc.c:1646  */
+#line 323 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2190 "go.tab.c" /* yacc.c:1646  */
+#line 2192 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 328 "go.y" /* yacc.c:1646  */
+#line 327 "go.y" /* yacc.c:1646  */
     {
 		yyerror("non-declaration statement outside function body");
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2199 "go.tab.c" /* yacc.c:1646  */
+#line 2201 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 333 "go.y" /* yacc.c:1646  */
+#line 332 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2207 "go.tab.c" /* yacc.c:1646  */
+#line 2209 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 340 "go.y" /* yacc.c:1646  */
+#line 339 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2218 "go.tab.c" /* yacc.c:1646  */
+#line 2220 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 347 "go.y" /* yacc.c:1646  */
+#line 346 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2229 "go.tab.c" /* yacc.c:1646  */
+#line 2231 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 354 "go.y" /* yacc.c:1646  */
+#line 353 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2240 "go.tab.c" /* yacc.c:1646  */
+#line 2242 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 361 "go.y" /* yacc.c:1646  */
+#line 360 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2251 "go.tab.c" /* yacc.c:1646  */
+#line 2253 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 368 "go.y" /* yacc.c:1646  */
+#line 367 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2262 "go.tab.c" /* yacc.c:1646  */
+#line 2264 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 375 "go.y" /* yacc.c:1646  */
+#line 374 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 4;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-6].ast), (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2273 "go.tab.c" /* yacc.c:1646  */
+#line 2275 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 382 "go.y" /* yacc.c:1646  */
+#line 381 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2284 "go.tab.c" /* yacc.c:1646  */
+#line 2286 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 389 "go.y" /* yacc.c:1646  */
+#line 388 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2295 "go.tab.c" /* yacc.c:1646  */
+#line 2297 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 396 "go.y" /* yacc.c:1646  */
+#line 395 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2306 "go.tab.c" /* yacc.c:1646  */
+#line 2308 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 403 "go.y" /* yacc.c:1646  */
+#line 402 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
 	}
-#line 2317 "go.tab.c" /* yacc.c:1646  */
+#line 2319 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 413 "go.y" /* yacc.c:1646  */
+#line 412 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "lconst", nkids, kids, leaf);
 	}
-#line 2328 "go.tab.c" /* yacc.c:1646  */
+#line 2330 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 423 "go.y" /* yacc.c:1646  */
+#line 422 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
 	}
-#line 2339 "go.tab.c" /* yacc.c:1646  */
+#line 2341 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 430 "go.y" /* yacc.c:1646  */
+#line 429 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
 	}
-#line 2350 "go.tab.c" /* yacc.c:1646  */
+#line 2352 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 437 "go.y" /* yacc.c:1646  */
+#line 436 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
 	}
-#line 2361 "go.tab.c" /* yacc.c:1646  */
+#line 2363 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 447 "go.y" /* yacc.c:1646  */
+#line 446 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "constdcl", nkids, kids, leaf);
 	}
-#line 2372 "go.tab.c" /* yacc.c:1646  */
+#line 2374 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 454 "go.y" /* yacc.c:1646  */
+#line 453 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "constdcl", nkids, kids, leaf);
 	}
-#line 2383 "go.tab.c" /* yacc.c:1646  */
+#line 2385 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 464 "go.y" /* yacc.c:1646  */
+#line 463 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2391 "go.tab.c" /* yacc.c:1646  */
+#line 2393 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 468 "go.y" /* yacc.c:1646  */
+#line 467 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "constdcl1", nkids, kids, leaf);
 	}
-#line 2402 "go.tab.c" /* yacc.c:1646  */
+#line 2404 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 475 "go.y" /* yacc.c:1646  */
+#line 474 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2410 "go.tab.c" /* yacc.c:1646  */
+#line 2412 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 482 "go.y" /* yacc.c:1646  */
+#line 481 "go.y" /* yacc.c:1646  */
     {
 		// the name becomes visible right here, not at the end
 		// of the declaration.
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2420 "go.tab.c" /* yacc.c:1646  */
+#line 2422 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 491 "go.y" /* yacc.c:1646  */
+#line 490 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "typedcl", nkids, kids, leaf);
 	}
-#line 2431 "go.tab.c" /* yacc.c:1646  */
+#line 2433 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 501 "go.y" /* yacc.c:1646  */
+#line 500 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2439 "go.tab.c" /* yacc.c:1646  */
+#line 2441 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 505 "go.y" /* yacc.c:1646  */
+#line 504 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
 	}
-#line 2450 "go.tab.c" /* yacc.c:1646  */
+#line 2452 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 512 "go.y" /* yacc.c:1646  */
+#line 511 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
 	}
-#line 2461 "go.tab.c" /* yacc.c:1646  */
+#line 2463 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 519 "go.y" /* yacc.c:1646  */
+#line 518 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
 	}
-#line 2472 "go.tab.c" /* yacc.c:1646  */
+#line 2474 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 526 "go.y" /* yacc.c:1646  */
+#line 525 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
 	}
-#line 2483 "go.tab.c" /* yacc.c:1646  */
+#line 2485 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 533 "go.y" /* yacc.c:1646  */
+#line 532 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
 	}
-#line 2494 "go.tab.c" /* yacc.c:1646  */
+#line 2496 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 543 "go.y" /* yacc.c:1646  */
+#line 542 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "case", nkids, kids, leaf);
 	}
-#line 2505 "go.tab.c" /* yacc.c:1646  */
+#line 2507 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 550 "go.y" /* yacc.c:1646  */
+#line 549 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "case", nkids, kids, leaf);
 	}
-#line 2516 "go.tab.c" /* yacc.c:1646  */
+#line 2518 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 557 "go.y" /* yacc.c:1646  */
+#line 556 "go.y" /* yacc.c:1646  */
     {
 		// TODO: maybe concat tokens?
 		struct token *leaf = (yyvsp[-4].t);
@@ -2524,33 +2526,33 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "case", nkids, kids, leaf);
 	}
-#line 2528 "go.tab.c" /* yacc.c:1646  */
+#line 2530 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 565 "go.y" /* yacc.c:1646  */
+#line 564 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "case", nkids, kids, leaf);
 	}
-#line 2539 "go.tab.c" /* yacc.c:1646  */
+#line 2541 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 576 "go.y" /* yacc.c:1646  */
+#line 575 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "compound_stmt", nkids, kids, leaf);
 	}
-#line 2550 "go.tab.c" /* yacc.c:1646  */
+#line 2552 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 586 "go.y" /* yacc.c:1646  */
+#line 585 "go.y" /* yacc.c:1646  */
     {
 		// If the last token read by the lexer was consumed
 		// as part of the case, clear it (parser has cleared yychar).
@@ -2560,11 +2562,11 @@ yyreduce:
 		// the case tokens if the stmt_list is empty.
 		yylast = yychar;
 	}
-#line 2564 "go.tab.c" /* yacc.c:1646  */
+#line 2566 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 596 "go.y" /* yacc.c:1646  */
+#line 595 "go.y" /* yacc.c:1646  */
     {
 		int last;
 
@@ -2585,504 +2587,504 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "caseblock", nkids, kids, leaf);
 	}
-#line 2589 "go.tab.c" /* yacc.c:1646  */
+#line 2591 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 620 "go.y" /* yacc.c:1646  */
+#line 619 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 2597 "go.tab.c" /* yacc.c:1646  */
+#line 2599 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 624 "go.y" /* yacc.c:1646  */
+#line 623 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "caseblock_list", nkids, kids, leaf);
 	}
-#line 2608 "go.tab.c" /* yacc.c:1646  */
+#line 2610 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 635 "go.y" /* yacc.c:1646  */
+#line 634 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "loop_body", nkids, kids, leaf);
 	}
-#line 2619 "go.tab.c" /* yacc.c:1646  */
+#line 2621 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 645 "go.y" /* yacc.c:1646  */
+#line 644 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "range_stmt", nkids, kids, leaf);
 	}
-#line 2630 "go.tab.c" /* yacc.c:1646  */
+#line 2632 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 652 "go.y" /* yacc.c:1646  */
+#line 651 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t); // TODO: concat tokens
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "range_stmt", nkids, kids, leaf);
 	}
-#line 2641 "go.tab.c" /* yacc.c:1646  */
+#line 2643 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 662 "go.y" /* yacc.c:1646  */
+#line 661 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "for_header", nkids, kids, leaf);
 	}
-#line 2652 "go.tab.c" /* yacc.c:1646  */
+#line 2654 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 669 "go.y" /* yacc.c:1646  */
+#line 668 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2660 "go.tab.c" /* yacc.c:1646  */
+#line 2662 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 673 "go.y" /* yacc.c:1646  */
+#line 672 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2668 "go.tab.c" /* yacc.c:1646  */
+#line 2670 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 680 "go.y" /* yacc.c:1646  */
+#line 679 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "for_body", nkids, kids, leaf);
 	}
-#line 2679 "go.tab.c" /* yacc.c:1646  */
+#line 2681 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 691 "go.y" /* yacc.c:1646  */
+#line 690 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "for_stmt", nkids, kids, leaf);
 	}
-#line 2690 "go.tab.c" /* yacc.c:1646  */
+#line 2692 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 701 "go.y" /* yacc.c:1646  */
+#line 700 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2698 "go.tab.c" /* yacc.c:1646  */
+#line 2700 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 705 "go.y" /* yacc.c:1646  */
+#line 704 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "if_header", nkids, kids, leaf);
 	}
-#line 2709 "go.tab.c" /* yacc.c:1646  */
+#line 2711 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 719 "go.y" /* yacc.c:1646  */
+#line 718 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 4;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "if_stmt", nkids, kids, leaf);
 	}
-#line 2720 "go.tab.c" /* yacc.c:1646  */
+#line 2722 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 730 "go.y" /* yacc.c:1646  */
+#line 729 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-3].t); // TODO: maybe concat tokens "elseif"
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "elseif", nkids, kids, leaf);
 	}
-#line 2731 "go.tab.c" /* yacc.c:1646  */
+#line 2733 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 740 "go.y" /* yacc.c:1646  */
+#line 739 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 2739 "go.tab.c" /* yacc.c:1646  */
+#line 2741 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 744 "go.y" /* yacc.c:1646  */
+#line 743 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL; 
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "elseif_list", nkids, kids, leaf);
 	}
-#line 2750 "go.tab.c" /* yacc.c:1646  */
+#line 2752 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 754 "go.y" /* yacc.c:1646  */
+#line 753 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 2758 "go.tab.c" /* yacc.c:1646  */
+#line 2760 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 758 "go.y" /* yacc.c:1646  */
+#line 757 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "else", nkids, kids, leaf);
 	}
-#line 2769 "go.tab.c" /* yacc.c:1646  */
+#line 2771 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 770 "go.y" /* yacc.c:1646  */
+#line 769 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t); // TODO: maybe concat tokens
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "switch_stmt", nkids, kids, leaf);
 	}
-#line 2780 "go.tab.c" /* yacc.c:1646  */
+#line 2782 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 781 "go.y" /* yacc.c:1646  */
+#line 780 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-3].t); // TODO: maybe concat tokens
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "select_stmt", nkids, kids, leaf);
 	}
-#line 2791 "go.tab.c" /* yacc.c:1646  */
+#line 2793 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 794 "go.y" /* yacc.c:1646  */
+#line 793 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 2799 "go.tab.c" /* yacc.c:1646  */
+#line 2801 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 798 "go.y" /* yacc.c:1646  */
+#line 797 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2810 "go.tab.c" /* yacc.c:1646  */
+#line 2812 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 805 "go.y" /* yacc.c:1646  */
+#line 804 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2821 "go.tab.c" /* yacc.c:1646  */
+#line 2823 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 812 "go.y" /* yacc.c:1646  */
+#line 811 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2832 "go.tab.c" /* yacc.c:1646  */
+#line 2834 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 819 "go.y" /* yacc.c:1646  */
+#line 818 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2843 "go.tab.c" /* yacc.c:1646  */
+#line 2845 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 826 "go.y" /* yacc.c:1646  */
+#line 825 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2854 "go.tab.c" /* yacc.c:1646  */
+#line 2856 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 833 "go.y" /* yacc.c:1646  */
+#line 832 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2865 "go.tab.c" /* yacc.c:1646  */
+#line 2867 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 840 "go.y" /* yacc.c:1646  */
+#line 839 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2876 "go.tab.c" /* yacc.c:1646  */
+#line 2878 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 847 "go.y" /* yacc.c:1646  */
+#line 846 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2887 "go.tab.c" /* yacc.c:1646  */
+#line 2889 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 854 "go.y" /* yacc.c:1646  */
+#line 853 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2898 "go.tab.c" /* yacc.c:1646  */
+#line 2900 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 861 "go.y" /* yacc.c:1646  */
+#line 860 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2909 "go.tab.c" /* yacc.c:1646  */
+#line 2911 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 868 "go.y" /* yacc.c:1646  */
+#line 867 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2920 "go.tab.c" /* yacc.c:1646  */
+#line 2922 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 875 "go.y" /* yacc.c:1646  */
+#line 874 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2931 "go.tab.c" /* yacc.c:1646  */
+#line 2933 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 882 "go.y" /* yacc.c:1646  */
+#line 881 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2942 "go.tab.c" /* yacc.c:1646  */
+#line 2944 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 889 "go.y" /* yacc.c:1646  */
+#line 888 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2953 "go.tab.c" /* yacc.c:1646  */
+#line 2955 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 896 "go.y" /* yacc.c:1646  */
+#line 895 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2964 "go.tab.c" /* yacc.c:1646  */
+#line 2966 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 903 "go.y" /* yacc.c:1646  */
+#line 902 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2975 "go.tab.c" /* yacc.c:1646  */
+#line 2977 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 910 "go.y" /* yacc.c:1646  */
+#line 909 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2986 "go.tab.c" /* yacc.c:1646  */
+#line 2988 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 917 "go.y" /* yacc.c:1646  */
+#line 916 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 2997 "go.tab.c" /* yacc.c:1646  */
+#line 2999 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 925 "go.y" /* yacc.c:1646  */
+#line 924 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 3008 "go.tab.c" /* yacc.c:1646  */
+#line 3010 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 932 "go.y" /* yacc.c:1646  */
+#line 931 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
 	}
-#line 3019 "go.tab.c" /* yacc.c:1646  */
+#line 3021 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 942 "go.y" /* yacc.c:1646  */
+#line 941 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3027 "go.tab.c" /* yacc.c:1646  */
+#line 3029 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 946 "go.y" /* yacc.c:1646  */
+#line 945 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3038 "go.tab.c" /* yacc.c:1646  */
+#line 3040 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 953 "go.y" /* yacc.c:1646  */
+#line 952 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3049 "go.tab.c" /* yacc.c:1646  */
+#line 3051 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 960 "go.y" /* yacc.c:1646  */
+#line 959 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3060 "go.tab.c" /* yacc.c:1646  */
+#line 3062 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 967 "go.y" /* yacc.c:1646  */
+#line 966 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3071 "go.tab.c" /* yacc.c:1646  */
+#line 3073 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 105:
-#line 974 "go.y" /* yacc.c:1646  */
+#line 973 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3082 "go.tab.c" /* yacc.c:1646  */
+#line 3084 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 106:
-#line 981 "go.y" /* yacc.c:1646  */
+#line 980 "go.y" /* yacc.c:1646  */
     {
 		yyerror("the bitwise complement operator is ^");
 		struct token *leaf = NULL;
@@ -3090,192 +3092,192 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3094 "go.tab.c" /* yacc.c:1646  */
+#line 3096 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 107:
-#line 989 "go.y" /* yacc.c:1646  */
+#line 988 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3105 "go.tab.c" /* yacc.c:1646  */
+#line 3107 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 108:
-#line 996 "go.y" /* yacc.c:1646  */
+#line 995 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
 	}
-#line 3116 "go.tab.c" /* yacc.c:1646  */
+#line 3118 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 109:
-#line 1010 "go.y" /* yacc.c:1646  */
+#line 1009 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
 	}
-#line 3127 "go.tab.c" /* yacc.c:1646  */
+#line 3129 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 110:
-#line 1017 "go.y" /* yacc.c:1646  */
+#line 1016 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
 	}
-#line 3138 "go.tab.c" /* yacc.c:1646  */
+#line 3140 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 111:
-#line 1024 "go.y" /* yacc.c:1646  */
+#line 1023 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-5].ast), (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
 	}
-#line 3149 "go.tab.c" /* yacc.c:1646  */
+#line 3151 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 1034 "go.y" /* yacc.c:1646  */
+#line 1033 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3160 "go.tab.c" /* yacc.c:1646  */
+#line 3162 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 113:
-#line 1041 "go.y" /* yacc.c:1646  */
+#line 1040 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3168 "go.tab.c" /* yacc.c:1646  */
+#line 3170 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 114:
-#line 1045 "go.y" /* yacc.c:1646  */
+#line 1044 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3179 "go.tab.c" /* yacc.c:1646  */
+#line 3181 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 115:
-#line 1052 "go.y" /* yacc.c:1646  */
+#line 1051 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3190 "go.tab.c" /* yacc.c:1646  */
+#line 3192 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 116:
-#line 1059 "go.y" /* yacc.c:1646  */
+#line 1058 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3201 "go.tab.c" /* yacc.c:1646  */
+#line 3203 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 117:
-#line 1066 "go.y" /* yacc.c:1646  */
+#line 1065 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3212 "go.tab.c" /* yacc.c:1646  */
+#line 3214 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 118:
-#line 1073 "go.y" /* yacc.c:1646  */
+#line 1072 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-5].ast), (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3223 "go.tab.c" /* yacc.c:1646  */
+#line 3225 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 119:
-#line 1080 "go.y" /* yacc.c:1646  */
+#line 1079 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 4;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-7].ast), (yyvsp[-5].ast), (yyvsp[-3].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3234 "go.tab.c" /* yacc.c:1646  */
+#line 3236 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 120:
-#line 1087 "go.y" /* yacc.c:1646  */
+#line 1086 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3242 "go.tab.c" /* yacc.c:1646  */
+#line 3244 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 121:
-#line 1091 "go.y" /* yacc.c:1646  */
+#line 1090 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3253 "go.tab.c" /* yacc.c:1646  */
+#line 3255 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 122:
-#line 1098 "go.y" /* yacc.c:1646  */
+#line 1097 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 4;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3264 "go.tab.c" /* yacc.c:1646  */
+#line 3266 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 123:
-#line 1105 "go.y" /* yacc.c:1646  */
+#line 1104 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3275 "go.tab.c" /* yacc.c:1646  */
+#line 3277 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 1112 "go.y" /* yacc.c:1646  */
+#line 1111 "go.y" /* yacc.c:1646  */
     {
 		yyerror("cannot parenthesize type in composite literal");
 
@@ -3284,250 +3286,250 @@ yyreduce:
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-5].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
 	}
-#line 3288 "go.tab.c" /* yacc.c:1646  */
+#line 3290 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 125:
-#line 1121 "go.y" /* yacc.c:1646  */
+#line 1120 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3296 "go.tab.c" /* yacc.c:1646  */
+#line 3298 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 126:
-#line 1128 "go.y" /* yacc.c:1646  */
+#line 1127 "go.y" /* yacc.c:1646  */
     {
 		// composite expression.
 		// make node early so we get the right line number.
 		(yyval.ast) = NULL;
 	}
-#line 3306 "go.tab.c" /* yacc.c:1646  */
+#line 3308 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 127:
-#line 1137 "go.y" /* yacc.c:1646  */
+#line 1136 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "keyval", nkids, kids, leaf);
 	}
-#line 3317 "go.tab.c" /* yacc.c:1646  */
+#line 3319 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 128:
-#line 1147 "go.y" /* yacc.c:1646  */
+#line 1146 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3325 "go.tab.c" /* yacc.c:1646  */
+#line 3327 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 129:
-#line 1151 "go.y" /* yacc.c:1646  */
+#line 1150 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "bare_complitexpr", nkids, kids, leaf);
 	}
-#line 3336 "go.tab.c" /* yacc.c:1646  */
+#line 3338 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 130:
-#line 1161 "go.y" /* yacc.c:1646  */
+#line 1160 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3344 "go.tab.c" /* yacc.c:1646  */
+#line 3346 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 131:
-#line 1165 "go.y" /* yacc.c:1646  */
+#line 1164 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "complitexpr", nkids, kids, leaf);
 	}
-#line 3355 "go.tab.c" /* yacc.c:1646  */
+#line 3357 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 132:
-#line 1175 "go.y" /* yacc.c:1646  */
+#line 1174 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3363 "go.tab.c" /* yacc.c:1646  */
+#line 3365 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 133:
-#line 1179 "go.y" /* yacc.c:1646  */
+#line 1178 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "pexpr", nkids, kids, leaf);
 	}
-#line 3374 "go.tab.c" /* yacc.c:1646  */
+#line 3376 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 134:
-#line 1189 "go.y" /* yacc.c:1646  */
+#line 1188 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3382 "go.tab.c" /* yacc.c:1646  */
+#line 3384 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 135:
-#line 1193 "go.y" /* yacc.c:1646  */
+#line 1192 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr_or_type", nkids, kids, leaf);
 	}
-#line 3393 "go.tab.c" /* yacc.c:1646  */
+#line 3395 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 136:
-#line 1203 "go.y" /* yacc.c:1646  */
+#line 1202 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 
 	}
-#line 3402 "go.tab.c" /* yacc.c:1646  */
+#line 3404 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 137:
-#line 1211 "go.y" /* yacc.c:1646  */
+#line 1210 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "lbrace", nkids, kids, leaf);
 	}
-#line 3413 "go.tab.c" /* yacc.c:1646  */
+#line 3415 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 138:
-#line 1218 "go.y" /* yacc.c:1646  */
+#line 1217 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "lbrace", nkids, kids, leaf);
 	}
-#line 3424 "go.tab.c" /* yacc.c:1646  */
+#line 3426 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 139:
-#line 1233 "go.y" /* yacc.c:1646  */
+#line 1232 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3432 "go.tab.c" /* yacc.c:1646  */
+#line 3434 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 140:
-#line 1240 "go.y" /* yacc.c:1646  */
+#line 1239 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3440 "go.tab.c" /* yacc.c:1646  */
+#line 3442 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 141:
-#line 1247 "go.y" /* yacc.c:1646  */
+#line 1246 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 3448 "go.tab.c" /* yacc.c:1646  */
+#line 3450 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 142:
-#line 1251 "go.y" /* yacc.c:1646  */
+#line 1250 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3456 "go.tab.c" /* yacc.c:1646  */
+#line 3458 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 143:
-#line 1258 "go.y" /* yacc.c:1646  */
+#line 1257 "go.y" /* yacc.c:1646  */
     {
 		struct token* leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
 	}
-#line 3467 "go.tab.c" /* yacc.c:1646  */
+#line 3469 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 144:
-#line 1265 "go.y" /* yacc.c:1646  */
+#line 1264 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3475 "go.tab.c" /* yacc.c:1646  */
+#line 3477 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 145:
-#line 1269 "go.y" /* yacc.c:1646  */
+#line 1268 "go.y" /* yacc.c:1646  */
     {
 		struct token* leaf = (yyvsp[0].t);
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
 	}
-#line 3486 "go.tab.c" /* yacc.c:1646  */
+#line 3488 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 146:
-#line 1279 "go.y" /* yacc.c:1646  */
+#line 1278 "go.y" /* yacc.c:1646  */
     {
 		struct token* leaf = (yyvsp[-2].t); // TODO: concat tokens ?
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
 	}
-#line 3497 "go.tab.c" /* yacc.c:1646  */
+#line 3499 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 147:
-#line 1286 "go.y" /* yacc.c:1646  */
+#line 1285 "go.y" /* yacc.c:1646  */
     {
 		struct token* leaf = (yyvsp[-2].t); // TODO: concat tokens ?
 		int nkids = 0;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
 	}
-#line 3508 "go.tab.c" /* yacc.c:1646  */
+#line 3510 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 148:
-#line 1296 "go.y" /* yacc.c:1646  */
+#line 1295 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "name", nkids, kids, leaf);
 	}
-#line 3519 "go.tab.c" /* yacc.c:1646  */
+#line 3521 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 149:
-#line 1306 "go.y" /* yacc.c:1646  */
+#line 1305 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3527 "go.tab.c" /* yacc.c:1646  */
+#line 3529 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 150:
-#line 1322 "go.y" /* yacc.c:1646  */
+#line 1321 "go.y" /* yacc.c:1646  */
     {
 		yyerror("final argument in variadic function missing type");
 
@@ -3536,310 +3538,310 @@ yyreduce:
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "dotdotdot", nkids, kids, leaf);
 	}
-#line 3540 "go.tab.c" /* yacc.c:1646  */
+#line 3542 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 151:
-#line 1331 "go.y" /* yacc.c:1646  */
+#line 1330 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "dotdotdot", nkids, kids, leaf);
 	}
-#line 3551 "go.tab.c" /* yacc.c:1646  */
+#line 3553 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 152:
-#line 1341 "go.y" /* yacc.c:1646  */
+#line 1340 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3559 "go.tab.c" /* yacc.c:1646  */
+#line 3561 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 153:
-#line 1345 "go.y" /* yacc.c:1646  */
+#line 1344 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3567 "go.tab.c" /* yacc.c:1646  */
+#line 3569 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 154:
-#line 1349 "go.y" /* yacc.c:1646  */
+#line 1348 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3575 "go.tab.c" /* yacc.c:1646  */
+#line 3577 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 155:
-#line 1353 "go.y" /* yacc.c:1646  */
+#line 1352 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3583 "go.tab.c" /* yacc.c:1646  */
+#line 3585 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 156:
-#line 1357 "go.y" /* yacc.c:1646  */
+#line 1356 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3591 "go.tab.c" /* yacc.c:1646  */
+#line 3593 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 157:
-#line 1361 "go.y" /* yacc.c:1646  */
+#line 1360 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "ntype", nkids, kids, leaf);
 	}
-#line 3602 "go.tab.c" /* yacc.c:1646  */
+#line 3604 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 158:
-#line 1371 "go.y" /* yacc.c:1646  */
+#line 1370 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3610 "go.tab.c" /* yacc.c:1646  */
+#line 3612 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 159:
-#line 1375 "go.y" /* yacc.c:1646  */
+#line 1374 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3618 "go.tab.c" /* yacc.c:1646  */
+#line 3620 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 160:
-#line 1379 "go.y" /* yacc.c:1646  */
+#line 1378 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3626 "go.tab.c" /* yacc.c:1646  */
+#line 3628 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 161:
-#line 1383 "go.y" /* yacc.c:1646  */
+#line 1382 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_expr_type", nkids, kids, leaf);
 	}
-#line 3637 "go.tab.c" /* yacc.c:1646  */
+#line 3639 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 162:
-#line 1393 "go.y" /* yacc.c:1646  */
+#line 1392 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3645 "go.tab.c" /* yacc.c:1646  */
+#line 3647 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 163:
-#line 1397 "go.y" /* yacc.c:1646  */
+#line 1396 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);;
 	}
-#line 3653 "go.tab.c" /* yacc.c:1646  */
+#line 3655 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 164:
-#line 1401 "go.y" /* yacc.c:1646  */
+#line 1400 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3661 "go.tab.c" /* yacc.c:1646  */
+#line 3663 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 165:
-#line 1405 "go.y" /* yacc.c:1646  */
+#line 1404 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3669 "go.tab.c" /* yacc.c:1646  */
+#line 3671 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 166:
-#line 1409 "go.y" /* yacc.c:1646  */
+#line 1408 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[-1].ast);
 	}
-#line 3677 "go.tab.c" /* yacc.c:1646  */
+#line 3679 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 167:
-#line 1416 "go.y" /* yacc.c:1646  */
+#line 1415 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3685 "go.tab.c" /* yacc.c:1646  */
+#line 3687 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 168:
-#line 1420 "go.y" /* yacc.c:1646  */
+#line 1419 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3693 "go.tab.c" /* yacc.c:1646  */
+#line 3695 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 169:
-#line 1427 "go.y" /* yacc.c:1646  */
+#line 1426 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3701 "go.tab.c" /* yacc.c:1646  */
+#line 3703 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 170:
-#line 1434 "go.y" /* yacc.c:1646  */
+#line 1433 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3709 "go.tab.c" /* yacc.c:1646  */
+#line 3711 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 171:
-#line 1438 "go.y" /* yacc.c:1646  */
+#line 1437 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3717 "go.tab.c" /* yacc.c:1646  */
+#line 3719 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 172:
-#line 1442 "go.y" /* yacc.c:1646  */
+#line 1441 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3725 "go.tab.c" /* yacc.c:1646  */
+#line 3727 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 173:
-#line 1446 "go.y" /* yacc.c:1646  */
+#line 1445 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3733 "go.tab.c" /* yacc.c:1646  */
+#line 3735 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 174:
-#line 1450 "go.y" /* yacc.c:1646  */
+#line 1449 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3741 "go.tab.c" /* yacc.c:1646  */
+#line 3743 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 175:
-#line 1457 "go.y" /* yacc.c:1646  */
+#line 1456 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3749 "go.tab.c" /* yacc.c:1646  */
+#line 3751 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 176:
-#line 1461 "go.y" /* yacc.c:1646  */
+#line 1460 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "dotname", nkids, kids, leaf);
 	}
-#line 3760 "go.tab.c" /* yacc.c:1646  */
+#line 3762 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 177:
-#line 1471 "go.y" /* yacc.c:1646  */
+#line 1470 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
 	}
-#line 3771 "go.tab.c" /* yacc.c:1646  */
+#line 3773 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 178:
-#line 1478 "go.y" /* yacc.c:1646  */
+#line 1477 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].t), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
 	}
-#line 3782 "go.tab.c" /* yacc.c:1646  */
+#line 3784 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 179:
-#line 1485 "go.y" /* yacc.c:1646  */
+#line 1484 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].t), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
 	}
-#line 3793 "go.tab.c" /* yacc.c:1646  */
+#line 3795 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 180:
-#line 1492 "go.y" /* yacc.c:1646  */
+#line 1491 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].t), (yyvsp[-1].t), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
 	}
-#line 3804 "go.tab.c" /* yacc.c:1646  */
+#line 3806 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 181:
-#line 1499 "go.y" /* yacc.c:1646  */
+#line 1498 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].t), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
 	}
-#line 3815 "go.tab.c" /* yacc.c:1646  */
+#line 3817 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 182:
-#line 1506 "go.y" /* yacc.c:1646  */
+#line 1505 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3823 "go.tab.c" /* yacc.c:1646  */
+#line 3825 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 183:
-#line 1510 "go.y" /* yacc.c:1646  */
+#line 1509 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3831 "go.tab.c" /* yacc.c:1646  */
+#line 3833 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 184:
-#line 1517 "go.y" /* yacc.c:1646  */
+#line 1516 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3839 "go.tab.c" /* yacc.c:1646  */
+#line 3841 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 185:
-#line 1525 "go.y" /* yacc.c:1646  */
+#line 1524 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);	// TODO: concat tokens ?
 		int nkids = 1;
@@ -3852,914 +3854,914 @@ yyreduce:
 		// struct tree** kids = create_tree_kids(nkids, $3);
 		(yyval.ast) = new_tree_node(++ruleno, "recvchantype", nkids, kids, leaf);
 	}
-#line 3856 "go.tab.c" /* yacc.c:1646  */
+#line 3858 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 186:
-#line 1541 "go.y" /* yacc.c:1646  */
+#line 1540 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structtype", nkids, kids, leaf);
 	}
-#line 3867 "go.tab.c" /* yacc.c:1646  */
+#line 3869 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 187:
-#line 1548 "go.y" /* yacc.c:1646  */
+#line 1547 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);	
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structtype", nkids, kids, leaf);
 	}
-#line 3878 "go.tab.c" /* yacc.c:1646  */
+#line 3880 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 188:
-#line 1558 "go.y" /* yacc.c:1646  */
+#line 1557 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "interfacetype", nkids, kids, leaf);
 	}
-#line 3889 "go.tab.c" /* yacc.c:1646  */
+#line 3891 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 189:
-#line 1565 "go.y" /* yacc.c:1646  */
+#line 1564 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "interfacetype", nkids, kids, leaf);
 	}
-#line 3900 "go.tab.c" /* yacc.c:1646  */
+#line 3902 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 190:
-#line 1579 "go.y" /* yacc.c:1646  */
+#line 1578 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "xfndcl", nkids, kids, leaf);
 	}
-#line 3911 "go.tab.c" /* yacc.c:1646  */
+#line 3913 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 191:
-#line 1589 "go.y" /* yacc.c:1646  */
+#line 1588 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "fndcl", nkids, kids, leaf);
 	}
-#line 3922 "go.tab.c" /* yacc.c:1646  */
+#line 3924 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 192:
-#line 1596 "go.y" /* yacc.c:1646  */
+#line 1595 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 4;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-6].ast), (yyvsp[-4].ast), (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "fndcl", nkids, kids, leaf);
 	}
-#line 3933 "go.tab.c" /* yacc.c:1646  */
+#line 3935 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 193:
-#line 1623 "go.y" /* yacc.c:1646  */
+#line 1606 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-4].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "fntype", nkids, kids, leaf);
 	}
-#line 3944 "go.tab.c" /* yacc.c:1646  */
+#line 3946 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 194:
-#line 1633 "go.y" /* yacc.c:1646  */
+#line 1616 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 3952 "go.tab.c" /* yacc.c:1646  */
+#line 3954 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 195:
-#line 1637 "go.y" /* yacc.c:1646  */
+#line 1620 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[-1].ast);
 	}
-#line 3960 "go.tab.c" /* yacc.c:1646  */
+#line 3962 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 196:
-#line 1644 "go.y" /* yacc.c:1646  */
+#line 1627 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 3968 "go.tab.c" /* yacc.c:1646  */
+#line 3970 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 197:
-#line 1648 "go.y" /* yacc.c:1646  */
+#line 1631 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3976 "go.tab.c" /* yacc.c:1646  */
+#line 3978 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 198:
-#line 1652 "go.y" /* yacc.c:1646  */
+#line 1635 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[-1].ast);
 	}
-#line 3984 "go.tab.c" /* yacc.c:1646  */
+#line 3986 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 199:
-#line 1659 "go.y" /* yacc.c:1646  */
+#line 1642 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 3992 "go.tab.c" /* yacc.c:1646  */
+#line 3994 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 200:
-#line 1666 "go.y" /* yacc.c:1646  */
+#line 1649 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-3].ast), (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "fnliteral", nkids, kids, leaf);
 	}
-#line 4003 "go.tab.c" /* yacc.c:1646  */
+#line 4005 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 201:
-#line 1673 "go.y" /* yacc.c:1646  */
+#line 1656 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "fnliteral", nkids, kids, leaf);
 	}
-#line 4014 "go.tab.c" /* yacc.c:1646  */
+#line 4016 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 202:
-#line 1688 "go.y" /* yacc.c:1646  */
+#line 1671 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4022 "go.tab.c" /* yacc.c:1646  */
+#line 4024 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 203:
-#line 1692 "go.y" /* yacc.c:1646  */
+#line 1675 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "xdcl_list", nkids, kids, leaf);
 	}
-#line 4033 "go.tab.c" /* yacc.c:1646  */
+#line 4035 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 204:
-#line 1702 "go.y" /* yacc.c:1646  */
+#line 1685 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4041 "go.tab.c" /* yacc.c:1646  */
+#line 4043 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 205:
-#line 1706 "go.y" /* yacc.c:1646  */
+#line 1689 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "vardcl_list", nkids, kids, leaf);
 	}
-#line 4052 "go.tab.c" /* yacc.c:1646  */
+#line 4054 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 206:
-#line 1716 "go.y" /* yacc.c:1646  */
+#line 1699 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4060 "go.tab.c" /* yacc.c:1646  */
+#line 4062 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 207:
-#line 1720 "go.y" /* yacc.c:1646  */
+#line 1703 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "constdcl_list", nkids, kids, leaf);
 	}
-#line 4071 "go.tab.c" /* yacc.c:1646  */
+#line 4073 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 208:
-#line 1730 "go.y" /* yacc.c:1646  */
+#line 1713 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4079 "go.tab.c" /* yacc.c:1646  */
+#line 4081 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 209:
-#line 1734 "go.y" /* yacc.c:1646  */
+#line 1717 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "typedcl_list", nkids, kids, leaf);
 	}
-#line 4090 "go.tab.c" /* yacc.c:1646  */
+#line 4092 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 210:
-#line 1744 "go.y" /* yacc.c:1646  */
+#line 1727 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4098 "go.tab.c" /* yacc.c:1646  */
+#line 4100 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 211:
-#line 1748 "go.y" /* yacc.c:1646  */
+#line 1731 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl_list", nkids, kids, leaf);
 	}
-#line 4109 "go.tab.c" /* yacc.c:1646  */
+#line 4111 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 212:
-#line 1758 "go.y" /* yacc.c:1646  */
+#line 1741 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4117 "go.tab.c" /* yacc.c:1646  */
+#line 4119 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 213:
-#line 1762 "go.y" /* yacc.c:1646  */
+#line 1745 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "interfacedcl_list", nkids, kids, leaf);
 	}
-#line 4128 "go.tab.c" /* yacc.c:1646  */
+#line 4130 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 214:
-#line 1772 "go.y" /* yacc.c:1646  */
+#line 1755 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4139 "go.tab.c" /* yacc.c:1646  */
+#line 4141 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 215:
-#line 1779 "go.y" /* yacc.c:1646  */
+#line 1762 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4150 "go.tab.c" /* yacc.c:1646  */
+#line 4152 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 216:
-#line 1786 "go.y" /* yacc.c:1646  */
+#line 1769 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4161 "go.tab.c" /* yacc.c:1646  */
+#line 4163 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 217:
-#line 1793 "go.y" /* yacc.c:1646  */
+#line 1776 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4172 "go.tab.c" /* yacc.c:1646  */
+#line 4174 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 218:
-#line 1800 "go.y" /* yacc.c:1646  */
+#line 1783 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4183 "go.tab.c" /* yacc.c:1646  */
+#line 4185 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 219:
-#line 1807 "go.y" /* yacc.c:1646  */
+#line 1790 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
 	}
-#line 4194 "go.tab.c" /* yacc.c:1646  */
+#line 4196 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 220:
-#line 1817 "go.y" /* yacc.c:1646  */
+#line 1800 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[0].t);
 		int nkids = 1;
 		struct tree** kids = NULL;
 		(yyval.ast) = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
 	}
-#line 4205 "go.tab.c" /* yacc.c:1646  */
+#line 4207 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 221:
-#line 1824 "go.y" /* yacc.c:1646  */
+#line 1807 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-2].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
 	}
-#line 4216 "go.tab.c" /* yacc.c:1646  */
+#line 4218 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 222:
-#line 1834 "go.y" /* yacc.c:1646  */
+#line 1817 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4224 "go.tab.c" /* yacc.c:1646  */
+#line 4226 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 223:
-#line 1841 "go.y" /* yacc.c:1646  */
+#line 1824 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "interfacedcl", nkids, kids, leaf);
 	}
-#line 4235 "go.tab.c" /* yacc.c:1646  */
+#line 4237 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 224:
-#line 1848 "go.y" /* yacc.c:1646  */
+#line 1831 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4243 "go.tab.c" /* yacc.c:1646  */
+#line 4245 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 225:
-#line 1852 "go.y" /* yacc.c:1646  */
+#line 1835 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[-1].ast);
 	}
-#line 4251 "go.tab.c" /* yacc.c:1646  */
+#line 4253 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 226:
-#line 1859 "go.y" /* yacc.c:1646  */
+#line 1842 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "indcl", nkids, kids, leaf);
 	}
-#line 4262 "go.tab.c" /* yacc.c:1646  */
+#line 4264 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 227:
-#line 1872 "go.y" /* yacc.c:1646  */
+#line 1855 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4270 "go.tab.c" /* yacc.c:1646  */
+#line 4272 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 228:
-#line 1876 "go.y" /* yacc.c:1646  */
+#line 1859 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "arg_type", nkids, kids, leaf);
 	}
-#line 4281 "go.tab.c" /* yacc.c:1646  */
+#line 4283 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 229:
-#line 1883 "go.y" /* yacc.c:1646  */
+#line 1866 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "arg_type", nkids, kids, leaf);
 	}
-#line 4292 "go.tab.c" /* yacc.c:1646  */
+#line 4294 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 230:
-#line 1890 "go.y" /* yacc.c:1646  */
+#line 1873 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4300 "go.tab.c" /* yacc.c:1646  */
+#line 4302 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 231:
-#line 1897 "go.y" /* yacc.c:1646  */
+#line 1880 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4308 "go.tab.c" /* yacc.c:1646  */
+#line 4310 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 232:
-#line 1901 "go.y" /* yacc.c:1646  */
+#line 1884 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "arg_type_list", nkids, kids, leaf);
 	}
-#line 4319 "go.tab.c" /* yacc.c:1646  */
+#line 4321 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 233:
-#line 1911 "go.y" /* yacc.c:1646  */
+#line 1894 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4327 "go.tab.c" /* yacc.c:1646  */
+#line 4329 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 234:
-#line 1915 "go.y" /* yacc.c:1646  */
+#line 1898 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "oarg_type_list_ocomma", nkids, kids, leaf);
 	}
-#line 4338 "go.tab.c" /* yacc.c:1646  */
+#line 4340 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 235:
-#line 1928 "go.y" /* yacc.c:1646  */
+#line 1911 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4346 "go.tab.c" /* yacc.c:1646  */
+#line 4348 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 236:
-#line 1932 "go.y" /* yacc.c:1646  */
+#line 1915 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4354 "go.tab.c" /* yacc.c:1646  */
+#line 4356 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 237:
-#line 1936 "go.y" /* yacc.c:1646  */
+#line 1919 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4362 "go.tab.c" /* yacc.c:1646  */
+#line 4364 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 238:
-#line 1940 "go.y" /* yacc.c:1646  */
+#line 1923 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4370 "go.tab.c" /* yacc.c:1646  */
+#line 4372 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 239:
+#line 1927 "go.y" /* yacc.c:1646  */
+    {
+		(yyval.ast) = (yyvsp[0].ast);
+	}
+#line 4380 "go.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 240:
+#line 1934 "go.y" /* yacc.c:1646  */
+    {
+		
+		(yyval.ast) = (yyvsp[0].ast);
+	}
+#line 4389 "go.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 241:
+#line 1939 "go.y" /* yacc.c:1646  */
+    {
+		
+		(yyval.ast) = (yyvsp[0].ast);
+	}
+#line 4398 "go.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 242:
 #line 1944 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4378 "go.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 240:
-#line 1951 "go.y" /* yacc.c:1646  */
-    {
-		
-		(yyval.ast) = (yyvsp[0].ast);
-	}
-#line 4387 "go.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 241:
-#line 1956 "go.y" /* yacc.c:1646  */
-    {
-		
-		(yyval.ast) = (yyvsp[0].ast);
-	}
-#line 4396 "go.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 242:
-#line 1961 "go.y" /* yacc.c:1646  */
-    {
-		(yyval.ast) = (yyvsp[0].ast);
-	}
-#line 4404 "go.tab.c" /* yacc.c:1646  */
+#line 4406 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 243:
-#line 1965 "go.y" /* yacc.c:1646  */
+#line 1948 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4412 "go.tab.c" /* yacc.c:1646  */
+#line 4414 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 244:
-#line 1969 "go.y" /* yacc.c:1646  */
+#line 1952 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4420 "go.tab.c" /* yacc.c:1646  */
+#line 4422 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 245:
-#line 1974 "go.y" /* yacc.c:1646  */
+#line 1957 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 22;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4431 "go.tab.c" /* yacc.c:1646  */
+#line 4433 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 246:
-#line 1981 "go.y" /* yacc.c:1646  */
+#line 1964 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].t));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4442 "go.tab.c" /* yacc.c:1646  */
+#line 4444 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 247:
-#line 1988 "go.y" /* yacc.c:1646  */
+#line 1971 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4453 "go.tab.c" /* yacc.c:1646  */
+#line 4455 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 248:
-#line 1995 "go.y" /* yacc.c:1646  */
+#line 1978 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4464 "go.tab.c" /* yacc.c:1646  */
+#line 4466 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 249:
-#line 2002 "go.y" /* yacc.c:1646  */
+#line 1985 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4475 "go.tab.c" /* yacc.c:1646  */
+#line 4477 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 250:
-#line 2009 "go.y" /* yacc.c:1646  */
+#line 1992 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4486 "go.tab.c" /* yacc.c:1646  */
+#line 4488 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 251:
-#line 2016 "go.y" /* yacc.c:1646  */
+#line 1999 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4497 "go.tab.c" /* yacc.c:1646  */
+#line 4499 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 252:
-#line 2023 "go.y" /* yacc.c:1646  */
+#line 2006 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = (yyvsp[-1].t);
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
 	}
-#line 4508 "go.tab.c" /* yacc.c:1646  */
+#line 4510 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 253:
-#line 2033 "go.y" /* yacc.c:1646  */
+#line 2016 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4516 "go.tab.c" /* yacc.c:1646  */
+#line 4518 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 254:
-#line 2037 "go.y" /* yacc.c:1646  */
+#line 2020 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "stmt_list", nkids, kids, leaf);
 	}
-#line 4527 "go.tab.c" /* yacc.c:1646  */
+#line 4529 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 255:
-#line 2047 "go.y" /* yacc.c:1646  */
+#line 2030 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4535 "go.tab.c" /* yacc.c:1646  */
+#line 4537 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 256:
-#line 2051 "go.y" /* yacc.c:1646  */
+#line 2034 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "new_name_list", nkids, kids, leaf);
 	}
-#line 4546 "go.tab.c" /* yacc.c:1646  */
+#line 4548 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 257:
-#line 2061 "go.y" /* yacc.c:1646  */
+#line 2044 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4554 "go.tab.c" /* yacc.c:1646  */
+#line 4556 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 258:
-#line 2065 "go.y" /* yacc.c:1646  */
+#line 2048 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "dcl_name_list", nkids, kids, leaf);
 	}
-#line 4565 "go.tab.c" /* yacc.c:1646  */
+#line 4567 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 259:
-#line 2075 "go.y" /* yacc.c:1646  */
+#line 2058 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4573 "go.tab.c" /* yacc.c:1646  */
+#line 4575 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 260:
-#line 2079 "go.y" /* yacc.c:1646  */
+#line 2062 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr_list", nkids, kids, leaf);
 	}
-#line 4584 "go.tab.c" /* yacc.c:1646  */
+#line 4586 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 261:
-#line 2089 "go.y" /* yacc.c:1646  */
+#line 2072 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4592 "go.tab.c" /* yacc.c:1646  */
+#line 4594 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 262:
-#line 2093 "go.y" /* yacc.c:1646  */
+#line 2076 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "expr_or_type_list", nkids, kids, leaf);
 	}
-#line 4603 "go.tab.c" /* yacc.c:1646  */
+#line 4605 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 263:
-#line 2106 "go.y" /* yacc.c:1646  */
+#line 2089 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4611 "go.tab.c" /* yacc.c:1646  */
+#line 4613 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 264:
-#line 2110 "go.y" /* yacc.c:1646  */
+#line 2093 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4619 "go.tab.c" /* yacc.c:1646  */
+#line 4621 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 265:
-#line 2114 "go.y" /* yacc.c:1646  */
+#line 2097 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "keyval_list", nkids, kids, leaf);
 	}
-#line 4630 "go.tab.c" /* yacc.c:1646  */
+#line 4632 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 266:
-#line 2121 "go.y" /* yacc.c:1646  */
+#line 2104 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-2].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "keyval_list", nkids, kids, leaf);
 	}
-#line 4641 "go.tab.c" /* yacc.c:1646  */
+#line 4643 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 267:
-#line 2131 "go.y" /* yacc.c:1646  */
+#line 2114 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4649 "go.tab.c" /* yacc.c:1646  */
+#line 4651 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 268:
-#line 2135 "go.y" /* yacc.c:1646  */
+#line 2118 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), (yyvsp[0].ast));
 		(yyval.ast) = new_tree_node(++ruleno, "braced_keyval_list", nkids, kids, leaf);
 	}
-#line 4660 "go.tab.c" /* yacc.c:1646  */
+#line 4662 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 269:
-#line 2148 "go.y" /* yacc.c:1646  */
+#line 2131 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4668 "go.tab.c" /* yacc.c:1646  */
+#line 4670 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 270:
-#line 2152 "go.y" /* yacc.c:1646  */
+#line 2135 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = new_tree_node(++ruleno, "osemi", 0, NULL, (yyvsp[0].t));
 	}
-#line 4676 "go.tab.c" /* yacc.c:1646  */
+#line 4678 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 271:
-#line 2159 "go.y" /* yacc.c:1646  */
+#line 2142 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4684 "go.tab.c" /* yacc.c:1646  */
+#line 4686 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 272:
-#line 2163 "go.y" /* yacc.c:1646  */
+#line 2146 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = new_tree_node(++ruleno, "ocomma", 0, NULL, (yyvsp[0].t));
 	}
-#line 4692 "go.tab.c" /* yacc.c:1646  */
+#line 4694 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 273:
-#line 2170 "go.y" /* yacc.c:1646  */
+#line 2153 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4700 "go.tab.c" /* yacc.c:1646  */
+#line 4702 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 274:
-#line 2174 "go.y" /* yacc.c:1646  */
+#line 2157 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4708 "go.tab.c" /* yacc.c:1646  */
+#line 4710 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 275:
-#line 2181 "go.y" /* yacc.c:1646  */
+#line 2164 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4716 "go.tab.c" /* yacc.c:1646  */
+#line 4718 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 276:
-#line 2185 "go.y" /* yacc.c:1646  */
+#line 2168 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4724 "go.tab.c" /* yacc.c:1646  */
+#line 4726 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 277:
-#line 2192 "go.y" /* yacc.c:1646  */
+#line 2175 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4732 "go.tab.c" /* yacc.c:1646  */
+#line 4734 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 278:
-#line 2196 "go.y" /* yacc.c:1646  */
+#line 2179 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = (yyvsp[0].ast);
 	}
-#line 4740 "go.tab.c" /* yacc.c:1646  */
+#line 4742 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 279:
-#line 2236 "go.y" /* yacc.c:1646  */
+#line 2187 "go.y" /* yacc.c:1646  */
     {
 		(yyval.ast) = NULL;
 	}
-#line 4748 "go.tab.c" /* yacc.c:1646  */
+#line 4750 "go.tab.c" /* yacc.c:1646  */
     break;
 
   case 280:
-#line 2240 "go.y" /* yacc.c:1646  */
+#line 2191 "go.y" /* yacc.c:1646  */
     {
 		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[0].t));
 		(yyval.ast) = new_tree_node(++ruleno, "oliteral", nkids, kids, leaf);
 	}
-#line 4759 "go.tab.c" /* yacc.c:1646  */
+#line 4761 "go.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 4763 "go.tab.c" /* yacc.c:1646  */
+#line 4765 "go.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -4987,5 +4989,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 2583 "go.y" /* yacc.c:1906  */
+#line 2214 "go.y" /* yacc.c:1906  */
 
