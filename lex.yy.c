@@ -1003,7 +1003,7 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 67 "vgolex.l"
-{ return tok(LASOP);   }
+{ return tok('=');   }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP

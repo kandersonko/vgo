@@ -17,11 +17,7 @@ struct tree
 
 typedef struct tree *tree_ptr;
 
-// int treeprint(struct tree *t, int depth);
-
 void print_tree(tree_ptr ast, int depth);
-
-void print_kids(struct tree **kids, int nkids);
 
 void delete_tree(tree_ptr ast);
 

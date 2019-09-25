@@ -34,19 +34,6 @@ void print_tree(tree_ptr ast, int depth)
         print_tree(ast->kids[i], depth + 1);
 }
 
-void print_kids(struct tree **kids, int nkids)
-{
-    int i;
-    printf("Printing kid:\n");
-    for (i = 0; i < nkids; i++)
-    {
-        if (kids[i])
-            printf("kid: %d %s - %d\n", kids[i]->prodrule, kids[i]->prodname, kids[i]->nkids);
-        else
-            printf("no kid at index %d\n", i);
-    }
-}
-
 void delete_tree(tree_ptr ast)
 {
     if (!ast)

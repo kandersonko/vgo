@@ -3,6 +3,7 @@ CFLAGS=-c -g -Wall
 OBJ=vgo.o lex.yy.o token.o tree.o utils.o go.tab.o
 binaries=vgo
 files=vgo.c token.c token.h go.tab.h vgolex.l makefile
+DEPS = rules.h
 
 vgo: $(OBJ)
 	$(CC) -o vgo $(OBJ) $(DEPS)

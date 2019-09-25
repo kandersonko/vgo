@@ -64,7 +64,7 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 "!="          { return tok(LNE);  }
 "&&"          { return tok(LANDAND);   }
 "||"          { return tok(LOROR);  }
-"="          { return tok(LASOP);   }
+"="          { return tok('=');   }
 "+="          { return tok(LASOP);   }
 "-="          { return tok(LASOP);   }
 "++"           { return tok(LINC); }
