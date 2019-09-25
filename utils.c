@@ -16,6 +16,8 @@ void *safe_malloc(size_t size)
     return ptr;
 }
 
+// TODO: print the pointer and token - and check
+
 void print_error(int tokentype)
 {
     switch (tokentype)
