@@ -59,8 +59,8 @@ int ruleno = 0;
 void yyerror(const char *s)
 {
 	fprintf(stderr, "%s\n", s);
-	fprintf(stderr, "syntax error: unexpected '%s' token in file %s, line %d\n",
-	   yytext,yyfilename, yylineno);
+	fprintf(stderr, "ERROR: found '%s' token at line %d in file %s\n",
+	   yytext,yylineno,yyfilename);
 	exit(2);
 }
 
@@ -99,26 +99,26 @@ void yyerror(const char *s)
 
 %type<ast>		stmt ntype 
 %type<ast>		arg_type 
-%type<ast>		compound_stmt dotname embed expr complitexpr bare_complitexpr
+%type<ast>		compound_stmt dotname embed expr
 %type<ast>		expr_or_type
 %type<ast>		fndcl fnliteral
 %type<ast>		for_body for_header for_stmt if_header if_stmt non_dcl_stmt
-%type<ast>		keyval labelname name
+%type<ast>		name
 %type<ast>		name_or_type non_expr_type
 %type<ast>		new_name dcl_name oexpr typedclname
 %type<ast>		osimple_stmt pexpr pexpr_no_paren
 %type<ast>		pseudocall 
 %type<ast>		simple_stmt 
 %type<ast>		uexpr 
-%type<ast>		xfndcl typedcl start_complit
+%type<ast>		xfndcl typedcl
 
 %type<ast>		xdcl fnbody fnres loop_body dcl_name_list
-%type<ast>		new_name_list expr_list keyval_list braced_keyval_list expr_or_type_list xdcl_list
+%type<ast>		new_name_list expr_list expr_or_type_list xdcl_list
 %type<ast>		oexpr_list elseif elseif_list else stmt_list oarg_type_list_ocomma ocomma arg_type_list
 %type<ast>		vardcl vardcl_list structdcl structdcl_list
 %type<ast>		common_dcl constdcl constdcl1 constdcl_list typedcl_list
 
-%type<ast>		convtype comptype dotdotdot
+%type<ast>		convtype dotdotdot
 %type<ast>		structtype ptrtype
 %type<ast>		othertype fnret_type fntype
 
@@ -134,7 +134,7 @@ void yyerror(const char *s)
 %left		'+' '-' '|' '^'
 %left		'*' '/' '%' '&' LLSH LRSH LANDNOT
 
-%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`' '.' '='
+%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`' '.' '=' '!' '~' '[' ']' '@'
 
 /*
  * manual override of shift/reduce conflicts.
@@ -155,19 +155,16 @@ void yyerror(const char *s)
 
 %error-verbose
 
-%token END 0 "end of file"
+// %token END 0 "end of file"
 
 // TODO: free unused token to prevent memory leak
 
 %%
 file:	package imports xdcl_list
 	{
-		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
-		// struct tree **create_tree_kids(int nkids, ...)
-		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, $1, $2, $3);
-		$$ = new_tree_node(R_FILE, "file", nkids, kids, leaf);
+		$$ = new_tree_node(R_FILE, "file", nkids, kids, NULL);
 		ast_root = $$;
 	}
 ;
@@ -176,65 +173,67 @@ package:
 	%empty %prec NotPackage 
 	{
 		yyerror("package statement must be first");
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_PACKAGE, "package");
 		exit(2);
 	}
 |	LPACKAGE sym ';' 
-	{ 
-		// tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
-		// struct tree **create_tree_kids(int nkids, ...)
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "package", nkids, kids, leaf);
+	{
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(R_PACKAGE, "package", $1);
+		struct tree* t3 = new_leaf_node($3->category, "package", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_PACKAGE, "package", nkids, kids, NULL);
 	}
 ;
 
 imports:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_IMPORTS, "imports");
 	}	
 |	imports import ';' 
 	{
-		struct token *leaf = $3;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "imports", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t3 = new_leaf_node($3->category, "imports", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, t3);
+		$$ = new_tree_node(R_IMPORTS, "imports", nkids, kids, NULL);
 	}
 ;
 
 import:
 	LIMPORT import_stmt
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "import", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_IMPORT, "import", nkids, kids, NULL);
 	}
 |	LIMPORT '(' import_stmt_list osemi ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $4);
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LIMPORT, "import", $1);
+		struct tree* t2 = new_leaf_node($2->category, "import", $2);
+		struct tree* t5 = new_leaf_node($5->category, "import", $5);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_IMPORT, "import", nkids, kids, NULL);
 	}
 |	LIMPORT '(' ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LIMPORT, "import", $1);
+		struct tree* t2 = new_leaf_node($2->category, "import", $2);
+		struct tree* t3 = new_leaf_node($3->category, "import", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
+		$$ = new_tree_node(R_IMPORT, "import", nkids, kids, NULL);
 	}
 ;
 
 import_stmt:
 	import_here import_package
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "import_stmt", nkids, kids, leaf);
+		$$ = new_tree_node(R_IMPORT_STMT, "import_stmt", nkids, kids, NULL);
 	}
 |	import_here
 	{
@@ -249,34 +248,35 @@ import_stmt_list:
 	}
 |	import_stmt_list ';' import_stmt
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "import_stmt_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "import_stmt_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_IMPORT_STMT_LIST, "import_stmt_list", nkids, kids, NULL);
 	}
 ;
 
 import_here:
 	LLITERAL
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LLITERAL, "import_here", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
 |	sym LLITERAL
 	{
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2);
+		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
 |	'.' LLITERAL
 	{
-		struct token *leaf = $2;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_here", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "import_here", $1);
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
+		struct tree** kids = create_tree_kids(nkids, t1, t2);
+		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
 ;
 
@@ -284,24 +284,26 @@ import_package:
 	LPACKAGE LNAME import_safety ';'
 	{
 		// TODO: concat package and name
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "import_package", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node(LPACKAGE, "import_package", $1);
+		struct tree* t2 = new_leaf_node(LNAME, "import_package", $2);
+		struct tree* t4 = new_leaf_node($4->category, "import_package", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4);
+		$$ = new_tree_node(R_IMPORT_PACKAGE, "import_package", nkids, kids, NULL);
 	}
 ;
 
 import_safety:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_IMPORT_SAFETY, "import_safety");
 	}
 |	LNAME
 	{
-		struct token *leaf = $1;
 		int nkids = 1;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "import_safety", nkids, kids, leaf);
+		struct tree* t1 = new_leaf_node(LNAME, "import_safety", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_IMPORT_SAFETY, "import_safety", nkids, kids, NULL);
 	}
 ;
 
@@ -312,7 +314,7 @@ xdcl:
 	%empty 
 	{
 		yyerror("empty top-level declaration");
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_XDCL, "xdcl");
 	}
 |	common_dcl
 	{
@@ -336,124 +338,134 @@ xdcl:
 common_dcl:
 	LVAR vardcl
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LVAR '(' vardcl_list osemi ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $4);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LVAR '(' ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst constdcl
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' constdcl osemi ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $4);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' constdcl ';' constdcl_list osemi ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5, $6);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 7;
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t4 = new_leaf_node($4->category, "common_dcl", $4);
+		struct tree* t7 = new_leaf_node($7->category, "common_dcl", $7);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5, $6, t7);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, t3);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE typedcl
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE '(' typedcl_list osemi ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $4);
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE '(' ')'
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "common_dcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
+		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
+		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 ;
 
 lconst:
 	LCONST
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "lconst", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LCONST, "lconst", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_LCONST, "lconst", nkids, kids, NULL);
 	}
 ;
 
 vardcl:
 	dcl_name_list ntype
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
+		$$ = new_tree_node(R_VARDCL, "vardcl", nkids, kids, NULL);
 	}
 |	dcl_name_list ntype '=' expr_list
 	{
-		struct token *leaf = $3;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $2, $4);
-		$$ = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t3 = new_leaf_node($3->category, "vardcl", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, t3, $4);
+		$$ = new_tree_node(R_VARDCL, "vardcl", nkids, kids, NULL);
 	}
 |	dcl_name_list '=' expr_list
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "vardcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "vardcl", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_VARDCL, "vardcl", nkids, kids, NULL);
 	}
 	;
 
 constdcl:
 	dcl_name_list ntype '=' expr_list
 	{
-		struct token *leaf = $3;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $2, $4);
-		$$ = new_tree_node(++ruleno, "constdcl", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t3 = new_leaf_node($3->category, "constdcl", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, t3, $4);
+		$$ = new_tree_node(R_CONSTDCL, "constdcl", nkids, kids, NULL);
 	}
 |	dcl_name_list '=' expr_list
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "constdcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "constdcl", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_CONSTDCL, "constdcl", nkids, kids, NULL);
 	}
 ;
 
@@ -464,10 +476,9 @@ constdcl1:
 	}
 |	dcl_name_list ntype
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "constdcl1", nkids, kids, leaf);
+		$$ = new_tree_node(R_CONSTDCL1, "constdcl1", nkids, kids, NULL);
 	}
 |	dcl_name_list
 	{
@@ -487,10 +498,9 @@ typedclname:
 typedcl:
 	typedclname ntype
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "typedcl", nkids, kids, leaf);
+		$$ = new_tree_node(R_TYPEDCL, "typedcl", nkids, kids, NULL);
 	}
 ;
 
@@ -501,38 +511,38 @@ simple_stmt:
 	}
 |	expr LASOP expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LASOP, "simple_stmt", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr_list '=' expr_list
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr_list LCOLAS expr_list
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LCOLAS, "simple_stmt", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr LINC
 	{
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t2 = new_leaf_node(LINC, "simple_stmt", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2);
+		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr LDEC
 	{
-		struct token *leaf = $2;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "simple_stmt", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t2 = new_leaf_node(LDEC, "simple_stmt", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2);
+		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -540,10 +550,11 @@ compound_stmt:
 	'{' 
 	stmt_list '}'
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "compound_stmt", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "compound_stmt", $1);
+		struct tree* t3 = new_leaf_node($3->category, "compound_stmt", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_COMPOUND_STMT, "compound_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -551,20 +562,22 @@ loop_body:
 	LBODY
 	stmt_list '}'
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "loop_body", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LBODY, "loop_body", $1);
+		struct tree* t3 = new_leaf_node($3->category, "loop_body", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_LOOP_BODY, "loop_body", nkids, kids, NULL);
 	}
 ;
 
 for_header:
 	osimple_stmt ';' osimple_stmt ';' osimple_stmt
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "for_header", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "for_header", $2);
+		struct tree* t4 = new_leaf_node($4->category, "for_header", $4);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_FOR_HEADER, "for_header", nkids, kids, NULL);
 	}
 |	osimple_stmt
 	{
@@ -575,10 +588,9 @@ for_header:
 for_body:
 	for_header loop_body
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "for_body", nkids, kids, leaf);
+		$$ = new_tree_node(R_FOR_BODY, "for_body", nkids, kids, NULL);
 	}
 ;
 
@@ -586,10 +598,10 @@ for_stmt:
 	LFOR
 	for_body
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "for_stmt", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LFOR, "for_stmt", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_FOR_STMT, "for_stmt", nkids, kids, NULL);
 	}
 	;
 
@@ -600,10 +612,10 @@ if_header:
 	}
 |	osimple_stmt ';' osimple_stmt
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "if_header", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "if_header", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_IF_HEADER, "if_header", nkids, kids, NULL);
 	}
 ;
 
@@ -614,10 +626,10 @@ if_stmt:
 	loop_body
 	elseif_list else
 	{
-		struct token *leaf = $1;
-		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $2, $3, $4, $5);
-		$$ = new_tree_node(++ruleno, "if_stmt", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LIF, "if_stmt", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, $4, $5);
+		$$ = new_tree_node(R_IF_STMT, "if_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -625,38 +637,38 @@ elseif:
 	LELSE LIF 
 	if_header loop_body
 	{
-		struct token *leaf = $1; // TODO: maybe concat tokens "elseif"
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $4);
-		$$ = new_tree_node(++ruleno, "elseif", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node(LELSE, "elseif", $1);
+		struct tree* t2 = new_leaf_node(LIF, "elseif", $2);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4);
+		$$ = new_tree_node(R_ELSEIF, "elseif", nkids, kids, NULL);
 	}
 ;
 
 elseif_list:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_ELSEIF_LIST, "elseif_list");
 	}
 |	elseif_list elseif
 	{
-		struct token *leaf = NULL; 
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "elseif_list", nkids, kids, leaf);
+		$$ = new_tree_node(R_ELSEIF_LIST, "elseif_list", nkids, kids, NULL);
 	}
 ;
 
 else:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_ELSE, "else");
 	}
 |	LELSE compound_stmt
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "else", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LELSE, "else", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_ELSE, "else", nkids, kids, NULL);
 	}
 ;
 
@@ -670,144 +682,115 @@ expr:
 	}
 |	expr LOROR expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LOROR, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LANDAND expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LANDAND, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LEQ expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LEQ, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LNE expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LNE, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LLT expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LLT, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LLE expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LLE, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LGE expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LGE, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LGT expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LGT, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '+' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '-' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '|' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
-	}
-|	expr '^' expr
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '*' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '/' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr '%' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
-	}
-|	expr '&' expr
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LANDNOT expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
-	}
-|	expr LLSH expr
-	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
-	}
-|	expr LRSH expr
-	/* not an expression anymore, but left in so we can give a good error */
-	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LANDNOT, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 |	expr LCOMM expr
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
 ;
 
@@ -818,60 +801,45 @@ uexpr:
 	}
 |	'*' uexpr
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
-	}
-|	'&' uexpr
-	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 |	'+' uexpr
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 |	'-' uexpr
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 |	'!' uexpr
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 |	'~' uexpr
 	{
-		yyerror("the bitwise complement operator is ^");
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
-	}
-|	'^' uexpr
-	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 |	LCOMM uexpr
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "uexpr", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LCOMM, "uexpr", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
 	}
 ;
 
@@ -882,34 +850,38 @@ uexpr:
 pseudocall:
 	pexpr '(' ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
+		struct tree* t3 = new_leaf_node($3->category, "pseudocall", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, t3);
+		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
 	}
 |	pexpr '(' expr_or_type_list ocomma ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $4);
-		$$ = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
+		struct tree* t5 = new_leaf_node($5->category, "pseudocall", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
 	}
 |	pexpr '(' expr_or_type_list LDDD ocomma ')'
 	{
-		struct token *leaf = $4;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "pseudocall", nkids, kids, leaf);
+		int nkids = 6;
+		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
+		struct tree* t4 = new_leaf_node(LDDD, "pseudocall", $4);
+		struct tree* t6 = new_leaf_node($6->category, "pseudocall", $6);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5, t6);
+		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
 	}
 ;
 
 pexpr_no_paren:
 	LLITERAL
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LLITERAL, "pexpr_no_paren", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	name
 	{
@@ -917,45 +889,37 @@ pexpr_no_paren:
 	}
 |	pexpr '.' sym
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '.' '(' expr_or_type ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $4);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
+		struct tree* t3 = new_leaf_node($3->category, "pexpr_no_paren", $3);
+		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, t3, $4, t5);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '.' '(' LTYPE ')'
 	{
-		struct token *leaf = $4;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
+		struct tree* t3 = new_leaf_node($3->category, "pexpr_no_paren", $3);
+		struct tree* t4 = new_leaf_node(LTYPE, "pexpr_no_paren", $4);
+		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, t3, t4, t5);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '[' expr ']'
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
-	}
-|	pexpr '[' oexpr ':' oexpr ']'
-	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
-	}
-|	pexpr '[' oexpr ':' oexpr ':' oexpr ']'
-	{
-		struct token *leaf = NULL;
 		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5, $7);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
+		struct tree* t4 = new_leaf_node($4->category, "pexpr_no_paren", $4);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pseudocall
 	{
@@ -963,33 +927,11 @@ pexpr_no_paren:
 	}
 |	convtype '(' expr ocomma ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $4);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
-	}
-|	comptype lbrace start_complit braced_keyval_list '}'
-	{
-		struct token *leaf = NULL;
-		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $1, $2, $3, $4);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
-	}
-|	pexpr_no_paren '{' start_complit braced_keyval_list '}'
-	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $4);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
-	}
-|	'(' expr_or_type ')' '{' start_complit braced_keyval_list '}'
-	{
-		yyerror("cannot parenthesize type in composite literal");
-
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $2, $5, $6);
-		$$ = new_tree_node(++ruleno, "pexpr_no_paren", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
+		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	fnliteral
 	{
@@ -997,52 +939,7 @@ pexpr_no_paren:
 	}
 ;
 
-start_complit:
-	%empty
-	{
-		// composite expression.
-		// make node early so we get the right line number.
-		$$ = NULL;
-	}
-;
 
-keyval:
-	expr ':' complitexpr
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "keyval", nkids, kids, leaf);
-	}
-;
-
-bare_complitexpr:
-	expr
-	{
-		$$ = $1;
-	}
-|	'{' start_complit braced_keyval_list '}'
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "bare_complitexpr", nkids, kids, leaf);
-	}
-;
-
-complitexpr:
-	expr
-	{
-		$$ = $1;
-	}
-|	'{' start_complit braced_keyval_list '}'
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "complitexpr", nkids, kids, leaf);
-	}
-;
 
 pexpr:
 	pexpr_no_paren
@@ -1051,10 +948,11 @@ pexpr:
 	}
 |	'(' expr_or_type ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "pexpr", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "pexpr", $1);
+		struct tree* t3 = new_leaf_node($3->category, "pexpr", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_PEXPR, "pexpr", nkids, kids, NULL);
 	}
 ;
 
@@ -1063,12 +961,11 @@ expr_or_type:
 	{
 		$$ = $1;
 	}
-|	non_expr_type	%prec PreferToRightParen
+|	non_expr_type %prec PreferToRightParen
 	{
-		struct token *leaf = NULL;
 		int nkids = 1;
 		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "expr_or_type", nkids, kids, leaf);
+		$$ = new_tree_node(R_EXPR_OR_TYPE, "expr_or_type", nkids, kids, NULL);
 	}
 ;
 
@@ -1083,17 +980,17 @@ name_or_type:
 lbrace:
 	LBODY
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "lbrace", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LBODY, "lbrace", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_LBRACE, "lbrace", nkids, kids, NULL);
 	}
 |	'{'
 	{
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "lbrace", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node($1->category, "lbrace", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_LBRACE, "lbrace", nkids, kids, NULL);
 	}
 ;
 
@@ -1119,10 +1016,10 @@ dcl_name:
 sym:
 	LNAME
 	{
-		struct token* leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LNAME, "sym", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_SYM, "sym", nkids, kids, NULL);
 	}
 |	hidden_importsym
 	{
@@ -1130,46 +1027,43 @@ sym:
 	}
 |	'?'
 	{
-		struct token* leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node($1->category, "sym", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_SYM, "sym", nkids, kids, NULL);
 	}
 ;
 
 hidden_importsym:
 	'@' LLITERAL '.' LNAME
 	{
-		struct token* leaf = $2; // TODO: concat tokens ?
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "hidden_importsym", $1);
+		struct tree* t2 = new_leaf_node(LLITERAL, "hidden_importsym", $2);
+		struct tree* t3 = new_leaf_node($3->category, "hidden_importsym", $3);
+		struct tree* t4 = new_leaf_node(LNAME, "hidden_importsym", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, t4);
+		$$ = new_tree_node(R_HIDDEN_IMPORTSYM, "hidden_importsym", nkids, kids, NULL);
 	}
 |	'@' LLITERAL '.' '?'
 	{
-		struct token* leaf = $2; // TODO: concat tokens ?
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "sym", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "hidden_importsym", $1);
+		struct tree* t2 = new_leaf_node(LLITERAL, "hidden_importsym", $2);
+		struct tree* t3 = new_leaf_node($3->category, "hidden_importsym", $3);
+		struct tree* t4 = new_leaf_node($4->category, "hidden_importsym", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, t4);
+		$$ = new_tree_node(R_HIDDEN_IMPORTSYM, "hidden_importsym", nkids, kids, NULL);
 	}
 ;
 
 name:
 	sym	%prec NotParen
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "name", nkids, kids, leaf);
-	}
-;
-
-labelname:
-	new_name
-	{
 		$$ = $1;
 	}
 ;
+
 
 /*
  * to avoid parsing conflicts, type is split into
@@ -1185,17 +1079,17 @@ dotdotdot:
 	{
 		yyerror("final argument in variadic function missing type");
 
-		struct token *leaf = $1;
-		int nkids = 0;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "dotdotdot", nkids, kids, leaf);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node(LDDD, "dotdotdot", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_DOTDOTDOT, "dotdotdot", nkids, kids, NULL);
 	}
 |	LDDD ntype
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "dotdotdot", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LDDD, "dotdotdot", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_DOTDOTDOT, "dotdotdot", nkids, kids, NULL);
 	}
 ;
 
@@ -1218,10 +1112,11 @@ ntype:
 	}
 |	'(' ntype ')'
 	{
-		struct token *leaf = NULL;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "ntype", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "ntype", $1);
+		struct tree* t3 = new_leaf_node($3->category, "ntype", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_NTYPE, "ntype", nkids, kids, NULL);
 	}
 ;
 
@@ -1236,10 +1131,10 @@ non_expr_type:
 	}
 |	'*' non_expr_type
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "non_expr_type", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "non_expr_type", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_NON_EXPR_TYPE, "non_expr_type", nkids, kids, NULL);
 	}
 ;
 
@@ -1254,12 +1149,6 @@ convtype:
 	}
 ;
 
-comptype:
-	othertype
-	{
-		$$ = $1;
-	}
-;
 
 fnret_type:
 	fntype
@@ -1287,34 +1176,39 @@ dotname:
 	}
 |	name '.' sym
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "dotname", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "dotname", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_DOTNAME, "dotname", nkids, kids, NULL);
 	}
 ;
 
 othertype:
 	'[' oexpr ']' ntype
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $4);
-		$$ = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "othertype", $1);
+		struct tree* t3 = new_leaf_node($3->category, "othertype", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3, $4);
+		$$ = new_tree_node(R_OTHERTYPE, "othertype", nkids, kids, NULL);
 	}	
 |	'[' LDDD ']' ntype
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $4);
-		$$ = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "othertype", $1);
+		struct tree* t2 = new_leaf_node(LDDD, "othertype", $2);
+		struct tree* t3 = new_leaf_node($3->category, "othertype", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, $4);
+		$$ = new_tree_node(R_OTHERTYPE, "othertype", nkids, kids, NULL);
 	}
 |	LMAP '[' ntype ']' ntype
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "othertype", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LMAP, "othertype", $1);
+		struct tree* t2 = new_leaf_node(LDDD, "othertype", $2);
+		struct tree* t4 = new_leaf_node($4->category, "othertype", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_OTHERTYPE, "othertype", nkids, kids, NULL);
 	}
 |	structtype
 	{
@@ -1325,24 +1219,29 @@ othertype:
 ptrtype:
 	'*' ntype
 	{
-		$$ = $2;
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node($1->category, "ptrtype", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_PTRTYPE, "ptrtype", nkids, kids, NULL);
 	}
 ;
 
 structtype:
 	LSTRUCT lbrace structdcl_list osemi '}'
 	{
-		struct token *leaf = $1;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $2, $3, $4);
-		$$ = new_tree_node(++ruleno, "structtype", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LSTRUCT, "structtype", $1);
+		struct tree* t5 = new_leaf_node($5->category, "structtype", $5);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, $4, t5);
+		$$ = new_tree_node(R_STRUCTTYPE, "structtype", nkids, kids, NULL);
 	}
 |	LSTRUCT lbrace '}'
 	{
-		struct token *leaf = $1;	
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "structtype", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LSTRUCT, "structtype", $1);
+		struct tree* t3 = new_leaf_node($3->category, "structtype", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_STRUCTTYPE, "structtype", nkids, kids, NULL);
 	}
 ;
 
@@ -1353,27 +1252,31 @@ structtype:
 xfndcl:
 	LFUNC fndcl fnbody
 	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "xfndcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LFUNC, "xfndcl", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3);
+		$$ = new_tree_node(R_XFNDCL, "xfndcl", nkids, kids, NULL);
 	}
 ;
 
 fndcl:
 	sym '(' oarg_type_list_ocomma ')' fnres
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $3, $5);
-		$$ = new_tree_node(++ruleno, "fndcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t2 = new_leaf_node($2->category, "fndcl", $2);
+		struct tree* t4 = new_leaf_node($4->category, "fndcl", $4);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_FNDCL, "fndcl", nkids, kids, NULL);
 	}
 |	'(' oarg_type_list_ocomma ')' sym '(' oarg_type_list_ocomma ')' fnres
 	{
-		struct token *leaf = NULL;
-		int nkids = 4;
-		struct tree** kids = create_tree_kids(nkids, $2, $4, $6, $8);
-		$$ = new_tree_node(++ruleno, "fndcl", nkids, kids, leaf);
+		int nkids = 8;
+		struct tree* t1 = new_leaf_node($1->category, "fndcl", $1);
+		struct tree* t3 = new_leaf_node($3->category, "fndcl", $3);
+		struct tree* t5 = new_leaf_node($5->category, "fndcl", $5);
+		struct tree* t7 = new_leaf_node($7->category, "fndcl", $7);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3, $4, t5, $6, t7, $8);
+		$$ = new_tree_node(R_FNDCL, "fndcl", nkids, kids, NULL);
 	}
 ;
 
@@ -1381,28 +1284,34 @@ fndcl:
 fntype:
 	LFUNC '(' oarg_type_list_ocomma ')' fnres
 	{
-		struct token *leaf = $1;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $5);
-		$$ = new_tree_node(++ruleno, "fntype", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node(LFUNC, "fntype", $1);
+		struct tree* t2 = new_leaf_node($2->category, "fntype", $2);
+		struct tree* t4 = new_leaf_node($4->category, "fntype", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_FNTYPE, "fntype", nkids, kids, NULL);
 	}
 ;
 
 fnbody:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_FNBODY, "fnbody");
 	}
 |	'{' stmt_list '}'
 	{
-		$$ = $2;
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "fnbody", $1);
+		struct tree* t3 = new_leaf_node($3->category, "fnbody", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_FNBODY, "fnbody", nkids, kids, NULL);
 	}
 ;
 
 fnres:
 	%empty %prec NotParen
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_FNRES, "fnres");
 	}
 |	fnret_type
 	{
@@ -1410,7 +1319,11 @@ fnres:
 	}
 |	'(' oarg_type_list_ocomma ')'
 	{
-		$$ = $2;
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "fnres", $1);
+		struct tree* t3 = new_leaf_node($3->category, "fnres", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
+		$$ = new_tree_node(R_FNRES, "fnres", nkids, kids, NULL);
 	}
 ;
 
@@ -1424,17 +1337,16 @@ fnlitdcl:
 fnliteral:
 	fnlitdcl lbrace stmt_list '}'
 	{
-		struct token *leaf = NULL;
-		int nkids = 3;
-		struct tree** kids = create_tree_kids(nkids, $1, $2, $3);
-		$$ = new_tree_node(++ruleno, "fnliteral", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t4 = new_leaf_node($4->category, "fnliteral", $4);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, $3, t4);
+		$$ = new_tree_node(R_FNLITERAL, "fnliteral", nkids, kids, NULL);
 	}
 |	fnlitdcl error
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "fnliteral", nkids, kids, leaf);
+		$$ = new_tree_node(R_FNLITERAL, "fnliteral", nkids, kids, NULL);
 	}
 ;
 
@@ -1446,14 +1358,14 @@ fnliteral:
 xdcl_list:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_XDCL_LIST, "xdcl_list");
 	}
 |	xdcl_list xdcl ';'
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "xdcl_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t3 = new_leaf_node($3->category, "xdcl_list", $3);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, t3);
+		$$ = new_tree_node(R_XDCL_LIST, "xdcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1464,10 +1376,10 @@ vardcl_list:
 	}
 |	vardcl_list ';' vardcl
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "vardcl_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "vardcl_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_VARDCL_LIST, "vardcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1478,10 +1390,10 @@ constdcl_list:
 	}
 |	constdcl_list ';' constdcl1
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "constdcl_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "constdcl_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_CONSTDCL_LIST, "constdcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1492,10 +1404,10 @@ typedcl_list:
 	}
 |	typedcl_list ';' typedcl
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "typedcl_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "typedcl_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_TYPEDCL_LIST, "typedcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1506,72 +1418,76 @@ structdcl_list:
 	}
 |	structdcl_list ';' structdcl
 	{
-		struct token *leaf = $2;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "structdcl_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "structdcl_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_STRUCTDCL_LIST, "structdcl_list", nkids, kids, NULL);
 	}
 ;
 
 structdcl:
 	new_name_list ntype oliteral
 	{
-		struct token *leaf = NULL;
 		int nkids = 3;
 		struct tree** kids = create_tree_kids(nkids, $1, $2, $3);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 |	embed oliteral
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 |	'(' embed ')' oliteral
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $4);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
+		struct tree* t3 = new_leaf_node($3->category, "structdcl", $3);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, t3, $4);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 |	'*' embed oliteral
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $2, $3);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 |	'(' '*' embed ')' oliteral
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $5);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "structdcl", $2);
+		struct tree* t4 = new_leaf_node($4->category, "structdcl", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 |	'*' '(' embed ')' oliteral
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $3, $5);
-		$$ = new_tree_node(++ruleno, "structdcl", nkids, kids, leaf);
+		int nkids = 5;
+		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
+		struct tree* t2 = new_leaf_node($2->category, "structdcl", $2);
+		struct tree* t4 = new_leaf_node($4->category, "structdcl", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
+		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
 	}
 	;
 
 packname:
 	LNAME
 	{
-		struct token *leaf = $1;
 		int nkids = 1;
-		struct tree** kids = NULL;
-		$$ = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
+		struct tree* t1 = new_leaf_node(LNAME, "packname", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_PACKNAME, "packname", nkids, kids, NULL);
 	}
 |	LNAME '.' sym
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $3);
-		$$ = new_tree_node(++ruleno, "packname", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t1 = new_leaf_node(LNAME, "packname", $1);
+		struct tree* t2 = new_leaf_node($2->category, "packname", $2);
+		struct tree** kids = create_tree_kids(nkids, t1, t2, $3);
+		$$ = new_tree_node(R_PACKNAME, "packname", nkids, kids, NULL);
 	}
 ;
 
@@ -1592,17 +1508,15 @@ arg_type:
 	}
 |	sym name_or_type
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "arg_type", nkids, kids, leaf);
+		$$ = new_tree_node(R_ARG_TYPE, "arg_type", nkids, kids, NULL);
 	}
 |	sym dotdotdot
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "arg_type", nkids, kids, leaf);
+		$$ = new_tree_node(R_ARG_TYPE, "arg_type", nkids, kids, NULL);
 	}
 |	dotdotdot
 	{
@@ -1617,24 +1531,23 @@ arg_type_list:
 	}
 |	arg_type_list ',' arg_type
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "arg_type_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "arg_type_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_ARG_TYPE_LIST, "arg_type_list", nkids, kids, NULL);
 	}
 	;
 
 oarg_type_list_ocomma:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OARG_TYPE_LIST_OCOMMA, "oarg_type_list_ocomma");
 	}
 |	arg_type_list ocomma
 	{
-		struct token *leaf = NULL;
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "oarg_type_list_ocomma", nkids, kids, leaf);
+		$$ = new_tree_node(R_OARG_TYPE_LIST_OCOMMA, "oarg_type_list_ocomma", nkids, kids, NULL);
 	}
 ;
 
@@ -1644,7 +1557,7 @@ oarg_type_list_ocomma:
 stmt:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_STMT, "stmt");
 	}
 |	compound_stmt
 	{
@@ -1679,27 +1592,12 @@ non_dcl_stmt:
 	{
 		$$ = $1;
 	}
-|	labelname ':'
-	stmt
-	{
-		struct token *leaf = NULL;
-		int nkids = 22;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
-	}
-|	LGO pseudocall
-	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
-	}
 |	LRETURN oexpr_list
 	{
-		struct token *leaf = $1;
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $2);
-		$$ = new_tree_node(++ruleno, "non_dcl_stmt", nkids, kids, leaf);
+		int nkids = 2;
+		struct tree* t1 = new_leaf_node(LRETURN, "non_dcl_stmt", $1);
+		struct tree** kids = create_tree_kids(nkids, t1, $2);
+		$$ = new_tree_node(R_NON_DCL_STMT, "non_dcl_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -1710,10 +1608,10 @@ stmt_list:
 	}
 |	stmt_list ';' stmt
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "stmt_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "stmt_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_STMT_LIST, "stmt_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1724,10 +1622,10 @@ new_name_list:
 	}
 |	new_name_list ',' new_name
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "new_name_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "new_name_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_NEW_NAME_LIST, "new_name_list", nkids, kids, NULL);
 	}
 	;
 
@@ -1738,10 +1636,10 @@ dcl_name_list:
 	}
 |	dcl_name_list ',' dcl_name
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "dcl_name_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "dcl_name_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_DCL_NAME_LIST, "dcl_name_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1752,10 +1650,10 @@ expr_list:
 	}
 |	expr_list ',' expr
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR_LIST, "expr_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1766,54 +1664,17 @@ expr_or_type_list:
 	}
 |	expr_or_type_list ',' expr_or_type
 	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "expr_or_type_list", nkids, kids, leaf);
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr_or_type_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR_OR_TYPE_LIST, "expr_or_type_list", nkids, kids, NULL);
 	}
 ;
 
 /*
  * list of combo of keyval and val
  */
-keyval_list:
-	keyval
-	{
-		$$ = $1;
-	}
-|	bare_complitexpr
-	{
-		$$ = $1;
-	}
-|	keyval_list ',' keyval
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "keyval_list", nkids, kids, leaf);
-	}
-|	keyval_list ',' bare_complitexpr
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $3);
-		$$ = new_tree_node(++ruleno, "keyval_list", nkids, kids, leaf);
-	}
-	;
 
-braced_keyval_list:
-	%empty
-	{
-		$$ = NULL;
-	}
-|	keyval_list ocomma
-	{
-		struct token *leaf = NULL;
-		int nkids = 2;
-		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(++ruleno, "braced_keyval_list", nkids, kids, leaf);
-	}
-;
 
 /*
  * optional things
@@ -1821,29 +1682,35 @@ braced_keyval_list:
 osemi:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OSEMI, "osemi");
 	}
 |	';'
 	{
-		$$ = new_tree_node(++ruleno, "osemi", 0, NULL, $1);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node($1->category, "osemi", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_OSEMI, "osemi", nkids, kids, NULL);
 	}
 	;
 
 ocomma:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OCOMMA, "ocomma");
 	}
 |	','
 	{
-		$$ = new_tree_node(++ruleno, "ocomma", 0, NULL, $1);
+		int nkids = 1;
+		struct tree* t1 = new_leaf_node($1->category, "ocomma", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_OCOMMA, "ocomma", nkids, kids, NULL);
 	}
 	;
 
 oexpr:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OEXPR, "oexpr");
 	}
 |	expr
 	{
@@ -1854,7 +1721,7 @@ oexpr:
 oexpr_list:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OEXPR_LIST, "oexpr_list");
 	}
 |	expr_list
 	{
@@ -1865,7 +1732,7 @@ oexpr_list:
 osimple_stmt:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OSIMPLE_STMT, "osimple_stmt");		
 	}
 |	simple_stmt
 	{
@@ -1877,14 +1744,14 @@ osimple_stmt:
 oliteral:
 	%empty
 	{
-		$$ = NULL;
+		$$ = new_epsilon_tree(R_OLITERAL, "oliteral");		
 	}	
 |	LLITERAL
 	{
-		struct token *leaf = NULL;
 		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(++ruleno, "oliteral", nkids, kids, leaf);
+		struct tree* t1 = new_leaf_node(LLITERAL, "oliteral", $1);
+		struct tree** kids = create_tree_kids(nkids, t1);
+		$$ = new_tree_node(R_OLITERAL, "oliteral", nkids, kids, NULL);
 	}
 ;
 

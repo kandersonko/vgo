@@ -21,7 +21,7 @@ void print_tree(tree_ptr ast, int depth)
     if (ast->leaf)
     {
         printf("%*s -> ", depth + 6, "leaf");
-        printf("cat: %d | text: %s | lineno: %d | file: %s\n", ast->leaf->category,
+        printf("cat: %d | text: `%s` | lineno: %d | file: %s\n", ast->leaf->category,
                ast->leaf->text,
                ast->leaf->lineno,
                ast->leaf->filename);
@@ -58,6 +58,8 @@ struct tree **create_tree_kids(int nkids, ...)
     va_list argp;
     va_start(argp, nkids);
 
+    // TODO: check bellow
+    // struct tree **kids = safe_malloc((nkids - 1) * sizeof(*kids));
     struct tree **kids = safe_malloc(nkids * sizeof(*kids));
     int i = 0;
     while (i < nkids)
@@ -70,6 +72,11 @@ struct tree **create_tree_kids(int nkids, ...)
     return kids;
 }
 
+struct tree *new_leaf_node(int ruleno, char *prodname, struct token *leaf)
+{
+    return new_tree_node(ruleno, prodname, 0, NULL, leaf);
+}
+
 tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **kids, struct token *leaf)
 {
     tree_ptr ast = safe_malloc(sizeof(*ast));
@@ -79,4 +86,9 @@ tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **ki
     ast->nkids = nkids;
     ast->kids = kids;
     return ast;
+}
+
+tree_ptr new_epsilon_tree(int prodrule, char *prodname)
+{
+    return new_tree_node(prodrule, prodname, 0, NULL, NULL);
 }

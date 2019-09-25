@@ -45,7 +45,6 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    END = 0,
     LLITERAL = 258,
     LASOP = 259,
     LCOLAS = 260,
@@ -108,7 +107,7 @@ union YYSTYPE
 	struct tree* ast;
 	struct token* t;
 
-#line 112 "go.tab.h" /* yacc.c:1909  */
+#line 111 "go.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
