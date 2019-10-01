@@ -16,6 +16,4 @@ enum ErrorCode
 
 void *safe_malloc(size_t size);
 
-void print_error(int tokentype);
-
 #endif // UTILS_H

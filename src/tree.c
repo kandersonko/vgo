@@ -10,13 +10,7 @@ void print_tree(tree_ptr ast, int depth)
     if (!ast)
         return;
 
-    // TODO: maybe print only node with a leaf node
-
-    // TODO: indent by depth number
-
     printf("%*s | rule: %d | nkids: %d\n", (int)strlen(ast->prodname) + depth, ast->prodname, ast->prodrule, ast->nkids);
-
-    // TODO: don't need the depth in printing
 
     if (ast->leaf)
     {
@@ -58,8 +52,6 @@ struct tree **create_tree_kids(int nkids, ...)
     va_list argp;
     va_start(argp, nkids);
 
-    // TODO: check bellow
-    // struct tree **kids = safe_malloc((nkids - 1) * sizeof(*kids));
     struct tree **kids = safe_malloc(nkids * sizeof(*kids));
     int i = 0;
     while (i < nkids)

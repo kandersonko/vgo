@@ -30,8 +30,6 @@
 // #define YYDEBUG 1
 // int yydebug=1;
 
-// TODO: Remove all warnings (useless rule, etc)
-
 struct tree* ast_root;
 
 int yylex (void);
@@ -95,7 +93,7 @@ void yyerror(const char *s)
 
 %type<ast> 		lbrace import_here
 %type<ast>		sym packname fnlitdcl 
-%type<ast>		oliteral error
+%type<ast>		oliteral error complitexpr
 
 %type<ast>		stmt ntype 
 %type<ast>		arg_type 
@@ -118,8 +116,8 @@ void yyerror(const char *s)
 %type<ast>		vardcl vardcl_list structdcl structdcl_list
 %type<ast>		common_dcl constdcl constdcl1 constdcl_list typedcl_list
 
-%type<ast>		convtype dotdotdot
-%type<ast>		structtype ptrtype
+%type<ast>		convtype comptype braced_keyval_list start_complit dotdotdot
+%type<ast>		structtype ptrtype keyval keyval_list bare_complitexpr
 %type<ast>		othertype fnret_type fntype
 
 %type<ast>		hidden_importsym
@@ -134,7 +132,7 @@ void yyerror(const char *s)
 %left		'+' '-' '|' '^'
 %left		'*' '/' '%' '&' LLSH LRSH LANDNOT
 
-%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`' '.' '=' '!' '~' '[' ']' '@'
+%type<t>	'{' '}' '?' '+' '-' '|' '^' '*' '/' '%' '&' ';' ',' '`' '.' '=' '!' '~' '[' ']' '@' '<' ':'
 
 /*
  * manual override of shift/reduce conflicts.
@@ -155,9 +153,7 @@ void yyerror(const char *s)
 
 %error-verbose
 
-// %token END 0 "end of file"
-
-// TODO: free unused token to prevent memory leak
+%token END 0 "end of file"
 
 %%
 file:	package imports xdcl_list
@@ -283,7 +279,6 @@ import_here:
 import_package:
 	LPACKAGE LNAME import_safety ';'
 	{
-		// TODO: concat package and name
 		int nkids = 4;
 		struct tree* t1 = new_leaf_node(LPACKAGE, "import_package", $1);
 		struct tree* t2 = new_leaf_node(LNAME, "import_package", $2);
@@ -559,11 +554,11 @@ compound_stmt:
 ;
 
 loop_body:
-	LBODY
+	'{'
 	stmt_list '}'
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LBODY, "loop_body", $1);
+		struct tree* t1 = new_leaf_node($1->category, "loop_body", $1);
 		struct tree* t3 = new_leaf_node($3->category, "loop_body", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
 		$$ = new_tree_node(R_LOOP_BODY, "loop_body", nkids, kids, NULL);
@@ -778,10 +773,32 @@ expr:
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
 		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
+|	expr '&' expr
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+	}
 |	expr LANDNOT expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node(LANDNOT, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+	}
+|	expr LLSH expr
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+	}
+
+|	expr LRSH expr
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
 		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
 	}
@@ -829,6 +846,7 @@ uexpr:
 	}
 |	'~' uexpr
 	{
+		yyerror("the bitwise complement operator is ^");
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
@@ -933,6 +951,13 @@ pexpr_no_paren:
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
 		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
+|	comptype lbrace start_complit braced_keyval_list '}' 
+	{
+		int nkids = 5;
+		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
+		struct tree** kids = create_tree_kids(nkids, $1, $2, $3, $4, t5);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+	}
 |	fnliteral
 	{
 		$$ = $1;
@@ -963,9 +988,7 @@ expr_or_type:
 	}
 |	non_expr_type %prec PreferToRightParen
 	{
-		int nkids = 1;
-		struct tree** kids = create_tree_kids(nkids, $1);
-		$$ = new_tree_node(R_EXPR_OR_TYPE, "expr_or_type", nkids, kids, NULL);
+		$$ = $1;
 	}
 ;
 
@@ -978,14 +1001,7 @@ name_or_type:
 ;
 
 lbrace:
-	LBODY
-	{
-		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LBODY, "lbrace", $1);
-		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_LBRACE, "lbrace", nkids, kids, NULL);
-	}
-|	'{'
+	'{'
 	{
 		int nkids = 1;
 		struct tree* t1 = new_leaf_node($1->category, "lbrace", $1);
@@ -1149,6 +1165,12 @@ convtype:
 	}
 ;
 
+comptype:
+	othertype
+	{
+		$$ = $1;
+	}
+;
 
 fnret_type:
 	fntype
@@ -1580,12 +1602,10 @@ stmt:
 non_dcl_stmt:
 	simple_stmt
 	{
-		
 		$$ = $1;
 	}
 |	for_stmt
 	{
-		
 		$$ = $1;
 	}
 |	if_stmt
@@ -1674,11 +1694,48 @@ expr_or_type_list:
 /*
  * list of combo of keyval and val
  */
+ keyval_list:
+	keyval
+	{
+		$$ = $1;
+	}
+|	bare_complitexpr
+	{
+		$$ = $1;
+	}
+|	keyval_list ',' keyval
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "keyval_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_KEYVAL_LIST, "keyval_list", nkids, kids, NULL);
+	}
+|	keyval_list ',' bare_complitexpr
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "keyval_list", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_KEYVAL_LIST, "keyval_list", nkids, kids, NULL);
+	}
+;
 
+ braced_keyval_list:
+	%empty
+	{
+		$$ = new_epsilon_tree(R_BRACED_KEYVAL_LIST, "braced_keyval_list");
+	}
+	|	keyval_list ocomma
+	{
+		int nkids = 2;
+		struct tree** kids = create_tree_kids(nkids, $1, $2);
+		$$ = new_tree_node(R_BRACED_KEYVAL_LIST, "braced_keyval_list", nkids, kids, NULL);
+	}
+;
 
 /*
  * optional things
  */
+
 osemi:
 	%empty
 	{
@@ -1754,6 +1811,54 @@ oliteral:
 		$$ = new_tree_node(R_OLITERAL, "oliteral", nkids, kids, NULL);
 	}
 ;
+
+start_complit:
+%empty
+	{
+		$$ = new_epsilon_tree(R_START_COMPLIT, "start_complit");		
+	}	
+;
+
+
+keyval:
+	expr ':' complitexpr
+	{
+		int nkids = 3;
+		struct tree* t2 = new_leaf_node($2->category, "keyval", $2);
+		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
+		$$ = new_tree_node(R_KEYVAL, "keyval", nkids, kids, NULL);
+	}
+	;
+
+bare_complitexpr:
+	expr
+	{
+		$$ = $1;
+	}
+|	'{' start_complit braced_keyval_list '}'
+	{
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "bare_complitexpr", $1);
+		struct tree* t4 = new_leaf_node($4->category, "bare_complitexpr", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, t4);
+		$$ = new_tree_node(R_BARE_COMPLITEXPR, "bare_complitexpr", nkids, kids, NULL);
+	}
+;
+
+complitexpr:
+	expr
+	{
+		$$ = $1;
+	}
+|	'{' start_complit braced_keyval_list '}'
+	{
+		int nkids = 4;
+		struct tree* t1 = new_leaf_node($1->category, "bare_complitexpr", $1);
+		struct tree* t4 = new_leaf_node($4->category, "bare_complitexpr", $4);
+		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, t4);
+		$$ = new_tree_node(R_COMPLITEXPR, "complitexpr", nkids, kids, NULL);
+	}
+	;
 
 /*
  * import syntax from package header

@@ -386,27 +386,27 @@ static const flex_int16_t yy_accept[207] =
     {   0,
         0,    0,    0,    0,   62,   60,   50,   49,   30,   60,
        29,   32,   60,   21,   22,   28,   25,   31,   26,   18,
-       27,   55,   55,   32,   17,    4,   11,    5,   52,   23,
-       24,   32,   52,   52,   52,   52,   52,   52,   52,   52,
-       52,   52,   52,   52,   52,   19,   32,   20,   61,   50,
+       27,   54,   54,   32,   17,    4,   11,    5,   51,   23,
+       24,   32,   51,   51,   51,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   51,   19,   32,   20,   61,   50,
         8,    0,   59,    0,   32,    9,   32,    0,    0,   14,
-       12,   15,   13,    0,   56,    0,    2,   56,   54,   55,
-        0,    0,   32,    6,    3,    7,   32,   52,   52,   52,
-       52,   52,   52,   52,   52,   52,   52,   52,   52,   48,
-       39,   52,   52,   52,   52,   52,   52,   52,   52,   52,
+       12,   15,   13,    0,   55,    0,    2,   55,   53,   54,
+        0,    0,   32,    6,    3,    7,   32,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,   51,   48,
+       39,   51,   51,   51,   51,   51,   51,   51,   51,   51,
 
-       52,   52,   10,   58,    0,    0,    0,   16,    0,    0,
-        0,    2,    0,   57,   53,   52,   52,   52,   52,   52,
-       52,   52,   52,   52,   37,   52,   52,   52,   41,   42,
-       52,   52,   52,   52,   52,   52,   52,   47,    0,   51,
-        0,    0,   56,    1,   33,   52,   48,   52,   52,   52,
-       52,   35,   52,   52,   38,   52,   52,   52,   52,   52,
-       52,   52,   52,   46,    0,    0,   34,   52,   52,   52,
-       52,   52,   52,   52,   52,   52,   52,   52,    0,    0,
-       52,   52,   52,   52,   40,   52,   52,   44,   45,    0,
-        0,   52,   52,   36,   52,   43,    0,   51,   52,   52,
+       51,   51,   10,   57,    0,    0,    0,   16,    0,    0,
+        0,    2,    0,   56,   52,   51,   51,   51,   51,   51,
+       51,   51,   51,   51,   37,   51,   51,   51,   41,   42,
+       51,   51,   51,   51,   51,   51,   51,   47,    0,   57,
+        0,    0,   55,    1,   33,   51,   48,   51,   51,   51,
+       51,   35,   51,   51,   38,   51,   51,   51,   51,   51,
+       51,   51,   51,   46,    0,    0,   34,   51,   51,   51,
+       51,   51,   51,   51,   51,   51,   51,   51,    0,    0,
+       51,   51,   51,   51,   40,   51,   51,   44,   45,    0,
+        0,   51,   51,   36,   51,   43,    0,   58,   51,   51,
 
-        0,   52,    0,   52,    0,    0
+        0,   51,    0,   51,    0,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -615,7 +615,7 @@ static const flex_int32_t yy_rule_can_match_eol[62] =
     {   0,
 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
     0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
@@ -968,7 +968,7 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 60 "vgolex.l"
-{ tok(LLT);   }
+{ return tok(LLT);   }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
@@ -1206,13 +1206,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 119 "vgolex.l"
-{fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
+#line 120 "vgolex.l"
+{ return tok(LNAME); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 121 "vgolex.l"
-{ return tok(LNAME); }
+#line 122 "vgolex.l"
+{ return tok(LLITERAL); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
@@ -1226,7 +1226,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 125 "vgolex.l"
+#line 126 "vgolex.l"
 { return tok(LLITERAL); }
 	YY_BREAK
 case 56:
@@ -1235,36 +1235,36 @@ YY_RULE_SETUP
 { return tok(LLITERAL); }
 	YY_BREAK
 case 57:
+/* rule 57 can match eol */
 YY_RULE_SETUP
-#line 128 "vgolex.l"
+#line 129 "vgolex.l"
 { return tok(LLITERAL); }
 	YY_BREAK
 case 58:
-/* rule 58 can match eol */
 YY_RULE_SETUP
-#line 130 "vgolex.l"
-{ return tok(LLITERAL); }
+#line 131 "vgolex.l"
+{fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
 	YY_BREAK
 case 59:
 /* rule 59 can match eol */
 YY_RULE_SETUP
-#line 132 "vgolex.l"
+#line 133 "vgolex.l"
 { return tok(LLITERAL); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 134 "vgolex.l"
+#line 135 "vgolex.l"
 { fprintf(stderr, "ERROR: unexpected character `%c` at line %d in file %s\n", yytext[0], yylineno, yyfilename); exit(1); }
 	YY_BREAK
 /* end of file */
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comment):
-#line 136 "vgolex.l"
+#line 137 "vgolex.l"
 { yylineno = 1; return tok(0); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 137 "vgolex.l"
+#line 138 "vgolex.l"
 ECHO;
 	YY_BREAK
 #line 1271 "lex.yy.c"
@@ -2241,7 +2241,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 137 "vgolex.l"
+#line 138 "vgolex.l"
 
 
 

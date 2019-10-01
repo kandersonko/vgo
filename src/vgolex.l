@@ -57,7 +57,7 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 
     /* Supported operators */
 "=="          { return tok(LEQ); }
-"<"          { tok(LLT);   }
+"<"          { return tok(LLT);   }
 ">"          { return tok(LGT);  }
 "<="          { return tok(LLE);  }
 ">="          { return tok(LGE);  }
@@ -116,7 +116,6 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 [\t\f\v\r ]+				{ /* Ignore whitespace. */ }
 
 
-{invalid_runes}     {fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
 
 [a-zA-Z_][a-zA-Z_0-9]*			{ return tok(LNAME); }
 
@@ -128,6 +127,8 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 [0-9]+{exponent}			{ return tok(LLITERAL); }
 
 "\'"(\\.|[^\\"])"\'"			{ return tok(LLITERAL); }
+
+{invalid_runes}     {fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
 
 "\""(\\.|[^\\"])*"\""			{ return tok(LLITERAL); }
 

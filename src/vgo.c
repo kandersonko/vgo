@@ -112,5 +112,3 @@ char *rename_go_file(char *name)
     fprintf(stderr, "ERROR: invalid file name \"%s\"\n", name);
     return NULL;
 }
-
-// TODO: fix ruleno

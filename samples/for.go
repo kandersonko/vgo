@@ -8,12 +8,12 @@
 
 package main
 
-func assertequal(is, shouldbe int, msg string) {
-	if is != shouldbe {
-		print("assertion fail", msg, "\n")
-		panic(1)
-	}
-}
+// func assertequal(is, shouldbe int, msg string) {
+// 	if is != shouldbe {
+// 		print("assertion fail", msg, "\n")
+// 		panic(1)
+// 	}
+// }
 
 func main() {
 	var i, sum int
