@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "token.h"
 #include "tree.h"
+#include "semantic.h"
 #include <string.h>
 #include <unistd.h>
 
@@ -23,6 +24,8 @@ const char *get_filename_ext(const char *filename);
 
 char *rename_go_file(char *name);
 
+sym_table_ptr current;
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -33,8 +36,10 @@ int main(int argc, char **argv)
 
     argc--;
     argv++;
-    int i;
 
+    current = new_st(149);
+
+    int i;
     for (i = 0; i < argc; i++)
     {
         yyfilename = rename_go_file(argv[i]);
@@ -54,7 +59,12 @@ int main(int argc, char **argv)
         if (!failed)
         {
             // parse successfull
-            print_tree(ast_root, 0);
+            // print_tree(ast_root, 0);
+            // populate_symbol_tables(ast_root);
+            // btfp(ast_root);
+            populate(ast_root);
+            print_symtab(current);
+            printsymbols(current, 0);
         }
         else
         {

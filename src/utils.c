@@ -16,3 +16,14 @@ void *safe_malloc(size_t size)
     }
     return ptr;
 }
+
+void *alloc(int n, size_t size)
+{
+    char *ptr = calloc(n, size);
+    if (ptr == NULL)
+    {
+        fprintf(stderr, "alloc(%d): out of memory\n", (int)n);
+        exit(-1);
+    }
+    return ptr;
+}

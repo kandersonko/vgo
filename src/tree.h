@@ -4,6 +4,8 @@
 #define MAX_KIDS_SIZE 10
 
 #include "token.h"
+#include "type.h"
+#include "symtab.h"
 #include <stdarg.h>
 
 struct tree
@@ -11,6 +13,9 @@ struct tree
     int prodrule;
     char *prodname;
     int nkids;
+    int basetype;
+    struct typeinfo *type;
+    struct sym_table *symtab;
     struct tree **kids;
     struct token *leaf;
 };

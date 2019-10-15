@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include "tree.h"
+#include "type.h"
 #include "utils.h"
 
 void print_tree(tree_ptr ast, int depth)
@@ -42,6 +43,8 @@ void delete_tree(tree_ptr ast)
     delete_token(ast->leaf);
     free(ast->kids);
     free(ast->prodname);
+    // free(ast->type);
+    free(ast->symtab);
     free(ast);
     ast = NULL;
 }
@@ -77,6 +80,8 @@ tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **ki
     ast->leaf = leaf;
     ast->nkids = nkids;
     ast->kids = kids;
+    ast->type = alloc(1, sizeof(struct typeinfo));
+    ast->symtab = alloc(1, sizeof(struct sym_table));
     return ast;
 }
 

@@ -175,10 +175,10 @@ package:
 |	LPACKAGE sym ';' 
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(R_PACKAGE, "package", $1);
+		struct tree* t1 = new_leaf_node($1->category, "package", $1);
 		struct tree* t3 = new_leaf_node($3->category, "package", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_PACKAGE, "package", nkids, kids, NULL);
+		$$ = new_tree_node(R_PACKAGE+1, "package", nkids, kids, NULL);
 	}
 ;
 
@@ -192,7 +192,7 @@ imports:
 		int nkids = 3;
 		struct tree* t3 = new_leaf_node($3->category, "imports", $3);
 		struct tree** kids = create_tree_kids(nkids, $1, $2, t3);
-		$$ = new_tree_node(R_IMPORTS, "imports", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORTS+1, "imports", nkids, kids, NULL);
 	}
 ;
 
@@ -207,20 +207,20 @@ import:
 |	LIMPORT '(' import_stmt_list osemi ')'
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LIMPORT, "import", $1);
+		struct tree* t1 = new_leaf_node($1->category, "import", $1);
 		struct tree* t2 = new_leaf_node($2->category, "import", $2);
 		struct tree* t5 = new_leaf_node($5->category, "import", $5);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_IMPORT, "import", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT+1, "import", nkids, kids, NULL);
 	}
 |	LIMPORT '(' ')'
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LIMPORT, "import", $1);
+		struct tree* t1 = new_leaf_node($1->category, "import", $1);
 		struct tree* t2 = new_leaf_node($2->category, "import", $2);
 		struct tree* t3 = new_leaf_node($3->category, "import", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
-		$$ = new_tree_node(R_IMPORT, "import", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT+2, "import", nkids, kids, NULL);
 	}
 ;
 
@@ -247,7 +247,7 @@ import_stmt_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "import_stmt_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_IMPORT_STMT_LIST, "import_stmt_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT_STMT_LIST+1, "import_stmt_list", nkids, kids, NULL);
 	}
 ;
 
@@ -255,24 +255,24 @@ import_here:
 	LLITERAL
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LLITERAL, "import_here", $1);
+		struct tree* t1 = new_leaf_node($1->category, "import_here", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
 |	sym LLITERAL
 	{
 		int nkids = 2;
-		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
+		struct tree* t2 = new_leaf_node($2->category, "import_here", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2);
-		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT_HERE+1, "import_here", nkids, kids, NULL);
 	}
 |	'.' LLITERAL
 	{
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "import_here", $1);
-		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
+		struct tree* t2 = new_leaf_node($2->category, "import_here", $2);
 		struct tree** kids = create_tree_kids(nkids, t1, t2);
-		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT_HERE+2, "import_here", nkids, kids, NULL);
 	}
 ;
 
@@ -280,8 +280,8 @@ import_package:
 	LPACKAGE LNAME import_safety ';'
 	{
 		int nkids = 4;
-		struct tree* t1 = new_leaf_node(LPACKAGE, "import_package", $1);
-		struct tree* t2 = new_leaf_node(LNAME, "import_package", $2);
+		struct tree* t1 = new_leaf_node($1->category, "import_package", $1);
+		struct tree* t2 = new_leaf_node($2->category, "import_package", $2);
 		struct tree* t4 = new_leaf_node($4->category, "import_package", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4);
 		$$ = new_tree_node(R_IMPORT_PACKAGE, "import_package", nkids, kids, NULL);
@@ -296,9 +296,9 @@ import_safety:
 |	LNAME
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LNAME, "import_safety", $1);
+		struct tree* t1 = new_leaf_node($1->category, "import_safety", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_IMPORT_SAFETY, "import_safety", nkids, kids, NULL);
+		$$ = new_tree_node(R_IMPORT_SAFETY+1, "import_safety", nkids, kids, NULL);
 	}
 ;
 
@@ -334,33 +334,33 @@ common_dcl:
 	LVAR vardcl
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
 		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
 	}
 |	LVAR '(' vardcl_list osemi ')'
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+1, "common_dcl", nkids, kids, NULL);
 	}
 |	LVAR '(' ')'
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LVAR, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+2, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst constdcl
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+3, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' constdcl osemi ')'
 	{
@@ -368,7 +368,7 @@ common_dcl:
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+4, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' constdcl ';' constdcl_list osemi ')'
 	{
@@ -377,7 +377,7 @@ common_dcl:
 		struct tree* t4 = new_leaf_node($4->category, "common_dcl", $4);
 		struct tree* t7 = new_leaf_node($7->category, "common_dcl", $7);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5, $6, t7);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+5, "common_dcl", nkids, kids, NULL);
 	}
 |	lconst '(' ')'
 	{
@@ -385,32 +385,32 @@ common_dcl:
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, t3);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+6, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE typedcl
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+7, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE '(' typedcl_list osemi ')'
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t5 = new_leaf_node($5->category, "common_dcl", $5);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+8, "common_dcl", nkids, kids, NULL);
 	}
 |	LTYPE '(' ')'
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LTYPE, "common_dcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "common_dcl", $1);
 		struct tree* t2 = new_leaf_node($2->category, "common_dcl", $2);
 		struct tree* t3 = new_leaf_node($3->category, "common_dcl", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3);
-		$$ = new_tree_node(R_COMMON_DCL, "common_dcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMMON_DCL+9, "common_dcl", nkids, kids, NULL);
 	}
 ;
 
@@ -418,7 +418,7 @@ lconst:
 	LCONST
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LCONST, "lconst", $1);
+		struct tree* t1 = new_leaf_node($1->category, "lconst", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_LCONST, "lconst", nkids, kids, NULL);
 	}
@@ -436,14 +436,14 @@ vardcl:
 		int nkids = 4;
 		struct tree* t3 = new_leaf_node($3->category, "vardcl", $3);
 		struct tree** kids = create_tree_kids(nkids, $1, $2, t3, $4);
-		$$ = new_tree_node(R_VARDCL, "vardcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_VARDCL+1, "vardcl", nkids, kids, NULL);
 	}
 |	dcl_name_list '=' expr_list
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "vardcl", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_VARDCL, "vardcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_VARDCL+2, "vardcl", nkids, kids, NULL);
 	}
 	;
 
@@ -460,7 +460,7 @@ constdcl:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "constdcl", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_CONSTDCL, "constdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_CONSTDCL+1, "constdcl", nkids, kids, NULL);
 	}
 ;
 
@@ -473,7 +473,7 @@ constdcl1:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_CONSTDCL1, "constdcl1", nkids, kids, NULL);
+		$$ = new_tree_node(R_CONSTDCL1+1, "constdcl1", nkids, kids, NULL);
 	}
 |	dcl_name_list
 	{
@@ -507,37 +507,37 @@ simple_stmt:
 |	expr LASOP expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LASOP, "simple_stmt", $2);
+		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_SIMPLE_STMT+1, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr_list '=' expr_list
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_SIMPLE_STMT+2, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr_list LCOLAS expr_list
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LCOLAS, "simple_stmt", $2);
+		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_SIMPLE_STMT+3, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr LINC
 	{
 		int nkids = 2;
-		struct tree* t2 = new_leaf_node(LINC, "simple_stmt", $2);
+		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2);
-		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_SIMPLE_STMT+4, "simple_stmt", nkids, kids, NULL);
 	}
 |	expr LDEC
 	{
 		int nkids = 2;
-		struct tree* t2 = new_leaf_node(LDEC, "simple_stmt", $2);
+		struct tree* t2 = new_leaf_node($2->category, "simple_stmt", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2);
-		$$ = new_tree_node(R_SIMPLE_STMT, "simple_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_SIMPLE_STMT+5, "simple_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -594,7 +594,7 @@ for_stmt:
 	for_body
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LFOR, "for_stmt", $1);
+		struct tree* t1 = new_leaf_node($1->category, "for_stmt", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
 		$$ = new_tree_node(R_FOR_STMT, "for_stmt", nkids, kids, NULL);
 	}
@@ -610,7 +610,7 @@ if_header:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "if_header", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_IF_HEADER, "if_header", nkids, kids, NULL);
+		$$ = new_tree_node(R_IF_HEADER+1, "if_header", nkids, kids, NULL);
 	}
 ;
 
@@ -622,7 +622,7 @@ if_stmt:
 	elseif_list else
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LIF, "if_stmt", $1);
+		struct tree* t1 = new_leaf_node($1->category, "if_stmt", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, $4, $5);
 		$$ = new_tree_node(R_IF_STMT, "if_stmt", nkids, kids, NULL);
 	}
@@ -633,8 +633,8 @@ elseif:
 	if_header loop_body
 	{
 		int nkids = 4;
-		struct tree* t1 = new_leaf_node(LELSE, "elseif", $1);
-		struct tree* t2 = new_leaf_node(LIF, "elseif", $2);
+		struct tree* t1 = new_leaf_node($1->category, "elseif", $1);
+		struct tree* t2 = new_leaf_node($2->category, "elseif", $2);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, $4);
 		$$ = new_tree_node(R_ELSEIF, "elseif", nkids, kids, NULL);
 	}
@@ -649,7 +649,7 @@ elseif_list:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_ELSEIF_LIST, "elseif_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_ELSEIF_LIST+1, "elseif_list", nkids, kids, NULL);
 	}
 ;
 
@@ -661,9 +661,9 @@ else:
 |	LELSE compound_stmt
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LELSE, "else", $1);
+		struct tree* t1 = new_leaf_node($1->category, "else", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_ELSE, "else", nkids, kids, NULL);
+		$$ = new_tree_node(R_ELSE+1, "else", nkids, kids, NULL);
 	}
 ;
 
@@ -678,136 +678,136 @@ expr:
 |	expr LOROR expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LOROR, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+1, "expr", nkids, kids, NULL);
 	}
 |	expr LANDAND expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LANDAND, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+2, "expr", nkids, kids, NULL);
 	}
 |	expr LEQ expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LEQ, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+3, "expr", nkids, kids, NULL);
 	}
 |	expr LNE expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LNE, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+4, "expr", nkids, kids, NULL);
 	}
 |	expr LLT expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LLT, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+5, "expr", nkids, kids, NULL);
 	}
 |	expr LLE expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LLE, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+6, "expr", nkids, kids, NULL);
 	}
 |	expr LGE expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LGE, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+7, "expr", nkids, kids, NULL);
 	}
 |	expr LGT expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LGT, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+8, "expr", nkids, kids, NULL);
 	}
 |	expr '+' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+9, "expr", nkids, kids, NULL);
 	}
 |	expr '-' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+10, "expr", nkids, kids, NULL);
 	}
 |	expr '|' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+11, "expr", nkids, kids, NULL);
 	}
 |	expr '*' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+12, "expr", nkids, kids, NULL);
 	}
 |	expr '/' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+13, "expr", nkids, kids, NULL);
 	}
 |	expr '%' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+14, "expr", nkids, kids, NULL);
 	}
 |	expr '&' expr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+15, "expr", nkids, kids, NULL);
 	}
 |	expr LANDNOT expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LANDNOT, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+16, "expr", nkids, kids, NULL);
 	}
 |	expr LLSH expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+17, "expr", nkids, kids, NULL);
 	}
 
 |	expr LRSH expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+18, "expr", nkids, kids, NULL);
 	}
 |	expr LCOMM expr
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node(LCOMM, "expr", $2);
+		struct tree* t2 = new_leaf_node($2->category, "expr", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR, "expr", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR+19, "expr", nkids, kids, NULL);
 	}
 ;
 
@@ -821,28 +821,28 @@ uexpr:
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+1, "uexpr", nkids, kids, NULL);
 	}
 |	'+' uexpr
 	{
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+2, "uexpr", nkids, kids, NULL);
 	}
 |	'-' uexpr
 	{
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+3, "uexpr", nkids, kids, NULL);
 	}
 |	'!' uexpr
 	{
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+4, "uexpr", nkids, kids, NULL);
 	}
 |	'~' uexpr
 	{
@@ -850,14 +850,14 @@ uexpr:
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+5, "uexpr", nkids, kids, NULL);
 	}
 |	LCOMM uexpr
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LCOMM, "uexpr", $1);
+		struct tree* t1 = new_leaf_node($1->category, "uexpr", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_UEXPR, "uexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_UEXPR+6, "uexpr", nkids, kids, NULL);
 	}
 ;
 
@@ -869,8 +869,8 @@ pseudocall:
 	pexpr '(' ')'
 	{
 		int nkids = 3;
-		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
-		struct tree* t3 = new_leaf_node($3->category, "pseudocall", $3);
+		struct tree* t3 = new_leaf_node($2->category, "pseudocall", $3);
+		struct tree* t2 = new_leaf_node($3->category, "pseudocall", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, t3);
 		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
 	}
@@ -880,16 +880,16 @@ pseudocall:
 		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
 		struct tree* t5 = new_leaf_node($5->category, "pseudocall", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
+		$$ = new_tree_node(R_PSEUDOCALL+1, "pseudocall", nkids, kids, NULL);
 	}
 |	pexpr '(' expr_or_type_list LDDD ocomma ')'
 	{
 		int nkids = 6;
 		struct tree* t2 = new_leaf_node($2->category, "pseudocall", $2);
-		struct tree* t4 = new_leaf_node(LDDD, "pseudocall", $4);
+		struct tree* t4 = new_leaf_node($4->category, "pseudocall", $4);
 		struct tree* t6 = new_leaf_node($6->category, "pseudocall", $6);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4, $5, t6);
-		$$ = new_tree_node(R_PSEUDOCALL, "pseudocall", nkids, kids, NULL);
+		$$ = new_tree_node(R_PSEUDOCALL+2, "pseudocall", nkids, kids, NULL);
 	}
 ;
 
@@ -897,7 +897,7 @@ pexpr_no_paren:
 	LLITERAL
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LLITERAL, "pexpr_no_paren", $1);
+		struct tree* t1 = new_leaf_node($1->category, "pexpr_no_paren", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
 	}
@@ -910,7 +910,7 @@ pexpr_no_paren:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+2, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '.' '(' expr_or_type ')'
 	{
@@ -919,17 +919,17 @@ pexpr_no_paren:
 		struct tree* t3 = new_leaf_node($3->category, "pexpr_no_paren", $3);
 		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, t3, $4, t5);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+3, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '.' '(' LTYPE ')'
 	{
 		int nkids = 5;
 		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
 		struct tree* t3 = new_leaf_node($3->category, "pexpr_no_paren", $3);
-		struct tree* t4 = new_leaf_node(LTYPE, "pexpr_no_paren", $4);
+		struct tree* t4 = new_leaf_node($4->category, "pexpr_no_paren", $4);
 		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, t3, t4, t5);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+4, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pexpr '[' expr ']'
 	{
@@ -937,7 +937,7 @@ pexpr_no_paren:
 		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
 		struct tree* t4 = new_leaf_node($4->category, "pexpr_no_paren", $4);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, t4);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+5, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	pseudocall
 	{
@@ -949,21 +949,20 @@ pexpr_no_paren:
 		struct tree* t2 = new_leaf_node($2->category, "pexpr_no_paren", $2);
 		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3, $4, t5);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+7, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	comptype lbrace start_complit braced_keyval_list '}' 
 	{
 		int nkids = 5;
 		struct tree* t5 = new_leaf_node($5->category, "pexpr_no_paren", $5);
 		struct tree** kids = create_tree_kids(nkids, $1, $2, $3, $4, t5);
-		$$ = new_tree_node(R_PEXPR_NO_PAREN, "pexpr_no_paren", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR_NO_PAREN+8, "pexpr_no_paren", nkids, kids, NULL);
 	}
 |	fnliteral
 	{
 		$$ = $1;
 	}
 ;
-
 
 
 pexpr:
@@ -977,7 +976,7 @@ pexpr:
 		struct tree* t1 = new_leaf_node($1->category, "pexpr", $1);
 		struct tree* t3 = new_leaf_node($3->category, "pexpr", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_PEXPR, "pexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_PEXPR+1, "pexpr", nkids, kids, NULL);
 	}
 ;
 
@@ -1033,7 +1032,7 @@ sym:
 	LNAME
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LNAME, "sym", $1);
+		struct tree* t1 = new_leaf_node($1->category, "sym", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_SYM, "sym", nkids, kids, NULL);
 	}
@@ -1046,7 +1045,7 @@ sym:
 		int nkids = 1;
 		struct tree* t1 = new_leaf_node($1->category, "sym", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_SYM, "sym", nkids, kids, NULL);
+		$$ = new_tree_node(R_SYM+2, "sym", nkids, kids, NULL);
 	}
 ;
 
@@ -1055,9 +1054,9 @@ hidden_importsym:
 	{
 		int nkids = 4;
 		struct tree* t1 = new_leaf_node($1->category, "hidden_importsym", $1);
-		struct tree* t2 = new_leaf_node(LLITERAL, "hidden_importsym", $2);
+		struct tree* t2 = new_leaf_node($2->category, "hidden_importsym", $2);
 		struct tree* t3 = new_leaf_node($3->category, "hidden_importsym", $3);
-		struct tree* t4 = new_leaf_node(LNAME, "hidden_importsym", $4);
+		struct tree* t4 = new_leaf_node($4->category, "hidden_importsym", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, t4);
 		$$ = new_tree_node(R_HIDDEN_IMPORTSYM, "hidden_importsym", nkids, kids, NULL);
 	}
@@ -1065,11 +1064,11 @@ hidden_importsym:
 	{
 		int nkids = 4;
 		struct tree* t1 = new_leaf_node($1->category, "hidden_importsym", $1);
-		struct tree* t2 = new_leaf_node(LLITERAL, "hidden_importsym", $2);
+		struct tree* t2 = new_leaf_node($2->category, "hidden_importsym", $2);
 		struct tree* t3 = new_leaf_node($3->category, "hidden_importsym", $3);
 		struct tree* t4 = new_leaf_node($4->category, "hidden_importsym", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, t4);
-		$$ = new_tree_node(R_HIDDEN_IMPORTSYM, "hidden_importsym", nkids, kids, NULL);
+		$$ = new_tree_node(R_HIDDEN_IMPORTSYM+1, "hidden_importsym", nkids, kids, NULL);
 	}
 ;
 
@@ -1096,16 +1095,16 @@ dotdotdot:
 		yyerror("final argument in variadic function missing type");
 
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LDDD, "dotdotdot", $1);
+		struct tree* t1 = new_leaf_node($1->category, "dotdotdot", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_DOTDOTDOT, "dotdotdot", nkids, kids, NULL);
 	}
 |	LDDD ntype
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LDDD, "dotdotdot", $1);
+		struct tree* t1 = new_leaf_node($1->category, "dotdotdot", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_DOTDOTDOT, "dotdotdot", nkids, kids, NULL);
+		$$ = new_tree_node(R_DOTDOTDOT+1, "dotdotdot", nkids, kids, NULL);
 	}
 ;
 
@@ -1132,7 +1131,7 @@ ntype:
 		struct tree* t1 = new_leaf_node($1->category, "ntype", $1);
 		struct tree* t3 = new_leaf_node($3->category, "ntype", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_NTYPE, "ntype", nkids, kids, NULL);
+		$$ = new_tree_node(R_NTYPE+4, "ntype", nkids, kids, NULL);
 	}
 ;
 
@@ -1150,7 +1149,7 @@ non_expr_type:
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "non_expr_type", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_NON_EXPR_TYPE, "non_expr_type", nkids, kids, NULL);
+		$$ = new_tree_node(R_NON_EXPR_TYPE+2, "non_expr_type", nkids, kids, NULL);
 	}
 ;
 
@@ -1201,7 +1200,7 @@ dotname:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "dotname", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_DOTNAME, "dotname", nkids, kids, NULL);
+		$$ = new_tree_node(R_DOTNAME+1, "dotname", nkids, kids, NULL);
 	}
 ;
 
@@ -1218,19 +1217,19 @@ othertype:
 	{
 		int nkids = 4;
 		struct tree* t1 = new_leaf_node($1->category, "othertype", $1);
-		struct tree* t2 = new_leaf_node(LDDD, "othertype", $2);
+		struct tree* t2 = new_leaf_node($2->category, "othertype", $2);
 		struct tree* t3 = new_leaf_node($3->category, "othertype", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, t3, $4);
-		$$ = new_tree_node(R_OTHERTYPE, "othertype", nkids, kids, NULL);
+		$$ = new_tree_node(R_OTHERTYPE+1, "othertype", nkids, kids, NULL);
 	}
 |	LMAP '[' ntype ']' ntype
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LMAP, "othertype", $1);
-		struct tree* t2 = new_leaf_node(LDDD, "othertype", $2);
+		struct tree* t1 = new_leaf_node($1->category, "othertype", $1);
+		struct tree* t2 = new_leaf_node($2->category, "othertype", $2);
 		struct tree* t4 = new_leaf_node($4->category, "othertype", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
-		$$ = new_tree_node(R_OTHERTYPE, "othertype", nkids, kids, NULL);
+		$$ = new_tree_node(R_OTHERTYPE+2, "othertype", nkids, kids, NULL);
 	}
 |	structtype
 	{
@@ -1252,7 +1251,7 @@ structtype:
 	LSTRUCT lbrace structdcl_list osemi '}'
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LSTRUCT, "structtype", $1);
+		struct tree* t1 = new_leaf_node($1->category, "structtype", $1);
 		struct tree* t5 = new_leaf_node($5->category, "structtype", $5);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, $4, t5);
 		$$ = new_tree_node(R_STRUCTTYPE, "structtype", nkids, kids, NULL);
@@ -1260,10 +1259,10 @@ structtype:
 |	LSTRUCT lbrace '}'
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LSTRUCT, "structtype", $1);
+		struct tree* t1 = new_leaf_node($1->category, "structtype", $1);
 		struct tree* t3 = new_leaf_node($3->category, "structtype", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_STRUCTTYPE, "structtype", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTTYPE+1, "structtype", nkids, kids, NULL);
 	}
 ;
 
@@ -1275,7 +1274,7 @@ xfndcl:
 	LFUNC fndcl fnbody
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LFUNC, "xfndcl", $1);
+		struct tree* t1 = new_leaf_node($1->category, "xfndcl", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3);
 		$$ = new_tree_node(R_XFNDCL, "xfndcl", nkids, kids, NULL);
 	}
@@ -1298,7 +1297,7 @@ fndcl:
 		struct tree* t5 = new_leaf_node($5->category, "fndcl", $5);
 		struct tree* t7 = new_leaf_node($7->category, "fndcl", $7);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3, $4, t5, $6, t7, $8);
-		$$ = new_tree_node(R_FNDCL, "fndcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_FNDCL+1, "fndcl", nkids, kids, NULL);
 	}
 ;
 
@@ -1307,7 +1306,7 @@ fntype:
 	LFUNC '(' oarg_type_list_ocomma ')' fnres
 	{
 		int nkids = 5;
-		struct tree* t1 = new_leaf_node(LFUNC, "fntype", $1);
+		struct tree* t1 = new_leaf_node($1->category, "fntype", $1);
 		struct tree* t2 = new_leaf_node($2->category, "fntype", $2);
 		struct tree* t4 = new_leaf_node($4->category, "fntype", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
@@ -1326,7 +1325,7 @@ fnbody:
 		struct tree* t1 = new_leaf_node($1->category, "fnbody", $1);
 		struct tree* t3 = new_leaf_node($3->category, "fnbody", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_FNBODY, "fnbody", nkids, kids, NULL);
+		$$ = new_tree_node(R_FNBODY+1, "fnbody", nkids, kids, NULL);
 	}
 ;
 
@@ -1345,7 +1344,7 @@ fnres:
 		struct tree* t1 = new_leaf_node($1->category, "fnres", $1);
 		struct tree* t3 = new_leaf_node($3->category, "fnres", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3);
-		$$ = new_tree_node(R_FNRES, "fnres", nkids, kids, NULL);
+		$$ = new_tree_node(R_FNRES+2, "fnres", nkids, kids, NULL);
 	}
 ;
 
@@ -1368,7 +1367,7 @@ fnliteral:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_FNLITERAL, "fnliteral", nkids, kids, NULL);
+		$$ = new_tree_node(R_FNLITERAL+1, "fnliteral", nkids, kids, NULL);
 	}
 ;
 
@@ -1387,7 +1386,7 @@ xdcl_list:
 		int nkids = 3;
 		struct tree* t3 = new_leaf_node($3->category, "xdcl_list", $3);
 		struct tree** kids = create_tree_kids(nkids, $1, $2, t3);
-		$$ = new_tree_node(R_XDCL_LIST, "xdcl_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_XDCL_LIST+1, "xdcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1401,7 +1400,7 @@ vardcl_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "vardcl_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_VARDCL_LIST, "vardcl_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_VARDCL_LIST+1, "vardcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1415,7 +1414,7 @@ constdcl_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "constdcl_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_CONSTDCL_LIST, "constdcl_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_CONSTDCL_LIST+1, "constdcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1429,7 +1428,7 @@ typedcl_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "typedcl_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_TYPEDCL_LIST, "typedcl_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_TYPEDCL_LIST+1, "typedcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1443,7 +1442,7 @@ structdcl_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "structdcl_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_STRUCTDCL_LIST, "structdcl_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL_LIST+1, "structdcl_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1458,7 +1457,7 @@ structdcl:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL+1, "structdcl", nkids, kids, NULL);
 	}
 |	'(' embed ')' oliteral
 	{
@@ -1466,14 +1465,14 @@ structdcl:
 		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
 		struct tree* t3 = new_leaf_node($3->category, "structdcl", $3);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, t3, $4);
-		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL+2, "structdcl", nkids, kids, NULL);
 	}
 |	'*' embed oliteral
 	{
 		int nkids = 3;
 		struct tree* t1 = new_leaf_node($1->category, "structdcl", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3);
-		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL+3, "structdcl", nkids, kids, NULL);
 	}
 |	'(' '*' embed ')' oliteral
 	{
@@ -1482,7 +1481,7 @@ structdcl:
 		struct tree* t2 = new_leaf_node($2->category, "structdcl", $2);
 		struct tree* t4 = new_leaf_node($4->category, "structdcl", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
-		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL+4, "structdcl", nkids, kids, NULL);
 	}
 |	'*' '(' embed ')' oliteral
 	{
@@ -1491,7 +1490,7 @@ structdcl:
 		struct tree* t2 = new_leaf_node($2->category, "structdcl", $2);
 		struct tree* t4 = new_leaf_node($4->category, "structdcl", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3, t4, $5);
-		$$ = new_tree_node(R_STRUCTDCL, "structdcl", nkids, kids, NULL);
+		$$ = new_tree_node(R_STRUCTDCL+5, "structdcl", nkids, kids, NULL);
 	}
 	;
 
@@ -1499,17 +1498,17 @@ packname:
 	LNAME
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LNAME, "packname", $1);
+		struct tree* t1 = new_leaf_node($1->category, "packname", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_PACKNAME, "packname", nkids, kids, NULL);
 	}
 |	LNAME '.' sym
 	{
 		int nkids = 3;
-		struct tree* t1 = new_leaf_node(LNAME, "packname", $1);
+		struct tree* t1 = new_leaf_node($1->category, "packname", $1);
 		struct tree* t2 = new_leaf_node($2->category, "packname", $2);
 		struct tree** kids = create_tree_kids(nkids, t1, t2, $3);
-		$$ = new_tree_node(R_PACKNAME, "packname", nkids, kids, NULL);
+		$$ = new_tree_node(R_PACKNAME+1, "packname", nkids, kids, NULL);
 	}
 ;
 
@@ -1532,13 +1531,13 @@ arg_type:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_ARG_TYPE, "arg_type", nkids, kids, NULL);
+		$$ = new_tree_node(R_ARG_TYPE+1, "arg_type", nkids, kids, NULL);
 	}
 |	sym dotdotdot
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_ARG_TYPE, "arg_type", nkids, kids, NULL);
+		$$ = new_tree_node(R_ARG_TYPE+2, "arg_type", nkids, kids, NULL);
 	}
 |	dotdotdot
 	{
@@ -1556,7 +1555,7 @@ arg_type_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "arg_type_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_ARG_TYPE_LIST, "arg_type_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_ARG_TYPE_LIST+1, "arg_type_list", nkids, kids, NULL);
 	}
 	;
 
@@ -1569,7 +1568,7 @@ oarg_type_list_ocomma:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_OARG_TYPE_LIST_OCOMMA, "oarg_type_list_ocomma", nkids, kids, NULL);
+		$$ = new_tree_node(R_OARG_TYPE_LIST_OCOMMA+1, "oarg_type_list_ocomma", nkids, kids, NULL);
 	}
 ;
 
@@ -1615,9 +1614,9 @@ non_dcl_stmt:
 |	LRETURN oexpr_list
 	{
 		int nkids = 2;
-		struct tree* t1 = new_leaf_node(LRETURN, "non_dcl_stmt", $1);
+		struct tree* t1 = new_leaf_node($1->category, "non_dcl_stmt", $1);
 		struct tree** kids = create_tree_kids(nkids, t1, $2);
-		$$ = new_tree_node(R_NON_DCL_STMT, "non_dcl_stmt", nkids, kids, NULL);
+		$$ = new_tree_node(R_NON_DCL_STMT+3, "non_dcl_stmt", nkids, kids, NULL);
 	}
 ;
 
@@ -1631,7 +1630,7 @@ stmt_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "stmt_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_STMT_LIST, "stmt_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_STMT_LIST+1, "stmt_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1645,7 +1644,7 @@ new_name_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "new_name_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_NEW_NAME_LIST, "new_name_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_NEW_NAME_LIST+1, "new_name_list", nkids, kids, NULL);
 	}
 	;
 
@@ -1659,7 +1658,7 @@ dcl_name_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "dcl_name_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_DCL_NAME_LIST, "dcl_name_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_DCL_NAME_LIST+1, "dcl_name_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1673,7 +1672,7 @@ expr_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR_LIST, "expr_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR_LIST+1, "expr_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1687,7 +1686,7 @@ expr_or_type_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "expr_or_type_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_EXPR_OR_TYPE_LIST, "expr_or_type_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_EXPR_OR_TYPE_LIST+1, "expr_or_type_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1708,14 +1707,14 @@ expr_or_type_list:
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "keyval_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_KEYVAL_LIST, "keyval_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_KEYVAL_LIST+2, "keyval_list", nkids, kids, NULL);
 	}
 |	keyval_list ',' bare_complitexpr
 	{
 		int nkids = 3;
 		struct tree* t2 = new_leaf_node($2->category, "keyval_list", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2, $3);
-		$$ = new_tree_node(R_KEYVAL_LIST, "keyval_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_KEYVAL_LIST+3, "keyval_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1728,7 +1727,7 @@ expr_or_type_list:
 	{
 		int nkids = 2;
 		struct tree** kids = create_tree_kids(nkids, $1, $2);
-		$$ = new_tree_node(R_BRACED_KEYVAL_LIST, "braced_keyval_list", nkids, kids, NULL);
+		$$ = new_tree_node(R_BRACED_KEYVAL_LIST+1, "braced_keyval_list", nkids, kids, NULL);
 	}
 ;
 
@@ -1746,7 +1745,7 @@ osemi:
 		int nkids = 1;
 		struct tree* t1 = new_leaf_node($1->category, "osemi", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_OSEMI, "osemi", nkids, kids, NULL);
+		$$ = new_tree_node(R_OSEMI+1, "osemi", nkids, kids, NULL);
 	}
 	;
 
@@ -1760,7 +1759,7 @@ ocomma:
 		int nkids = 1;
 		struct tree* t1 = new_leaf_node($1->category, "ocomma", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_OCOMMA, "ocomma", nkids, kids, NULL);
+		$$ = new_tree_node(R_OCOMMA+1, "ocomma", nkids, kids, NULL);
 	}
 	;
 
@@ -1806,9 +1805,9 @@ oliteral:
 |	LLITERAL
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node(LLITERAL, "oliteral", $1);
+		struct tree* t1 = new_leaf_node($1->category, "oliteral", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
-		$$ = new_tree_node(R_OLITERAL, "oliteral", nkids, kids, NULL);
+		$$ = new_tree_node(R_OLITERAL+1, "oliteral", nkids, kids, NULL);
 	}
 ;
 
@@ -1841,7 +1840,7 @@ bare_complitexpr:
 		struct tree* t1 = new_leaf_node($1->category, "bare_complitexpr", $1);
 		struct tree* t4 = new_leaf_node($4->category, "bare_complitexpr", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, t4);
-		$$ = new_tree_node(R_BARE_COMPLITEXPR, "bare_complitexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_BARE_COMPLITEXPR+1, "bare_complitexpr", nkids, kids, NULL);
 	}
 ;
 
@@ -1856,7 +1855,7 @@ complitexpr:
 		struct tree* t1 = new_leaf_node($1->category, "bare_complitexpr", $1);
 		struct tree* t4 = new_leaf_node($4->category, "bare_complitexpr", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, t4);
-		$$ = new_tree_node(R_COMPLITEXPR, "complitexpr", nkids, kids, NULL);
+		$$ = new_tree_node(R_COMPLITEXPR+1, "complitexpr", nkids, kids, NULL);
 	}
 	;
 

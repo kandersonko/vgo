@@ -16,4 +16,7 @@ enum ErrorCode
 
 void *safe_malloc(size_t size);
 
+// sample code from lecture notes (Dr. J)
+void *alloc(int n, size_t size); /* calloc + check for NULL */
+
 #endif // UTILS_H
