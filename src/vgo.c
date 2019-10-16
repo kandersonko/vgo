@@ -37,11 +37,25 @@ int main(int argc, char **argv)
     argc--;
     argv++;
 
+    int print_symtab = 0;
+
     current = new_st(149);
 
+    int j;
+    for (j = 0; j < argc; j++)
+    {
+        if (strcmp(argv[j], "-symtab") == 0)
+        {
+            print_symtab = 1;
+        }
+    }
     int i;
     for (i = 0; i < argc; i++)
     {
+        if (strcmp(argv[i], "-symtab") == 0)
+        {
+            continue;
+        }
         yyfilename = rename_go_file(argv[i]);
         if (!yyfilename)
         {
@@ -63,7 +77,8 @@ int main(int argc, char **argv)
             // populate_symbol_tables(ast_root);
             // btfp(ast_root);
             populate(ast_root);
-            printsymbols(current, 0);
+            if (print_symtab)
+                printsymbols(current, 0);
         }
         else
         {

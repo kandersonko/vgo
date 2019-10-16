@@ -113,7 +113,6 @@ static void populate_typedcl(tree_ptr n, char *typedclname)
     {
         if (n->nkids == 5)
         {
-            printf("STRUCTTYPE: %s %d\n", n->kids[2]->prodname, n->nkids);
             enter_newscope(typedclname, STRUCT_TYPE);
             populate_struct(n->kids[2]);
         }
@@ -168,7 +167,6 @@ static void populate_vardcl(tree_ptr n)
         break;
     case R_TYPEDCL:
         typedclname = get_typedclname(n);
-        printf("TYPE NAME: %s\n", typedclname);
         populate_typedcl(n, typedclname);
         popscope();
         break;
@@ -285,7 +283,6 @@ static void populate_imports(tree_ptr n)
     {
     case LLITERAL:
     case LNAME:
-        printf("FOUND: %s %s\n", n->leaf->text, n->prodname);
         n->type = alctype(IMPORT_TYPE);
         insert_sym(current, n->leaf->text, n->type);
         break;
