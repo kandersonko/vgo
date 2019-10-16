@@ -6,16 +6,20 @@
 #include "utils.h"
 
 struct typeinfo integer_type = {INT_TYPE};
+struct typeinfo bool_type = {BOOL_TYPE};
 struct typeinfo float64_type = {FLOAT64_TYPE};
 struct typeinfo String_type = {STRING_TYPE};
 struct typeinfo null_type = {NULL_TYPE};
 struct typeinfo import_type = {IMPORT_TYPE};
+struct typeinfo package_type = {PACKAGE_TYPE};
 type_ptr null_type_ptr = &null_type;
 type_ptr integer_type_ptr = &integer_type;
+type_ptr bool_type_ptr = &bool_type;
 type_ptr float64_type_ptr = &float64_type;
 type_ptr String_type_ptr = &String_type;
 type_ptr import_type_ptr = &import_type;
-char *typenames[] = {"null", "unknown", "import", "int", "float64", "string", "struct", "function"};
+type_ptr package_type_ptr = &package_type;
+char *typenames[] = {"null", "unknown", "import", "package", "int", "bool", "float64", "string", "struct", "function"};
 
 type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st);
 
@@ -29,6 +33,9 @@ type_ptr alctype(int basetype)
     case INT_TYPE:
         return integer_type_ptr;
         break;
+    case BOOL_TYPE:
+        return bool_type_ptr;
+        break;
     case FLOAT64_TYPE:
         return float64_type_ptr;
         break;
@@ -37,6 +44,9 @@ type_ptr alctype(int basetype)
         break;
     case IMPORT_TYPE:
         return import_type_ptr;
+        break;
+    case PACKAGE_TYPE:
+        return package_type_ptr;
         break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));
@@ -84,6 +94,8 @@ int get_basetype(char *s)
 {
     if (strcmp(s, "int") == 0)
         return INT_TYPE;
+    else if (strcmp(s, "bool") == 0)
+        return BOOL_TYPE;
     else if (strcmp(s, "float64") == 0)
         return FLOAT64_TYPE;
     else if (strcmp(s, "string") == 0)

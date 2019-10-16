@@ -267,11 +267,13 @@ static void populate_package(tree_ptr n)
     {
     case R_PACKAGE + 1:
         check_package_main(n->kids[1]);
-        enter_newscope("package main", UNKNOW_TYPE);
+        // enter_newscope("package main", UNKNOW_TYPE);
         // insert_w_typeinfo(n->kids[1], current);
         break;
     case LNAME:
-        insert_sym(current, n->leaf->text, alctype(UNKNOW_TYPE));
+        n->type = alctype(PACKAGE_TYPE);
+        insert_sym(current, n->leaf->text, n->type);
+        printf("PACKAGE: %s\n", n->leaf->text);
         break;
     default:
         break;
@@ -430,9 +432,11 @@ void printsymbols(sym_table_ptr st, int level)
             switch (ste->type->basetype)
             {
             case INT_TYPE:
+            case BOOL_TYPE:
             case FLOAT64_TYPE:
             case STRING_TYPE:
             case IMPORT_TYPE:
+            case PACKAGE_TYPE:
             case UNKNOW_TYPE:
                 printf("\t%s\n", typename(ste->type));
                 break;

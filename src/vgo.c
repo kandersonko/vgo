@@ -63,7 +63,6 @@ int main(int argc, char **argv)
             // populate_symbol_tables(ast_root);
             // btfp(ast_root);
             populate(ast_root);
-            print_symtab(current);
             printsymbols(current, 0);
         }
         else
