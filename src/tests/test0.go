@@ -6,13 +6,13 @@ import (
 )
 
 var arr [128]string
-var arr2 [25]float64
 
 type rect struct {
 	width, height int
 }
 
-// var mymap map[string]int
+var mymap map[string]int
+var map2 map[int]float64
 
 type pet struct {
 	hunger int

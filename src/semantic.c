@@ -173,11 +173,15 @@ static void populate_vardcl(tree_ptr n)
         popscope();
         break;
     case R_OTHERTYPE:
-        // printf("varname: %s\n", varname);
         n->type = alctype(ARRAY_TYPE);
         n->type->u.a.elemtype = n->kids[3]->type;
         int size = get_array_size(n);
         n->type->u.a.size = size;
+        break;
+    case R_OTHERTYPE + 2:
+        n->type = alctype(MAP_TYPE);
+        n->type->u.m.indextype = n->kids[2]->type;
+        n->type->u.m.elemtype = n->kids[4]->type;
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
@@ -263,7 +267,6 @@ static void populate_package(tree_ptr n)
     case LNAME:
         n->type = alctype(PACKAGE_TYPE);
         insert_sym(current, n->leaf->text, n->type);
-        printf("PACKAGE: %s\n", n->leaf->text);
         break;
     default:
         break;
@@ -300,7 +303,6 @@ void populate(tree_ptr n)
     // char *functname;
     if (n == NULL)
         return;
-    printf("ast tree: %s | %d | %s | %s | %s\n", n->prodname, n->nkids, n->kids[0]->prodname, n->kids[1]->prodname, n->kids[2]->prodname);
     populate_package(n->kids[0]);
     populate_imports(n->kids[1]);
     populate_xdcl(n->kids[2]);
@@ -384,6 +386,11 @@ void printsymbols(sym_table_ptr st, int level)
                 printf("\tarray\n");
                 printf("\tsize: %d\n", ste->type->u.a.size);
                 printf("\telement type: %s\n", typename(ste->type->u.a.elemtype));
+                break;
+            case MAP_TYPE:
+                printf("\tmap\n");
+                printf("\tindex type: %s\n", typename(ste->type->u.m.indextype));
+                printf("\telement type: %s\n", typename(ste->type->u.m.elemtype));
                 break;
             }
         }
