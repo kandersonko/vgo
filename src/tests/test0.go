@@ -5,6 +5,15 @@ import (
 	"math"
 )
 
+var arr [128]string
+var arr2 [25]float64
+
+type rect struct {
+	width, height int
+}
+
+// var mymap map[string]int
+
 type pet struct {
 	hunger int
 	happy  int
@@ -28,9 +37,10 @@ func main() {
 	const year int = 2019
 	const data int = 1138159
 	const age int = 17
+	a[4] = 100
 }
 
-func add(a int, b float64) string {
+func add(a int, b float64, dog pet) string {
 	var k string = "text"
 	return a + b
 }

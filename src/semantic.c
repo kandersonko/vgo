@@ -97,7 +97,6 @@ static void populate_struct(tree_ptr n)
         n->type = alctype(n->basetype);
         break;
     default:
-        printf("STRUCTTYPE: %s %d\n", n->prodname, n->nkids);
         break;
     }
 }
@@ -112,8 +111,12 @@ static void populate_typedcl(tree_ptr n, char *typedclname)
 
     if (strcmp(n->prodname, "structtype") == 0)
     {
-        enter_newscope(typedclname, STRUCT_TYPE);
-        populate_struct(n);
+        if (n->nkids == 5)
+        {
+            printf("STRUCTTYPE: %s %d\n", n->kids[2]->prodname, n->nkids);
+            enter_newscope(typedclname, STRUCT_TYPE);
+            populate_struct(n->kids[2]);
+        }
     }
 
     // switch (n->prodrule)
@@ -125,6 +128,24 @@ static void populate_typedcl(tree_ptr n, char *typedclname)
     // }
 }
 
+static int get_array_size(tree_ptr n)
+{
+    static int size = 0;
+    if (!n)
+        return 0;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        size = get_array_size(n->kids[i]);
+    }
+    if ((n->nkids == 0) && strcmp(n->prodname, "pexpr_no_paren") == 0)
+    {
+        int size = atoi(n->leaf->text);
+        return size;
+    }
+    return size;
+}
+
 static void populate_vardcl(tree_ptr n)
 {
     if (!n)
@@ -134,6 +155,7 @@ static void populate_vardcl(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_vardcl(n->kids[i]);
+
     switch (n->prodrule)
     {
     case R_VARDCL:
@@ -149,6 +171,13 @@ static void populate_vardcl(tree_ptr n)
         printf("TYPE NAME: %s\n", typedclname);
         populate_typedcl(n, typedclname);
         popscope();
+        break;
+    case R_OTHERTYPE:
+        // printf("varname: %s\n", varname);
+        n->type = alctype(ARRAY_TYPE);
+        n->type->u.a.elemtype = n->kids[3]->type;
+        int size = get_array_size(n);
+        n->type->u.a.size = size;
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
@@ -350,6 +379,11 @@ void printsymbols(sym_table_ptr st, int level)
             case STRUCT_TYPE:
                 printf("\tstruct\n");
                 printsymbols(ste->type->u.s.st, level + 1);
+                break;
+            case ARRAY_TYPE:
+                printf("\tarray\n");
+                printf("\tsize: %d\n", ste->type->u.a.size);
+                printf("\telement type: %s\n", typename(ste->type->u.a.elemtype));
                 break;
             }
         }
