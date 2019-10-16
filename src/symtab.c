@@ -269,7 +269,7 @@ sym_entry_ptr lookup_st(sym_table_ptr st, char *s)
 
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
-        if (!strcmp(s, entry->text))
+        if (strcmp(s, entry->text) == 0)
         {
             /*
           *  Return a pointer to the symbol table entry.

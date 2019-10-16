@@ -305,6 +305,16 @@ void populate(tree_ptr n)
     populate_xdcl(n->kids[2]);
 }
 
+static void check_vardcl(tree_ptr n)
+{
+    sym_entry_ptr entry = lookup_st(current, n->leaf->text);
+    if (entry != NULL)
+    {
+        fprintf(stderr, "ERROR: redeclaration of `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
+        exit(-1);
+    }
+}
+
 /*
  * "inherited attribute" for type could go down by copying from
  * parent node to child nodes, or by passing a parameter. Which is better?
@@ -326,21 +336,10 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     {
     case LNAME:
         // st_insert(st, n->leaf->text, n->type);
+        check_vardcl(n);
         insert_sym(st, n->leaf->text, n->type);
-        // printf("tree: %s %s\n", n->leaf->text, typename(n->type));
         break;
     }
-}
-
-void dovariabledeclarator(tree_ptr n, type_ptr t)
-{
-    n = n->kids[0]; /* get variabledeclaratorid */
-    if (n->prodrule == R_NAME)
-    {
-        yyerror("arrays unimplemented");
-        exit(0);
-    }
-    insert_sym(current, n->kids[0]->leaf->text, t);
 }
 
 void printsymbols(sym_table_ptr st, int level)
@@ -400,7 +399,7 @@ void semanticerror(char *s, tree_ptr n)
         n = n->kids[0];
     if (n)
     {
-        fprintf(stderr, "%s:%d: ", n->leaf->filename, n->leaf->lineno);
+        fprintf(stderr, "%s:%d: %s", n->leaf->filename, n->leaf->lineno, n->leaf->text);
     }
     fprintf(stderr, "%s", s);
     // if (n && n->id == IDENT)
