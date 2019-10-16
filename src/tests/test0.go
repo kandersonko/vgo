@@ -8,6 +8,7 @@ var z, t int
 
 func main() {
 	print("hello, world\n")
+	var m string
 }
 
 func add(a int, b float64) string {

@@ -22,7 +22,7 @@ void yyerror(char *);
 
 void enter_newscope(char *s, int basetype)
 {
-    sym_table_ptr new = new_st(13);
+    sym_table_ptr new = new_st(30);
     type_ptr t = NULL;
     // t = (type == STRUCT_TYPE) ? alc(s, new) : alcmethodtype(NULL, NULL, new);
     switch (basetype)
@@ -170,6 +170,8 @@ static char *get_functname(tree_ptr n)
 
 static void populate_vardcl(tree_ptr n)
 {
+    if (!n)
+        return;
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_vardcl(n->kids[i]);
@@ -179,23 +181,99 @@ static void populate_vardcl(tree_ptr n)
         n->type = n->kids[1]->type; // synthesize
         n->kids[0]->type = n->type; // inherit
         insert_w_typeinfo(n->kids[0], current);
+
         break;
-    case R_NTYPE:
-        n->type = n->kids[0]->type;
-        break;
+    // case R_NTYPE:
+    //     n->type = n->kids[0]->type;
+    //     break;
     case R_SYM:
         n->type = n->kids[0]->type;
         break;
     case LNAME:
         n->basetype = get_basetype(n->leaf->text);
-        // if (n->type->basetype)
-        //     printf("type: %s\n", typename(n->type));
-        // TODO: lookup
-        printf("basetype: %d\n", n->basetype);
         n->type = alctype(n->basetype);
         break;
     default:
-        // printf("default: %d %p %p %s\n", n->type->basetype, n->type, n, n->prodname);
+        break;
+    }
+}
+
+static void populate_body(tree_ptr n)
+{
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_body(n->kids[i]);
+    switch (n->prodrule)
+    {
+    case R_COMMON_DCL:
+        populate_vardcl(n->kids[1]);
+        break;
+    default:
+        break;
+    }
+}
+
+static void populate_function(tree_ptr n)
+{
+    char *functname;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_function(n->kids[i]);
+    switch (n->prodrule)
+    {
+    case R_XFNDCL:
+        functname = get_functname(n->kids[1]);
+        printf("function %s\n", functname);
+        enter_newscope(functname, FUNC_TYPE);
+        populate_params(n->kids[1]);
+        populate_body(n->kids[2]);
+        popscope();
+        break;
+    default:
+        break;
+    }
+}
+
+static void populate_xdcl(tree_ptr n)
+{
+    char *functname;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_xdcl(n->kids[i]);
+    switch (n->prodrule)
+    {
+    case R_XDCL_LIST + 1:
+        printf("XDCL_LIST: %s | %d | %d | %d - %s\n", n->prodname, n->nkids, n->kids[0]->nkids, n->kids[1]->nkids, n->kids[1]->prodname);
+        if (strcmp(n->kids[1]->prodname, "xfndcl") == 0)
+        {
+            populate_function(n->kids[1]);
+        }
+        else if (strcmp(n->kids[1]->prodname, "common_dcl") == 0)
+        {
+            populate_vardcl(n->kids[1]);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+static void populate_package(tree_ptr n)
+{
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_package(n->kids[i]);
+    switch (n->prodrule)
+    {
+    case R_PACKAGE + 1:
+        check_package_main(n->kids[1]);
+        enter_newscope("package main", UNKNOW_TYPE);
+        // insert_w_typeinfo(n->kids[1], current);
+        break;
+    case LNAME:
+        insert_sym(current, n->leaf->text, alctype(UNKNOW_TYPE));
+        break;
+    default:
         break;
     }
 }
@@ -206,65 +284,71 @@ void populate(tree_ptr n)
     // TODO: check that type is not defined first
     // TODO: show scope information (for local & global declartion)
     // TODO: preorder to popscope/pushscope (2 switches)
-    char *functname;
-    int i;
+    // char *functname;
     if (n == NULL)
         return;
-    for (i = 0; i < n->nkids; i++)
-        populate(n->kids[i]);
-    switch (n->prodrule)
-    {
-    // case R_FILE:
-    //     // enter_newscope(globals, UNKNOW_TYPE);
+    printf("ast tree: %s | %d | %s | %s | %s\n", n->prodname, n->nkids, n->kids[0]->prodname, n->kids[1]->prodname, n->kids[2]->prodname);
+    populate_package(n->kids[0]);
+    // populate_imports(n->kids[1]);
+    populate_xdcl(n->kids[2]);
+    // int i;
+    // for (i = 0; i < n->nkids; i++)
+    //     populate(n->kids[i]);
+    // switch (n->prodrule)
+    // {
+    // // case R_FILE:
+    // //     // enter_newscope("globals", UNKNOW_TYPE);
+    // //     break;
+    // case R_PACKAGE + 1:
+    //     check_package_main(n->kids[1]);
+    //     enter_newscope("package main", UNKNOW_TYPE);
+    //     // insert_w_typeinfo(n->kids[1], current);
     //     break;
-    case R_PACKAGE + 1:
-        check_package_main(n->kids[1]);
-        insert_w_typeinfo(n->kids[1], current);
-        break;
-    case R_XFNDCL:
-        functname = get_functname(n->kids[1]);
-        enter_newscope(functname, FUNC_TYPE);
-        printf("function %s\n", functname);
-        populate_params(n->kids[1]);
-        popscope();
-        break;
-    case R_COMMON_DCL:
-        // populate_vardcl(n->kids[1]);
-        break;
-    case R_VARDCL:
-        n->type = n->kids[1]->type; // synthesize
-        n->kids[0]->type = n->type; // inherit
-        insert_w_typeinfo(n->kids[0], current);
-        break;
-    case R_NTYPE:
-        n->type = n->kids[0]->type;
-        break;
-    case R_SYM:
-        n->type = n->kids[0]->type;
-        break;
-    case LNAME:
-        n->basetype = get_basetype(n->leaf->text);
-        // TODO: lookup
-        printf("basetype: %d\n", n->basetype);
-        n->type = alctype(n->basetype);
-        break;
-    default:
-        // printf("default: %d %p %p %s\n", n->type->basetype, n->type, n, n->prodname);
-        break;
-        // case ARG_TYPE_LIST_1: /* ATL: arg_type */
-        //     break;
-        // case ARG_TYPE_LIST_2: /* ATL: ATL ',' arg_type */
-        //     break;
-        // case ARG_TYPE_1: /* AT: name_or_type */
-        //     break;
-        // case ARG_TYPE_2: /* AT: sym name_or_type */
-        //     break;
-        // case ARG_TYPE_3: /* AT: sym dotdotdot */
-        //     break;
-        // case ARG_TYPE_4: /* AT: dotdotdot */
-        //     break
-        // }
-    }
+    // case R_XFNDCL:
+    //     functname = get_functname(n->kids[1]);
+    //     printf("function %s\n", functname);
+    //     enter_newscope(functname, FUNC_TYPE);
+    //     populate_params(n->kids[1]);
+    //     populate_body(n->kids[2]);
+    //     popscope();
+    //     break;
+    // case R_COMMON_DCL:
+    //     populate_vardcl(n->kids[1]);
+    //     break;
+    // // case R_VARDCL:
+    // //     n->type = n->kids[1]->type; // synthesize
+    // //     n->kids[0]->type = n->type; // inherit
+    // //     insert_w_typeinfo(n->kids[0], current);
+    // //     break;
+    // // case R_NTYPE:
+    // //     n->type = n->kids[0]->type;
+    // //     break;
+    // // case R_SYM:
+    // //     n->type = n->kids[0]->type;
+    // //     break;
+    // // case LNAME:
+    // //     n->basetype = get_basetype(n->leaf->text);
+    // //     // TODO: lookup
+    // //     printf("basetype: %d\n", n->basetype);
+    // //     n->type = alctype(n->basetype);
+    // //     break;
+    // default:
+    //     // printf("default: %d %p %p %s\n", n->type->basetype, n->type, n, n->prodname);
+    //     break;
+    //     // case ARG_TYPE_LIST_1: /* ATL: arg_type */
+    //     //     break;
+    //     // case ARG_TYPE_LIST_2: /* ATL: ATL ',' arg_type */
+    //     //     break;
+    //     // case ARG_TYPE_1: /* AT: name_or_type */
+    //     //     break;
+    //     // case ARG_TYPE_2: /* AT: sym name_or_type */
+    //     //     break;
+    //     // case ARG_TYPE_3: /* AT: sym dotdotdot */
+    //     //     break;
+    //     // case ARG_TYPE_4: /* AT: dotdotdot */
+    //     //     break
+    //     // }
+    // }
 }
 
 /*
@@ -289,7 +373,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     case LNAME:
         // st_insert(st, n->leaf->text, n->type);
         insert_sym(st, n->leaf->text, n->type);
-        printf("tree: %s %s\n", n->leaf->text, typename(n->type));
+        // printf("tree: %s %s\n", n->leaf->text, typename(n->type));
         break;
     }
 }
@@ -326,11 +410,12 @@ void printsymbols(sym_table_ptr st, int level)
             {
             case INT_TYPE:
             case FLOAT64_TYPE:
+            case STRING_TYPE:
             case UNKNOW_TYPE:
                 printf("\t%s\n", typename(ste->type));
                 break;
             case FUNC_TYPE:
-                printf("\n");
+                printf("\tfunction\n");
                 printsymbols(ste->type->u.f.st, level + 1);
                 break;
             }
@@ -353,27 +438,6 @@ void semanticerror(char *s, tree_ptr n)
     errors++;
 }
 
-/*
- * An error function during a tree traversal will typically occur
- * at some particular tree node. But to report it, compiler will
- * have to map back to some source location, given by some token.
- */
-void error(char *s, tree_ptr t)
-{
-    while (t->nkids > 0)
-        t = t->kids[0];
-    yylval.ast = t;
-    yyerror(s);
-}
-
-void warn(char *s, tree_ptr t)
-{
-    char tmp[128];
-    sprintf(tmp, "warning: %s", s);
-    error(tmp, t);
-    nerrors--; /* since yyerror() in this example would increment nerrors */
-}
-
 void populate_params(tree_ptr n)
 {
     if (!n)
@@ -386,13 +450,18 @@ void populate_params(tree_ptr n)
 
     switch (n->prodrule)
     {
+    case R_FNRES:
+        n->type->u.f.returntype = alctype(UNKNOW_TYPE);
+        break;
+    case R_FNRES + 2:
+        n->type->u.f.returntype = n->kids[1]->type->u.f.returntype;
+        break;
     case R_ARG_TYPE_LIST + 1:
         // n->kids[0]->type = n->kids[2]->type;
         populate_params(n->kids[2]);
         break;
     case R_ARG_TYPE + 1:
         n->kids[0]->type = n->kids[1]->type;
-        // insert_w_typeinfo(n->kids[1], current);
         insert_w_typeinfo(n->kids[0], current);
         break;
     case R_NTYPE:
@@ -403,12 +472,12 @@ void populate_params(tree_ptr n)
         break;
     case LNAME:
         n->basetype = get_basetype(n->leaf->text);
-        printf("ARG basetype: %d %s\n", n->basetype, n->leaf->text);
+        // printf("ARG basetype: %d %s\n", n->basetype, n->leaf->text);
         n->type = alctype(n->basetype);
         break;
 
     default:
-        printf("ARG default: %s\n", n->prodname);
+        // printf("ARG default: %s\n", n->prodname);
         break;
     }
 }

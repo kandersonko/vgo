@@ -7,12 +7,13 @@
 
 struct typeinfo integer_type = {INT_TYPE};
 struct typeinfo float64_type = {FLOAT64_TYPE};
+struct typeinfo String_type = {STRING_TYPE};
 struct typeinfo null_type = {NULL_TYPE};
 type_ptr null_type_ptr = &null_type;
 type_ptr integer_type_ptr = &integer_type;
 type_ptr float64_type_ptr = &float64_type;
-type_ptr String_type_ptr;
-char *typenames[] = {"null", "unknown", "int", "float64", "struct", "function"};
+type_ptr String_type_ptr = &String_type;
+char *typenames[] = {"null", "unknown", "int", "float64", "string", "struct", "function"};
 
 type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st);
 
@@ -29,12 +30,15 @@ type_ptr alctype(int basetype)
     case FLOAT64_TYPE:
         return float64_type_ptr;
         break;
+    case STRING_TYPE:
+        return String_type_ptr;
+        break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));
         if (t == NULL)
             return t;
         t->basetype = basetype;
-        printf("found type: %d\n", t->basetype);
+        // printf("found type: %d\n", t->basetype);
         return t;
         break;
     }
@@ -77,6 +81,8 @@ int get_basetype(char *s)
         return INT_TYPE;
     else if (strcmp(s, "float64") == 0)
         return FLOAT64_TYPE;
+    else if (strcmp(s, "string") == 0)
+        return STRING_TYPE;
     return UNKNOW_TYPE;
 }
 
