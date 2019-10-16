@@ -74,17 +74,17 @@ static void populate_vardcl(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_vardcl(n->kids[i]);
+    printf("VARDCL: %s\n", n->prodname);
     switch (n->prodrule)
     {
     case R_VARDCL:
+    case R_VARDCL + 1:
+    case R_CONSTDCL:
+    case R_CONSTDCL1 + 1:
         n->type = n->kids[1]->type; // synthesize
         n->kids[0]->type = n->type; // inherit
         insert_w_typeinfo(n->kids[0], current);
-
         break;
-    // case R_NTYPE:
-    //     n->type = n->kids[0]->type;
-    //     break;
     case R_SYM:
         n->type = n->kids[0]->type;
         break;
@@ -99,16 +99,14 @@ static void populate_vardcl(tree_ptr n)
 
 static void populate_body(tree_ptr n)
 {
+    if (!n)
+        return;
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_body(n->kids[i]);
-    switch (n->prodrule)
+    if (strcmp(n->prodname, "common_dcl") == 0)
     {
-    case R_COMMON_DCL:
-        populate_vardcl(n->kids[1]);
-        break;
-    default:
-        break;
+        populate_vardcl(n);
     }
 }
 
