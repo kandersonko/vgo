@@ -1871,7 +1871,7 @@ yyreduce:
 #line 256 "go.y" /* yacc.c:1646  */
     {
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node((yyvsp[0].t)->category, "import_here", (yyvsp[0].t));
+		struct tree* t1 = new_leaf_node(LLITERAL, "import_here", (yyvsp[0].t));
 		struct tree** kids = create_tree_kids(nkids, t1);
 		(yyval.ast) = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
@@ -1882,7 +1882,7 @@ yyreduce:
 #line 263 "go.y" /* yacc.c:1646  */
     {
 		int nkids = 2;
-		struct tree* t2 = new_leaf_node((yyvsp[0].t)->category, "import_here", (yyvsp[0].t));
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", (yyvsp[0].t));
 		struct tree** kids = create_tree_kids(nkids, (yyvsp[-1].ast), t2);
 		(yyval.ast) = new_tree_node(R_IMPORT_HERE+1, "import_here", nkids, kids, NULL);
 	}
@@ -1894,7 +1894,7 @@ yyreduce:
     {
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node((yyvsp[-1].t)->category, "import_here", (yyvsp[-1].t));
-		struct tree* t2 = new_leaf_node((yyvsp[0].t)->category, "import_here", (yyvsp[0].t));
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", (yyvsp[0].t));
 		struct tree** kids = create_tree_kids(nkids, t1, t2);
 		(yyval.ast) = new_tree_node(R_IMPORT_HERE+2, "import_here", nkids, kids, NULL);
 	}

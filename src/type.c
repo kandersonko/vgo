@@ -9,11 +9,13 @@ struct typeinfo integer_type = {INT_TYPE};
 struct typeinfo float64_type = {FLOAT64_TYPE};
 struct typeinfo String_type = {STRING_TYPE};
 struct typeinfo null_type = {NULL_TYPE};
+struct typeinfo import_type = {IMPORT_TYPE};
 type_ptr null_type_ptr = &null_type;
 type_ptr integer_type_ptr = &integer_type;
 type_ptr float64_type_ptr = &float64_type;
 type_ptr String_type_ptr = &String_type;
-char *typenames[] = {"null", "unknown", "int", "float64", "string", "struct", "function"};
+type_ptr import_type_ptr = &import_type;
+char *typenames[] = {"null", "unknown", "import", "int", "float64", "string", "struct", "function"};
 
 type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st);
 
@@ -32,6 +34,9 @@ type_ptr alctype(int basetype)
         break;
     case STRING_TYPE:
         return String_type_ptr;
+        break;
+    case IMPORT_TYPE:
+        return import_type_ptr;
         break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));

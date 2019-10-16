@@ -255,14 +255,14 @@ import_here:
 	LLITERAL
 	{
 		int nkids = 1;
-		struct tree* t1 = new_leaf_node($1->category, "import_here", $1);
+		struct tree* t1 = new_leaf_node(LLITERAL, "import_here", $1);
 		struct tree** kids = create_tree_kids(nkids, t1);
 		$$ = new_tree_node(R_IMPORT_HERE, "import_here", nkids, kids, NULL);
 	}
 |	sym LLITERAL
 	{
 		int nkids = 2;
-		struct tree* t2 = new_leaf_node($2->category, "import_here", $2);
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
 		struct tree** kids = create_tree_kids(nkids, $1, t2);
 		$$ = new_tree_node(R_IMPORT_HERE+1, "import_here", nkids, kids, NULL);
 	}
@@ -270,7 +270,7 @@ import_here:
 	{
 		int nkids = 2;
 		struct tree* t1 = new_leaf_node($1->category, "import_here", $1);
-		struct tree* t2 = new_leaf_node($2->category, "import_here", $2);
+		struct tree* t2 = new_leaf_node(LLITERAL, "import_here", $2);
 		struct tree** kids = create_tree_kids(nkids, t1, t2);
 		$$ = new_tree_node(R_IMPORT_HERE+2, "import_here", nkids, kids, NULL);
 	}

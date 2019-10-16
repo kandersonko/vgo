@@ -278,6 +278,27 @@ static void populate_package(tree_ptr n)
     }
 }
 
+static void populate_imports(tree_ptr n)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_imports(n->kids[i]);
+
+    switch (n->prodrule)
+    {
+    case LLITERAL:
+    case LNAME:
+        printf("FOUND: %s %s\n", n->leaf->text, n->prodname);
+        n->type = alctype(IMPORT_TYPE);
+        insert_sym(current, n->leaf->text, n->type);
+        break;
+    default:
+        break;
+    }
+}
+
 // TODO: check with another tree traversal variable declaration
 void populate(tree_ptr n)
 {
@@ -289,7 +310,7 @@ void populate(tree_ptr n)
         return;
     printf("ast tree: %s | %d | %s | %s | %s\n", n->prodname, n->nkids, n->kids[0]->prodname, n->kids[1]->prodname, n->kids[2]->prodname);
     populate_package(n->kids[0]);
-    // populate_imports(n->kids[1]);
+    populate_imports(n->kids[1]);
     populate_xdcl(n->kids[2]);
     // int i;
     // for (i = 0; i < n->nkids; i++)
@@ -411,6 +432,7 @@ void printsymbols(sym_table_ptr st, int level)
             case INT_TYPE:
             case FLOAT64_TYPE:
             case STRING_TYPE:
+            case IMPORT_TYPE:
             case UNKNOW_TYPE:
                 printf("\t%s\n", typename(ste->type));
                 break;
@@ -472,7 +494,6 @@ void populate_params(tree_ptr n)
         break;
     case LNAME:
         n->basetype = get_basetype(n->leaf->text);
-        // printf("ARG basetype: %d %s\n", n->basetype, n->leaf->text);
         n->type = alctype(n->basetype);
         break;
 

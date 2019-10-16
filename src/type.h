@@ -4,14 +4,15 @@
 /* base types. In the real thing, there will be many more base types */
 #define NULL_TYPE 1000000
 #define UNKNOW_TYPE 1000001
-#define INT_TYPE 1000002
-#define FLOAT64_TYPE 1000003
-#define STRING_TYPE 1000004
-#define STRUCT_TYPE 1000005
-#define ARRAY_TYPE 1000006
-#define FUNC_TYPE 1000007
-#define MAP_TYPE 1000008
-#define CHAR_TYPE 1000009
+#define IMPORT_TYPE 1000002
+#define INT_TYPE 1000003
+#define FLOAT64_TYPE 1000004
+#define STRING_TYPE 1000005
+#define STRUCT_TYPE 1000006
+#define ARRAY_TYPE 1000007
+#define FUNC_TYPE 1000008
+#define MAP_TYPE 1000009
+#define CHAR_TYPE 1000010
 
 typedef struct param
 {
