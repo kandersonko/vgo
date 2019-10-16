@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 type pet struct {
 	hunger int
 	happy  int
+	power  float64
+	name   string
 }
 
 const x int = 2
 
-var y float64
+var y float64 = math.Sin(30)
 
 var z, t int
 

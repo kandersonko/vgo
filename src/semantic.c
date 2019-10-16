@@ -28,6 +28,9 @@ void enter_newscope(char *s, int basetype)
     switch (basetype)
     {
     case STRUCT_TYPE:
+        t = alctype(STRUCT_TYPE);
+        t->u.s.st = new;
+        t->u.s.name = strdup(s);
         break;
     case FUNC_TYPE:
         t = alctype(FUNC_TYPE);
@@ -67,14 +70,70 @@ static char *get_functname(tree_ptr n)
     return n->kids[0]->kids[0]->leaf->text;
 }
 
-static void populate_vardcl(tree_ptr n)
+static char *get_typedclname(tree_ptr n)
+{
+    return n->kids[0]->kids[0]->leaf->text;
+}
+
+static void populate_struct(tree_ptr n)
 {
     if (!n)
         return;
     int i;
     for (i = 0; i < n->nkids; i++)
+        populate_struct(n->kids[i]);
+    switch (n->prodrule)
+    {
+    case R_STRUCTDCL:
+        n->type = n->kids[1]->type; // synthesize
+        n->kids[0]->type = n->type; // inherit
+        insert_w_typeinfo(n->kids[0], current);
+        break;
+    case R_SYM:
+        n->type = n->kids[0]->type;
+        break;
+    case LNAME:
+        n->basetype = get_basetype(n->leaf->text);
+        n->type = alctype(n->basetype);
+        break;
+    default:
+        printf("STRUCTTYPE: %s %d\n", n->prodname, n->nkids);
+        break;
+    }
+}
+
+static void populate_typedcl(tree_ptr n, char *typedclname)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        populate_typedcl(n->kids[i], typedclname);
+
+    if (strcmp(n->prodname, "structtype") == 0)
+    {
+        enter_newscope(typedclname, STRUCT_TYPE);
+        populate_struct(n);
+    }
+
+    // switch (n->prodrule)
+    // {
+    // case R_VARDCL:
+    //     break;
+    // default:
+    //     break;
+    // }
+}
+
+static void populate_vardcl(tree_ptr n)
+{
+    if (!n)
+        return;
+
+    char *typedclname;
+    int i;
+    for (i = 0; i < n->nkids; i++)
         populate_vardcl(n->kids[i]);
-    printf("VARDCL: %s\n", n->prodname);
     switch (n->prodrule)
     {
     case R_VARDCL:
@@ -84,6 +143,12 @@ static void populate_vardcl(tree_ptr n)
         n->type = n->kids[1]->type; // synthesize
         n->kids[0]->type = n->type; // inherit
         insert_w_typeinfo(n->kids[0], current);
+        break;
+    case R_TYPEDCL:
+        typedclname = get_typedclname(n);
+        printf("TYPE NAME: %s\n", typedclname);
+        populate_typedcl(n, typedclname);
+        popscope();
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
@@ -138,7 +203,7 @@ static void populate_xdcl(tree_ptr n)
     switch (n->prodrule)
     {
     case R_XDCL_LIST + 1:
-        printf("XDCL_LIST: %s | %d | %d | %d - %s\n", n->prodname, n->nkids, n->kids[0]->nkids, n->kids[1]->nkids, n->kids[1]->prodname);
+        // printf("XDCL_LIST: %s | %d | %d | %d - %s\n", n->prodname, n->nkids, n->kids[0]->nkids, n->kids[1]->nkids, n->kids[1]->prodname);
         if (strcmp(n->kids[1]->prodname, "xfndcl") == 0)
         {
             populate_function(n->kids[1]);
@@ -281,6 +346,10 @@ void printsymbols(sym_table_ptr st, int level)
             case FUNC_TYPE:
                 printf("\tfunction\n");
                 printsymbols(ste->type->u.f.st, level + 1);
+                break;
+            case STRUCT_TYPE:
+                printf("\tstruct\n");
+                printsymbols(ste->type->u.s.st, level + 1);
                 break;
             }
         }
