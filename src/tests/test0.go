@@ -33,7 +33,7 @@ var z, t int
 var logicalValue bool
 
 func main() {
-	map1[3] = 9.6
+	map2[3] = 9.6
 
 	// var year = math.Sin(20)
 	print("hello, world\n")
@@ -42,10 +42,11 @@ func main() {
 	const year int = 2019
 	const data int = 1138159
 	const age int = 17
-	a[4] = 100
 }
 
-func add(a int, p bool, dog pet, m map[int]string, ar [5]string) string {
+func add(a int, p bool, dog vehicle, m map[int]string, ar [5]string) string {
+	a[4] = 100
+
 	const x int = 4
 }
 

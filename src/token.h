@@ -21,7 +21,4 @@ token_ptr create_token(int category, char *filename, int lineno, char *text, int
 
 void delete_token(token_ptr t);
 
-char *replace_str(const char *s, const char *oldW,
-                  const char *newW);
-
 #endif

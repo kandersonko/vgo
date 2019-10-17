@@ -225,6 +225,7 @@ char *insert_stringpool(char *s)
 
 int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
+    printf("INSERT: %s\n", s);
     int h;
     struct sym_entry *entry;
 

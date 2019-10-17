@@ -13,6 +13,7 @@
 #include "go.tab.h"
 #include "type.h"
 #include "rules.h"
+#include "utils.h"
 
 void enter_newscope(char *s, int basetype)
 {
@@ -150,6 +151,41 @@ static int get_array_size(tree_ptr n)
     return size;
 }
 
+static void check_undeclared(tree_ptr n)
+{
+    if (!n)
+        return;
+    sym_entry_ptr entry = NULL;
+
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        if (n->prodrule == (R_PEXPR_NO_PAREN + 2))
+        {
+            check_undeclared(n->kids[0]);
+            return;
+        }
+        else
+            check_undeclared(n->kids[i]);
+    }
+    switch (n->prodrule)
+    {
+    case LNAME:
+        entry = lookup_st(current, n->leaf->text);
+        if (entry == NULL)
+            entry = lookup_st(current->parent, n->leaf->text);
+        if (entry == NULL)
+        {
+            fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
+            exit(3);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void populate_vardcl(tree_ptr n)
 {
     if (!n)
@@ -158,7 +194,9 @@ static void populate_vardcl(tree_ptr n)
     char *typedclname;
     int i;
     for (i = 0; i < n->nkids; i++)
+    {
         populate_vardcl(n->kids[i]);
+    }
 
     switch (n->prodrule)
     {
@@ -197,6 +235,8 @@ static void populate_vardcl(tree_ptr n)
     default:
         break;
     }
+    if (strcmp(n->prodname, "expr") == 0)
+        check_undeclared(n);
 }
 
 void populate_params(tree_ptr n)
@@ -259,10 +299,13 @@ static void populate_body(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_body(n->kids[i]);
+
     if (strcmp(n->prodname, "common_dcl") == 0)
     {
         populate_vardcl(n);
     }
+    if (strcmp(n->prodname, "pexpr_no_paren") == 0)
+        check_undeclared(n);
 }
 
 static void get_functrettype(tree_ptr n, type_ptr *type)
@@ -356,6 +399,7 @@ static void populate_package(tree_ptr n)
 
 static void populate_imports(tree_ptr n)
 {
+    char *importname;
     if (!n)
         return;
     int i;
@@ -366,8 +410,9 @@ static void populate_imports(tree_ptr n)
     {
     case LLITERAL:
     case LNAME:
+        importname = strip_chars(n->leaf->text);
         n->type = alctype(IMPORT_TYPE);
-        insert_sym(current, n->leaf->text, n->type);
+        insert_sym(current, importname, n->type);
         break;
     default:
         break;
@@ -405,7 +450,6 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     switch (n->prodrule)
     {
     case LNAME:
-        // st_insert(st, n->leaf->text, n->type);
         check_vardcl(n);
         insert_sym(st, n->leaf->text, n->type);
         break;

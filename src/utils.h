@@ -19,4 +19,9 @@ void *safe_malloc(size_t size);
 // sample code from lecture notes (Dr. J)
 void *alloc(int n, size_t size); /* calloc + check for NULL */
 
+char *replace_str(const char *s, const char *oldW,
+                  const char *newW);
+
+char *strip_chars(char *text);
+
 #endif // UTILS_H
