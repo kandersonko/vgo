@@ -1,3 +1,8 @@
+/*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
 #if !defined(SEMANTIC_H)
 #define SEMANTIC_H
 
@@ -23,17 +28,9 @@ extern void printsymbols(sym_table_ptr st, int level);
 
 void populate_symbol_tables(tree_ptr ast);
 void populatesymbols(tree_ptr t);
-void populate_init_declarators(tree_ptr t, type_ptr type);
 
 void populate(tree_ptr n);
 void populate_params(tree_ptr n);
 void insert_w_typeinfo(tree_ptr n, sym_table_ptr st);
-
-void dovariabledeclarator(tree_ptr n, type_ptr t);
-void semanticerror(char *s, tree_ptr n);
-
-void btfp(tree_ptr n);
-
-type_ptr get_type(int type);
 
 #endif // SEMANTIC_H

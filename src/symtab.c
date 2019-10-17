@@ -1,4 +1,9 @@
 /*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
+/*
  * symtab.c
  */
 
@@ -69,18 +74,6 @@ sym_table_ptr new_st(int nbuckets)
         stringpool = new_st(149);
     }
     return st;
-}
-
-void print_symtab(sym_table_ptr st)
-{
-    int i;
-    for (i = 0; i < st->nbuckets; i++)
-    {
-        if (st->buckets[i])
-            printf("entry: %s | nentries: %d | type: %s \n", st->buckets[i]->text, st->entries, typename(st->buckets[i]->type));
-        // else
-        //     printf("empty bucket\n");
-    }
 }
 
 /*
@@ -229,7 +222,6 @@ char *insert_stringpool(char *s)
 
 int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
-    // printf("INSERT: %s\n", s);
     int h;
     struct sym_entry *entry;
 

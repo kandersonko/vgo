@@ -1,3 +1,8 @@
+/*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -9,22 +14,10 @@
 #include "type.h"
 #include "rules.h"
 
-int errors, nerrors;
-void yyerror(char *);
-/*
- * what-all should be done automatically when a new scope is entered?
- * mainly we are creating a new empty local symbol table.
- * but if we are entering this function/method/class type into the global
- * symbol table, someone has to extract its signature
- */
-
-// TODO: have global scope
-
 void enter_newscope(char *s, int basetype)
 {
     sym_table_ptr new = new_st(30);
     type_ptr t = NULL;
-    // t = (type == STRUCT_TYPE) ? alc(s, new) : alcmethodtype(NULL, NULL, new);
     switch (basetype)
     {
     case STRUCT_TYPE:
@@ -43,7 +36,6 @@ void enter_newscope(char *s, int basetype)
     }
     new->scope = t;
 
-    // TODO: handle current scope when missing
     insert_sym(current, s, t);
     pushscope(new);
 }
@@ -68,7 +60,8 @@ static void check_package_main(tree_ptr n)
         if (strcmp(n->kids[0]->leaf->text, "main") != 0)
         {
             fprintf(stderr, "ERROR: found `%s` at line %d in file %s\n", n->kids[0]->leaf->text, n->kids[0]->leaf->lineno, n->kids[0]->leaf->filename);
-            yyerror("ERROR: package name should be `main`\n");
+            fprintf(stderr, "ERROR: package name should be `main`\n");
+            exit(3);
         }
         break;
 
@@ -137,14 +130,6 @@ static void populate_typedcl(tree_ptr n, char *typedclname)
             populate_struct(n->kids[2]);
         }
     }
-
-    // switch (n->prodrule)
-    // {
-    // case R_VARDCL:
-    //     break;
-    // default:
-    //     break;
-    // }
 }
 
 static int get_array_size(tree_ptr n)
@@ -225,7 +210,6 @@ void populate_params(tree_ptr n)
         populate_params(n->kids[i]);
     }
 
-    printf("DEFAULT: %s\n", n->prodname);
     sym_entry_ptr entry = NULL;
 
     switch (n->prodrule)
@@ -253,10 +237,8 @@ void populate_params(tree_ptr n)
         break;
     case LNAME:
         entry = lookup_st(current->parent, n->leaf->text);
-
         if (entry != NULL)
         {
-            printf("NAME: %s\n", entry->text);
             n->type = entry->type;
         }
         else
@@ -336,7 +318,6 @@ static void populate_xdcl(tree_ptr n)
     switch (n->prodrule)
     {
     case R_XDCL_LIST + 1:
-        // printf("XDCL_LIST: %s | %d | %d | %d - %s\n", n->prodname, n->nkids, n->kids[0]->nkids, n->kids[1]->nkids, n->kids[1]->prodname);
         if (strcmp(n->kids[1]->prodname, "xfndcl") == 0)
         {
             populate_function(n->kids[1]);
@@ -480,19 +461,4 @@ void printsymbols(sym_table_ptr st, int level)
             }
         }
     }
-}
-
-void semanticerror(char *s, tree_ptr n)
-{
-    while (n)
-        n = n->kids[0];
-    if (n)
-    {
-        fprintf(stderr, "%s:%d: %s", n->leaf->filename, n->leaf->lineno, n->leaf->text);
-    }
-    fprintf(stderr, "%s", s);
-    // if (n && n->id == IDENT)
-    //     fprintf(stderr, " %s", n->u.leaf.text);
-    // fprintf(stderr, "\n");
-    errors++;
 }

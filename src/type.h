@@ -1,3 +1,8 @@
+/*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
 #ifndef TYPE_H
 #define TYPE_H
 

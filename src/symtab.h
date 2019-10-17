@@ -1,4 +1,9 @@
 /*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
+/*
  * Warning: this code may be incomplete or fragmentary!
  */
 
@@ -42,8 +47,6 @@ char *insert_stringpool(char *);                    /* enter string into pool */
 char *install_sym(sym_table_ptr, char *, type_ptr); /* enter string into table */
 int insert_sym(sym_table_ptr, char *, type_ptr);    /* enter symbol into table */
 sym_entry_ptr lookup_st(sym_table_ptr st, char *s); /* lookup symbol */
-
-void print_symtab(sym_table_ptr st);
 
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */

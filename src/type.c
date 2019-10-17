@@ -1,3 +1,8 @@
+/*
+ * Code adapted from lecture notes
+ * by Dr. J
+ * http://www2.cs.uidaho.edu/~jeffery/courses/445/lecture.html
+ */
 #include <stdio.h>
 #include <string.h>
 #include "type.h"
@@ -53,7 +58,6 @@ type_ptr alctype(int basetype)
         if (t == NULL)
             return t;
         t->basetype = basetype;
-        // printf("found type: %d\n", t->basetype);
         return t;
         break;
     }

@@ -35,6 +35,8 @@ var z, t int
 var logicalValue bool
 
 func main() {
+	map1[3] = 9.6
+
 	// var year = math.Sin(20)
 	print("hello, world\n")
 	fmt.Println("stuff and things")
@@ -45,9 +47,8 @@ func main() {
 	a[4] = 100
 }
 
-func add(a int, p float64, dog pet, m map[int]string, ar [5]string) map[string]float64 {
-	const k int = 4
-	return p, a
+func add(a int, p bool, dog pet, m map[int]string, ar [5]string) string {
+	const x int = 4
 }
 
 func double(n int) float64 {
