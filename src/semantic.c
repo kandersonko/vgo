@@ -65,12 +65,21 @@ static void check_package_main(tree_ptr n)
     }
 }
 
-static char *get_functname(tree_ptr n)
+static void check_vardcl(tree_ptr n)
 {
-    return n->kids[0]->kids[0]->leaf->text;
+    sym_entry_ptr entry = lookup_st(current, n->leaf->text);
+    if (entry != NULL)
+    {
+        if (strcmp(entry->text, n->leaf->text) == 0)
+        {
+            printf("CHECK: %s %s %s %s\n", n->leaf->text, entry->text, typename(entry->type), typename(n->type));
+            fprintf(stderr, "ERROR: redeclaration of `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
+            exit(-1);
+        }
+    }
 }
 
-static char *get_typedclname(tree_ptr n)
+static char *get_functname(tree_ptr n)
 {
     return n->kids[0]->kids[0]->leaf->text;
 }
@@ -166,7 +175,8 @@ static void populate_vardcl(tree_ptr n)
         insert_w_typeinfo(n->kids[0], current);
         break;
     case R_TYPEDCL:
-        typedclname = get_typedclname(n);
+        typedclname = n->kids[0]->kids[0]->leaf->text;
+        check_vardcl(n->kids[0]->kids[0]);
         populate_typedcl(n, typedclname);
         popscope();
         break;
@@ -193,6 +203,39 @@ static void populate_vardcl(tree_ptr n)
     }
 }
 
+void populate_params(tree_ptr n)
+{
+
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        populate_params(n->kids[i]);
+    }
+
+    switch (n->prodrule)
+    {
+    case R_ARG_TYPE + 1:
+        n->kids[0]->type = n->kids[1]->type;
+        insert_w_typeinfo(n->kids[0], current);
+        break;
+    case R_NTYPE:
+        n->type = n->kids[0]->type;
+        break;
+    case R_SYM:
+        n->type = n->kids[0]->type;
+        break;
+    case LNAME:
+        n->basetype = get_basetype(n->leaf->text);
+        n->type = alctype(n->basetype);
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void populate_body(tree_ptr n)
 {
     if (!n)
@@ -208,6 +251,9 @@ static void populate_body(tree_ptr n)
 
 static void populate_function(tree_ptr n)
 {
+
+    if (!n)
+        return;
     char *functname;
     int i;
     for (i = 0; i < n->nkids; i++)
@@ -305,16 +351,6 @@ void populate(tree_ptr n)
     populate_xdcl(n->kids[2]);
 }
 
-static void check_vardcl(tree_ptr n)
-{
-    sym_entry_ptr entry = lookup_st(current, n->leaf->text);
-    if (entry != NULL)
-    {
-        fprintf(stderr, "ERROR: redeclaration of `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
-        exit(-1);
-    }
-}
-
 /*
  * "inherited attribute" for type could go down by copying from
  * parent node to child nodes, or by passing a parameter. Which is better?
@@ -326,11 +362,8 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        if (n->kids[i])
-        {
-            n->kids[i]->type = n->type;
-            insert_w_typeinfo(n->kids[i], st);
-        }
+        n->kids[i]->type = n->type;
+        insert_w_typeinfo(n->kids[i], st);
     }
     switch (n->prodrule)
     {
@@ -371,7 +404,7 @@ void printsymbols(sym_table_ptr st, int level)
                 printf("\t%s\n", typename(ste->type));
                 break;
             case FUNC_TYPE:
-                printf("\tfunction\n");
+                printf("\tfunction -> %s\n", typename(ste->type->u.f.returntype));
                 printsymbols(ste->type->u.f.st, level + 1);
                 break;
             case STRUCT_TYPE:
@@ -406,47 +439,4 @@ void semanticerror(char *s, tree_ptr n)
     //     fprintf(stderr, " %s", n->u.leaf.text);
     // fprintf(stderr, "\n");
     errors++;
-}
-
-void populate_params(tree_ptr n)
-{
-    if (!n)
-        return;
-    int i;
-    for (i = 0; i < n->nkids; i++)
-    {
-        populate_params(n->kids[i]);
-    }
-
-    switch (n->prodrule)
-    {
-    case R_FNRES:
-        n->type->u.f.returntype = alctype(UNKNOW_TYPE);
-        break;
-    case R_FNRES + 2:
-        n->type->u.f.returntype = n->kids[1]->type->u.f.returntype;
-        break;
-    case R_ARG_TYPE_LIST + 1:
-        // n->kids[0]->type = n->kids[2]->type;
-        populate_params(n->kids[2]);
-        break;
-    case R_ARG_TYPE + 1:
-        n->kids[0]->type = n->kids[1]->type;
-        insert_w_typeinfo(n->kids[0], current);
-        break;
-    case R_NTYPE:
-        n->type = n->kids[0]->type;
-        break;
-    case R_SYM:
-        n->type = n->kids[0]->type;
-        break;
-    case LNAME:
-        n->basetype = get_basetype(n->leaf->text);
-        n->type = alctype(n->basetype);
-        break;
-
-    default:
-        // printf("ARG default: %s\n", n->prodname);
-        break;
-    }
 }
