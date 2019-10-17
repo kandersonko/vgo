@@ -48,6 +48,18 @@ void enter_newscope(char *s, int basetype)
     pushscope(new);
 }
 
+static void enter_func_scope(char *s, type_ptr returntype)
+{
+    sym_table_ptr new = new_st(30);
+    type_ptr t = alctype(FUNC_TYPE);
+    t->u.f.st = new;
+    t->u.f.returntype = returntype;
+    t->u.f.name = strdup(s);
+    new->scope = t;
+    insert_sym(current, s, t);
+    pushscope(new);
+}
+
 static void check_package_main(tree_ptr n)
 {
     switch (n->prodrule)
@@ -230,7 +242,6 @@ void populate_params(tree_ptr n)
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
         break;
-
     default:
         break;
     }
@@ -249,12 +260,31 @@ static void populate_body(tree_ptr n)
     }
 }
 
+static void get_functrettype(tree_ptr n, type_ptr *type)
+{
+    int basetype;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+        get_functrettype(n->kids[i], type);
+    switch (n->prodrule)
+    {
+    case LNAME:
+        basetype = get_basetype(n->leaf->text);
+        *type = alctype(basetype);
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void populate_function(tree_ptr n)
 {
 
     if (!n)
         return;
     char *functname;
+    type_ptr returntype = NULL;
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_function(n->kids[i]);
@@ -262,7 +292,10 @@ static void populate_function(tree_ptr n)
     {
     case R_XFNDCL:
         functname = get_functname(n->kids[1]);
-        enter_newscope(functname, FUNC_TYPE);
+
+        get_functrettype(n->kids[1]->kids[4], &returntype);
+        n->type->u.f.returntype = returntype;
+        enter_func_scope(functname, returntype);
         populate_params(n->kids[1]);
         populate_body(n->kids[2]);
         popscope();

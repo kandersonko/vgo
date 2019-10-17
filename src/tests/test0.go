@@ -45,12 +45,11 @@ func main() {
 	a[4] = 100
 }
 
-func add(a int, p float64, dog pet) string {
+func add(a int, p float64, dog pet) int {
 	var k string = "text"
-	return a + b
+	return p, a
 }
 
 func double(n int) float64 {
-	var factor float64
-	return n * factor
+	return n * 0.2
 }
