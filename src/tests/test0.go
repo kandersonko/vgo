@@ -7,9 +7,7 @@ import (
 
 var arr [128]string
 
-type rect struct {
-	width, height int
-}
+type rect struct{ width, height int }
 
 var mymap map[string]int
 var map2 map[int]float64

@@ -81,6 +81,8 @@ sym_table_ptr new_st(int nbuckets)
  */
 void delete_st(sym_table_ptr st)
 {
+    if (!st)
+        return;
     sym_entry_ptr se, se1;
     int h;
 
@@ -88,6 +90,7 @@ void delete_st(sym_table_ptr st)
         for (se = st->buckets[h]; se != NULL; se = se1)
         {
             se1 = se->next;
+            free(se->text);
             free((char *)se);
         }
     free((char *)st);

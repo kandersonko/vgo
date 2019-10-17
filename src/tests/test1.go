@@ -1,4 +1,5 @@
 package main
-func main() {
-  "lexical error...
-}
+
+// func main() {
+//   "lexical error...
+// }

@@ -39,8 +39,6 @@ int main(int argc, char **argv)
 
     int print_symtab = 0;
 
-    current = new_st(149);
-
     int j;
     for (j = 0; j < argc; j++)
     {
@@ -72,19 +70,20 @@ int main(int argc, char **argv)
         int failed = yyparse();
         if (!failed)
         {
-            // parse successfull
-            // print_tree(ast_root, 0);
-            // populate_symbol_tables(ast_root);
-            // btfp(ast_root);
+            current = new_st(149);
             populate(ast_root);
             if (print_symtab)
+            {
+                printf("============ file: %s ===========\n", yyfilename);
                 printsymbols(current, 0);
+            }
         }
         else
         {
             // parse failed due to error
             printf("ERROR: parsing failed for file \"%s\"!\n", yyfilename);
         }
+        delete_st(current);
         fclose(yyin);
     }
 
