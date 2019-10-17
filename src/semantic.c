@@ -84,9 +84,8 @@ static void check_vardcl(tree_ptr n)
     {
         if (strcmp(entry->text, n->leaf->text) == 0)
         {
-            printf("CHECK: %s %s %s %s\n", n->leaf->text, entry->text, typename(entry->type), typename(n->type));
             fprintf(stderr, "ERROR: redeclaration of `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
-            exit(-1);
+            exit(3);
         }
     }
 }
