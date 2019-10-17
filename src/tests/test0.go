@@ -44,7 +44,7 @@ func main() {
 	const age int = 17
 }
 
-func add(a int, p bool, dog vehicle, m map[int]string, ar [5]string) string {
+func add(a int, p bool, dog pet, m map[int]string, ar [5]string) string {
 	a[4] = 100
 
 	const x int = 4

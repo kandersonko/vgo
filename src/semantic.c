@@ -41,6 +41,30 @@ void enter_newscope(char *s, int basetype)
     pushscope(new);
 }
 
+static int is_keyword_type(char *s)
+{
+    if ((strcmp(s, "int") == 0) || (strcmp(s, "float64") == 0) || (strcmp(s, "bool") == 0) || (strcmp(s, "string") == 0))
+        return 1;
+    return 0;
+}
+
+static void undeclared_error(tree_ptr n)
+{
+    if (!n)
+        return;
+    if (is_keyword_type(n->leaf->text))
+        return;
+
+    sym_entry_ptr entry = lookup_st(current, n->leaf->text);
+    if (entry == NULL)
+        entry = lookup_st(current->parent, n->leaf->text);
+    if (entry == NULL)
+    {
+        fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
+        exit(3);
+    }
+}
+
 static void enter_func_scope(char *s, type_ptr returntype)
 {
     sym_table_ptr new = new_st(30);
@@ -155,7 +179,6 @@ static void check_undeclared(tree_ptr n)
 {
     if (!n)
         return;
-    sym_entry_ptr entry = NULL;
 
     int i;
     for (i = 0; i < n->nkids; i++)
@@ -168,17 +191,11 @@ static void check_undeclared(tree_ptr n)
         else
             check_undeclared(n->kids[i]);
     }
+
     switch (n->prodrule)
     {
     case LNAME:
-        entry = lookup_st(current, n->leaf->text);
-        if (entry == NULL)
-            entry = lookup_st(current->parent, n->leaf->text);
-        if (entry == NULL)
-        {
-            fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
-            exit(3);
-        }
+        undeclared_error(n);
         break;
 
     default:
@@ -239,6 +256,29 @@ static void populate_vardcl(tree_ptr n)
         check_undeclared(n);
 }
 
+static void check_arg_undeclared(tree_ptr n)
+{
+    if (!n)
+        return;
+
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        check_arg_undeclared(n->kids[i]);
+    }
+
+    switch (n->prodrule)
+    {
+    case LNAME:
+        undeclared_error(n);
+        break;
+
+    default:
+        break;
+    }
+    // sym_entry_ptr entry = lookup_st(current, n->leaf->text);
+}
+
 void populate_params(tree_ptr n)
 {
 
@@ -257,6 +297,7 @@ void populate_params(tree_ptr n)
     case R_ARG_TYPE + 1:
         n->kids[0]->type = n->kids[1]->type;
         insert_w_typeinfo(n->kids[0], current);
+        check_arg_undeclared(n->kids[1]);
         break;
     case R_OTHERTYPE:
         n->type = alctype(ARRAY_TYPE);
@@ -290,6 +331,8 @@ void populate_params(tree_ptr n)
     default:
         break;
     }
+    // if (strcmp(n->prodname, "arg_type_list") == 0)
+    //     check_undeclared(n);
 }
 
 static void populate_body(tree_ptr n)
@@ -340,7 +383,6 @@ static void populate_function(tree_ptr n)
     {
     case R_XFNDCL:
         functname = get_functname(n->kids[1]);
-
         get_functrettype(n->kids[1]->kids[4], &returntype);
         n->type->u.f.returntype = returntype;
         enter_func_scope(functname, returntype);
@@ -419,13 +461,8 @@ static void populate_imports(tree_ptr n)
     }
 }
 
-// TODO: check with another tree traversal variable declaration
 void populate(tree_ptr n)
 {
-    // TODO: check that type is not defined first
-    // TODO: show scope information (for local & global declartion)
-    // TODO: preorder to popscope/pushscope (2 switches)
-    // char *functname;
     if (n == NULL)
         return;
     populate_package(n->kids[0]);
