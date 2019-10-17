@@ -4,7 +4,7 @@ OBJ=vgo.o lex.yy.o token.o tree.o symtab.o semantic.o type.o utils.o go.tab.o
 binaries=vgo
 files=vgo.c token.c token.h symtab.c symtab.h semantic.c semantic.h type.c type.h go.tab.h go.y vgolex.l rules.h tree.c tree.h utils.c utils.h makefile
 DEPS = rules.h
-zip_name=hw2
+zip_name=hw3
 
 vgo: $(OBJ)
 	$(CC) -o vgo $(OBJ) $(DEPS)
