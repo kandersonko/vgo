@@ -225,6 +225,9 @@ void populate_params(tree_ptr n)
         populate_params(n->kids[i]);
     }
 
+    printf("DEFAULT: %s\n", n->prodname);
+    sym_entry_ptr entry = NULL;
+
     switch (n->prodrule)
     {
     case R_ARG_TYPE + 1:
@@ -238,8 +241,18 @@ void populate_params(tree_ptr n)
         n->type = n->kids[0]->type;
         break;
     case LNAME:
-        n->basetype = get_basetype(n->leaf->text);
-        n->type = alctype(n->basetype);
+        entry = lookup_st(current->parent, n->leaf->text);
+
+        if (entry != NULL)
+        {
+            printf("NAME: %s\n", entry->text);
+            n->type = entry->type;
+        }
+        else
+        {
+            n->basetype = get_basetype(n->leaf->text);
+            n->type = alctype(n->basetype);
+        }
         break;
     default:
         break;

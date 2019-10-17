@@ -100,6 +100,7 @@ int get_basetype(char *s)
         return FLOAT64_TYPE;
     else if (strcmp(s, "string") == 0)
         return STRING_TYPE;
+
     return UNKNOW_TYPE;
 }
 
