@@ -45,9 +45,8 @@ func main() {
 	a[4] = 100
 }
 
-func add(a int, p float64, dog pet) int {
+func add(a int, p float64, dog pet, m map[int]string, ar [5]string) map[string]float64 {
 	const k int = 4
-	const m int = k + 3
 	return p, a
 }
 

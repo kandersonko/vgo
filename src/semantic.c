@@ -234,6 +234,17 @@ void populate_params(tree_ptr n)
         n->kids[0]->type = n->kids[1]->type;
         insert_w_typeinfo(n->kids[0], current);
         break;
+    case R_OTHERTYPE:
+        n->type = alctype(ARRAY_TYPE);
+        n->type->u.a.elemtype = n->kids[3]->type;
+        int size = get_array_size(n);
+        n->type->u.a.size = size;
+        break;
+    case R_OTHERTYPE + 2:
+        n->type = alctype(MAP_TYPE);
+        n->type->u.m.indextype = n->kids[2]->type;
+        n->type->u.m.elemtype = n->kids[4]->type;
+        break;
     case R_NTYPE:
         n->type = n->kids[0]->type;
         break;
