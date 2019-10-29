@@ -374,7 +374,7 @@ static void populate_body(tree_ptr n)
     {
         populate_vardcl(n);
     }
-    char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list"};
+    char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
     int size = (int)ARRAY_SIZE(names);
     int j;
     for (j = 0; j < size; j++)
