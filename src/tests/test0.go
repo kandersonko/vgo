@@ -44,10 +44,10 @@ func main() {
 	const age int = 17
 }
 
-func add(a int, p bool, dog pet, m map[int]string, ar [5]string) string {
-	a[4] = 100
+func add(a int, p bool, mass int, dog pet, m map[int]string, ar [5]string) string {
+	m[4] = 100
 
-	const x int = 4
+	const x int = 4 + a + mass
 }
 
 func double(n int) float64 {

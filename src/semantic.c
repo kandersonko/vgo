@@ -43,8 +43,16 @@ void enter_newscope(char *s, int basetype)
 
 static int is_keyword_type(char *s)
 {
-    if ((strcmp(s, "int") == 0) || (strcmp(s, "float64") == 0) || (strcmp(s, "bool") == 0) || (strcmp(s, "string") == 0))
-        return 1;
+    char *keywords[] = {"int", "float64", "string", "bool", "if", "else", "true", "false"};
+    int size = (int)ARRAY_SIZE(keywords);
+    int i;
+    for (i = 0; i < size; i++)
+    {
+        if (strcmp(s, keywords[i]) == 0)
+        {
+            return 1;
+        }
+    }
     return 0;
 }
 
@@ -52,16 +60,30 @@ static void undeclared_error(tree_ptr n)
 {
     if (!n)
         return;
-    if (is_keyword_type(n->leaf->text))
-        return;
 
-    sym_entry_ptr entry = lookup_st(current, n->leaf->text);
-    if (entry == NULL)
-        entry = lookup_st(current->parent, n->leaf->text);
-    if (entry == NULL)
+    int i;
+    for (i = 0; i < n->nkids; i++)
     {
-        fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
-        exit(3);
+        undeclared_error(n->kids[i]);
+    }
+
+    if (n->prodrule == LNAME)
+    {
+        if (is_keyword_type(n->leaf->text))
+            return;
+        sym_table_ptr temp;
+        sym_entry_ptr entry;
+        for (temp = current; temp != NULL; temp = temp->parent)
+        {
+            entry = lookup_st(temp, n->leaf->text);
+            if (entry != NULL)
+                return;
+        }
+        if (entry == NULL)
+        {
+            fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
+            exit(3);
+        }
     }
 }
 
@@ -276,7 +298,6 @@ static void check_arg_undeclared(tree_ptr n)
     default:
         break;
     }
-    // sym_entry_ptr entry = lookup_st(current, n->leaf->text);
 }
 
 void populate_params(tree_ptr n)
@@ -313,6 +334,11 @@ void populate_params(tree_ptr n)
     case R_NTYPE:
         n->type = n->kids[0]->type;
         break;
+    case R_DOTNAME + 1:
+        n->type = n->kids[0]->type;
+        n->kids[2]->type = n->type;
+        insert_w_typeinfo(n->kids[2], current);
+        break;
     case R_SYM:
         n->type = n->kids[0]->type;
         break;
@@ -327,6 +353,7 @@ void populate_params(tree_ptr n)
             n->basetype = get_basetype(n->leaf->text);
             n->type = alctype(n->basetype);
         }
+        printf("TYPE: %s %s\n", n->leaf->text, typename(n->type));
         break;
     default:
         break;
@@ -347,8 +374,27 @@ static void populate_body(tree_ptr n)
     {
         populate_vardcl(n);
     }
-    if (strcmp(n->prodname, "pexpr_no_paren") == 0)
-        check_undeclared(n);
+    char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list"};
+    int size = (int)ARRAY_SIZE(names);
+    int j;
+    for (j = 0; j < size; j++)
+    {
+        if (strcmp(n->prodname, names[j]) == 0)
+        {
+            printf("======= FOUND %s =======\n", names[j]);
+            undeclared_error(n);
+            break;
+        }
+    }
+
+    // if (strcmp(n->prodname, "pseudocall") == 0)
+    //     check_undeclared(n);
+    // else if (strcmp(n->prodname, "non_dcl_stmt") == 0)
+    //     check_undeclared(n);
+    // else if (strcmp(n->prodname, "if_stmt") == 0)
+    //     check_undeclared(n);
+    // else if (strcmp(n->prodname, "elseif") == 0)
+    //     check_undeclared(n);
 }
 
 static void get_functrettype(tree_ptr n, type_ptr *type)
@@ -411,8 +457,8 @@ static void populate_xdcl(tree_ptr n)
         {
             populate_vardcl(n->kids[1]);
         }
-        break;
     default:
+        printf("DEFAULT: %s\n", n->prodname);
         break;
     }
 }
@@ -465,6 +511,11 @@ void populate(tree_ptr n)
 {
     if (n == NULL)
         return;
+
+    insert_sym(current, "fmt", alctype(IMPORT_TYPE));
+    insert_sym(current, "Println", alctype(IMPORT_TYPE));
+    insert_sym(current, "println", alctype(IMPORT_TYPE));
+    insert_sym(current, "print", alctype(IMPORT_TYPE));
     populate_package(n->kids[0]);
     populate_imports(n->kids[1]);
     populate_xdcl(n->kids[2]);

@@ -68,6 +68,7 @@ sym_table_ptr new_st(int nbuckets)
     st->buckets = buckets;
     st->nbuckets = nbuckets;
     st->entries = 0;
+    st->parent = NULL;
     if (buf.frag_lst == NULL)
     {
         init_sbuf(&buf);
@@ -227,6 +228,7 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
     int h;
     struct sym_entry *entry;
+    printf("INSERT: %s - %s\n", s, typename(t));
 
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
