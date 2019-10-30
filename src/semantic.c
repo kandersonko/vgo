@@ -76,6 +76,7 @@ static void undeclared_error(tree_ptr n)
         for (temp = current; temp != NULL; temp = temp->parent)
         {
             entry = lookup_st(temp, n->leaf->text);
+
             if (entry != NULL)
                 return;
         }
@@ -353,7 +354,6 @@ void populate_params(tree_ptr n)
             n->basetype = get_basetype(n->leaf->text);
             n->type = alctype(n->basetype);
         }
-        printf("TYPE: %s %s\n", n->leaf->text, typename(n->type));
         break;
     default:
         break;
@@ -381,7 +381,6 @@ static void populate_body(tree_ptr n)
     {
         if (strcmp(n->prodname, names[j]) == 0)
         {
-            printf("======= FOUND %s =======\n", names[j]);
             undeclared_error(n);
             break;
         }
@@ -458,7 +457,6 @@ static void populate_xdcl(tree_ptr n)
             populate_vardcl(n->kids[1]);
         }
     default:
-        printf("DEFAULT: %s\n", n->prodname);
         break;
     }
 }

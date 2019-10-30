@@ -228,11 +228,10 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
     int h;
     struct sym_entry *entry;
-    printf("INSERT: %s - %s\n", s, typename(t));
 
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
-        if (!strcmp(s, entry->text))
+        if (strcmp(s, entry->text) == 0)
         {
             /*
           * A copy of the string is already in the table.

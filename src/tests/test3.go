@@ -12,7 +12,7 @@ func main() {
 
 	var test3 int
 	var test4, test5 int
-	var test6, test7, test8 int
+	var test6, test7, test8, test9 int
 
 	// All values filled
 	for test1 = 0; test1 < 10; test1 += 1 {
