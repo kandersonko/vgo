@@ -5,6 +5,7 @@
 #include "go.tab.h"
 #include "token.h"
 #include "tree.h"
+#include "type.h"
 #include "utils.h"
 
 int lasttoken;
@@ -18,10 +19,15 @@ char* yytext;
 char *sval = "\0";
 int ival;
 double dval;
+int basetype;
 
 void set_token(int category)
 {
-    yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, dval, sval);
+yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, dval, sval, basetype);
+    basetype = 0;
+    ival = 0;
+    dval = 0.0;
+    sval = "\0";
 }
 
 %}
@@ -117,20 +123,20 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 
 
 
-[a-zA-Z_][a-zA-Z_0-9]*			{ return tok(LNAME); }
+[a-zA-Z_][a-zA-Z_0-9]*			{ basetype = STRING_TYPE; sval = yytext; return tok(LNAME); }
 
-"0"[xX][0-9a-fA-F]+			{ return tok(LLITERAL); }
-"0"[0-7]+				{ return tok(LLITERAL); }
-[0-9]+					{ return tok(LLITERAL); }
+"0"[xX][0-9a-fA-F]+			{ basetype = INT_TYPE; ival = (int)strtol(yytext, NULL, 16); return tok(LLITERAL); }
+"0"[0-7]+				{  basetype = INT_TYPE; ival = (int)strtol(yytext, NULL, 8); return tok(LLITERAL); }
+[0-9]+					{ basetype = INT_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
 
-{float}{exponent}?			{ return tok(LLITERAL); }
-[0-9]+{exponent}			{ return tok(LLITERAL); }
+{float}{exponent}?			{ basetype = FLOAT64_TYPE; dval = atof(yytext); return tok(LLITERAL); }
+[0-9]+{exponent}			{ basetype = FLOAT64_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
 
-"\'"(\\.|[^\\"])"\'"			{ return tok(LLITERAL); }
+"\'"(\\.|[^\\"])"\'"			{ basetype = STRING_TYPE; sval = yytext; return tok(LLITERAL); }
 
 {invalid_runes}     {fprintf(stderr, "%d: invalid runes `%s`\n", yylineno, yytext); exit(1);}
 
-"\""(\\.|[^\\"])*"\""			{ return tok(LLITERAL); }
+"\""(\\.|[^\\"])*"\""			{ basetype = STRING_TYPE; sval = yytext; return tok(LLITERAL); }
 
 .					{ fprintf(stderr, "ERROR: unexpected character `%c` at line %d in file %s\n", yytext[0], yylineno, yyfilename); exit(1); }
     /* end of file */

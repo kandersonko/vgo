@@ -3,6 +3,7 @@
 #include "token.h"
 #include "tree.h"
 #include "semantic.h"
+#include "typecheck.h"
 #include <string.h>
 #include <unistd.h>
 
@@ -72,6 +73,7 @@ int main(int argc, char **argv)
         {
             current = new_st(149);
             populate(ast_root);
+            typecheck(ast_root);
             if (print_symtab)
             {
                 printf("============ file: %s ===========\n", yyfilename);

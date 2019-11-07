@@ -84,14 +84,17 @@ type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st
 
 char *typename(type_ptr t)
 {
-    if (!t)
+    if (t == NULL)
         return "(NULL)";
     else if (t->basetype == STRUCT_TYPE)
     {
         return t->u.s.name;
     }
-    else
-        return typenames[t->basetype - 1000000];
+    else if (t->basetype == FUNC_TYPE)
+    {
+        return t->u.f.name;
+    }
+    return typenames[t->basetype - 1000000];
 }
 
 int get_basetype(char *s)
@@ -106,8 +109,4 @@ int get_basetype(char *s)
         return STRING_TYPE;
 
     return UNKNOW_TYPE;
-}
-
-void delete_type(type_ptr t)
-{
 }

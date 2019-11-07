@@ -15,8 +15,6 @@ var map2 map[int]float64
 type pet struct {
 	hunger int
 	happy  int
-	power  float64
-	name   string
 }
 
 // type pet struct {
@@ -34,6 +32,10 @@ var logicalValue bool
 
 func main() {
 	map2[3] = 9.6
+
+	var p pet
+	// p.happy = 2
+	// fmt.Println(something)
 
 	// var year = math.Sin(20)
 	print("hello, world\n")

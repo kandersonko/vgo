@@ -238,6 +238,8 @@ static void populate_vardcl(tree_ptr n)
         populate_vardcl(n->kids[i]);
     }
 
+    sym_entry_ptr entry;
+
     switch (n->prodrule)
     {
     case R_VARDCL:
@@ -269,6 +271,22 @@ static void populate_vardcl(tree_ptr n)
         n->type = n->kids[0]->type;
         break;
     case LNAME:
+        entry = lookup_st(current, n->leaf->text);
+        if (entry != NULL)
+        {
+            n->type = entry->type;
+        }
+        else if (is_keyword_type(n->leaf->text))
+        {
+            n->basetype = get_basetype(n->leaf->text);
+            n->type = alctype(n->basetype);
+        }
+        else
+        {
+            n->type = alctype(UNKNOW_TYPE);
+        }
+        break;
+    case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
         break;
@@ -339,6 +357,11 @@ void populate_params(tree_ptr n)
         n->type = n->kids[0]->type;
         n->kids[2]->type = n->type;
         insert_w_typeinfo(n->kids[2], current);
+        break;
+    case R_TYPEDCL:
+        n->type = n->kids[1]->type;
+        n->kids[0]->type = n->type;
+        insert_w_typeinfo(n->kids[1], current);
         break;
     case R_SYM:
         n->type = n->kids[0]->type;

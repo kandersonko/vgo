@@ -4,6 +4,7 @@
 struct token
 {
     int category;   /* the integer code returned by yylex */
+    int basetype;   // for typechecking
     char *text;     /* the actual string (lexeme) matched */
     int lineno;     /* the line number on which the token occurs */
     char *filename; /* the source file in which the token occurs */
@@ -17,7 +18,7 @@ typedef struct token *token_ptr;
 
 extern token_ptr yytoken;
 
-token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval);
+token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval, int basetype);
 
 void delete_token(token_ptr t);
 
