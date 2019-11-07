@@ -131,7 +131,7 @@ static void check_common_dcl(tree_ptr n)
 
 static void incompatible_types_error_msg(tree_ptr n, int basetype)
 {
-    if (n->leaf->basetype != basetype)
+    if (n->type->basetype != basetype)
     {
         type_error_msg(n, alctype(basetype));
     }
@@ -226,8 +226,8 @@ static void check_expression(tree_ptr n)
     case R_EXPR + 17:
     case R_EXPR + 18:
     case R_EXPR + 19:
-        // find_literal_type(n->kids[0], &basetype);
-        // check_incompatible_types_error_msg(n->kids[2], basetype);
+        find_literal_type(n->kids[0], &basetype);
+        check_incompatible_types_error_msg(n->kids[2], basetype);
 
         break;
 
