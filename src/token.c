@@ -7,23 +7,16 @@
 void yyerror(char *s);
 
 // create a token struct
-token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval, int basetype)
+token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, int bval, double dval, char *sval, int basetype)
 {
     token_ptr temp = safe_malloc(sizeof(*temp));
-    // token_ptr temp;
-    // temp = malloc(sizeof(*temp));
-    // if (!temp)
-    // {
-    //     perror("malloc");
-    //     return NULL;
-    // }
-    // memset(temp, 0, sizeof(*temp));
     temp->category = category;
     temp->basetype = basetype;
     temp->filename = strdup(filename);
     temp->lineno = lineno;
     temp->text = strdup(text);
     temp->ival = ival;
+    temp->bval = bval;
     temp->dval = dval;
     temp->sval = strdup(sval);
     return temp;

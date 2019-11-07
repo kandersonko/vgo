@@ -9,6 +9,7 @@ struct token
     int lineno;     /* the line number on which the token occurs */
     char *filename; /* the source file in which the token occurs */
     int ival;       /* for integer constants, store binary value here */
+    int bval;       /* for boolean values 1 -> true, 0 -> false, -1 -> not set */
     double dval;    /* for real constants, store binary value here */
     char *sval;     /* for string constants, malloc space, de-escape, store */
                     /*    the string (less quotes and after escapes) here */
@@ -18,7 +19,7 @@ typedef struct token *token_ptr;
 
 extern token_ptr yytoken;
 
-token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, double dval, char *sval, int basetype);
+token_ptr create_token(int category, char *filename, int lineno, char *text, int ival, int bval, double dval, char *sval, int basetype);
 
 void delete_token(token_ptr t);
 

@@ -18,14 +18,16 @@ char* yytext;
 
 char *sval = "\0";
 int ival;
+int bval = -1;
 double dval;
 int basetype;
 
 void set_token(int category)
 {
-yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, dval, sval, basetype);
+yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, bval, dval, sval, basetype);
     basetype = 0;
     ival = 0;
+    bval = -1;
     dval = 0.0;
     sval = "\0";
 }
@@ -113,6 +115,10 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 "struct"				{ return tok(LSTRUCT); }
 "type"					{ return tok(LTYPE); }
 "var"					{ return tok(LVAR); }
+
+
+"true"			{ basetype = BOOL_TYPE; bval = 1; return tok(LLITERAL); }
+"false"			{ basetype = BOOL_TYPE; bval = 0; return tok(LLITERAL); }
 
     /* Not supported keywords */
 {invalid_keywords}  { fprintf(stderr, "ERROR: invalid VGO keyword `%s` at line %d in file `%s`\n", yytext, yylineno, yyfilename); exit(1);}

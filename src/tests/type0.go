@@ -11,7 +11,7 @@ func main() {
 	var x int
 	var enabled bool
 
-	enabled = true
+	enabled = false
 
 	k = 2
 	// println(x)
