@@ -51,6 +51,10 @@ static void type_error(tree_ptr n, type_ptr t)
     }
     switch (n->prodrule)
     {
+    case R_OTHERTYPE:
+        type_error(n->kids[1], n->kids[3]->type);
+        break;
+
     case LLITERAL:
         if (n->leaf->basetype != t->basetype)
         {
@@ -68,64 +72,6 @@ static void type_error(tree_ptr n, type_ptr t)
     default:
         // printf("DEFAULT: %s\n", n->prodname);
         break;
-    }
-}
-
-static void check_declaration(tree_ptr n)
-{
-    if (n == NULL)
-        return;
-    int i;
-    for (i = 0; i < n->nkids; i++)
-    {
-        check_declaration(n->kids[i]);
-    }
-
-    // printf("DEFAULT: %s\n", n->prodname);
-
-    switch (n->prodrule)
-    {
-    case R_VARDCL + 1:
-    case R_CONSTDCL:
-        n->type = n->kids[1]->type;
-        type_error(n->kids[3], n->type);
-        break;
-
-    case R_VARDCL + 2:
-        n->type = n->kids[0]->type;
-        type_error(n->kids[2], n->type);
-        break;
-
-    case LNAME:
-        printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
-        insert_sym(globals, n->leaf->text, n->type);
-        break;
-
-    case LLITERAL:
-        n->type = alctype(n->leaf->basetype);
-        // printf("TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
-        insert_sym(globals, n->leaf->text, n->type);
-        break;
-
-    default:
-        break;
-    }
-}
-
-static void check_common_dcl(tree_ptr n)
-{
-    if (n == NULL)
-        return;
-
-    int i;
-    for (i = 0; i < n->nkids; i++)
-    {
-        check_common_dcl(n->kids[i]);
-    }
-
-    if (strcmp(n->prodname, "common_dcl") == 0)
-    {
-        check_declaration(n);
     }
 }
 
@@ -157,6 +103,99 @@ static void check_incompatible_types_error_msg(tree_ptr n, int basetype)
 
     default:
         break;
+    }
+}
+
+static void check_ntype(tree_ptr n)
+{
+
+    if (n == NULL)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        check_ntype(n->kids[i]);
+    }
+
+    // printf("DEFAULT: %s\n", n->prodname);
+
+    switch (n->prodrule)
+    {
+    case R_OTHERTYPE:
+        check_incompatible_types_error_msg(n->kids[1], n->kids[3]->type->basetype);
+        break;
+    default:
+        break;
+    }
+}
+
+static void check_declaration(tree_ptr n)
+{
+    if (n == NULL)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        check_declaration(n->kids[i]);
+    }
+
+    // printf("DEFAULT: %s\n", n->prodname);
+
+    // char *typedclname;
+
+    switch (n->prodrule)
+    {
+    case R_VARDCL + 1:
+    case R_CONSTDCL:
+        check_ntype(n->kids[1]);
+        n->type = n->kids[1]->type;
+        // type_error(n->kids[3], n->type);
+        break;
+
+    case R_VARDCL + 2:
+    case R_CONSTDCL + 2:
+        n->type = n->kids[0]->type;
+        type_error(n->kids[2], n->type);
+        break;
+
+        // case R_TYPEDCL:
+        //     typedclname = n->kids[0]->kids[0]->leaf->text;
+        //     printf("FOUND OTHERTYPE: %s\n", typedclname);
+        //     break;
+        // case R_PEXPR_NO_PAREN + 5:
+        //     printf("FOUND ITEM: %s\n", n->prodname);
+        //     break;
+
+    case LNAME:
+        // printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
+        insert_sym(globals, n->leaf->text, n->type);
+        break;
+
+    case LLITERAL:
+        n->type = alctype(n->leaf->basetype);
+        // printf("TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
+        insert_sym(globals, n->leaf->text, n->type);
+        break;
+
+    default:
+        break;
+    }
+}
+
+static void check_common_dcl(tree_ptr n)
+{
+    if (n == NULL)
+        return;
+
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        check_common_dcl(n->kids[i]);
+    }
+
+    if (strcmp(n->prodname, "common_dcl") == 0)
+    {
+        check_declaration(n);
     }
 }
 
@@ -254,7 +293,7 @@ static void check_expression(tree_ptr n)
 
 void typecheck(tree_ptr n)
 {
-    globals = new_st(1000);
+    globals = new_st(1000); // remove this symtab
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
     check_common_dcl(n);

@@ -73,6 +73,8 @@ int main(int argc, char **argv)
         {
             current = new_st(149);
             populate(ast_root);
+            // TODO: fix lost of prev scopes (symtabs)
+            // both populate and typecheck should use the global symtab `current`
             typecheck(ast_root);
             if (print_symtab)
             {

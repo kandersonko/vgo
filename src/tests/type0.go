@@ -7,20 +7,22 @@ package main
 func main() {
 	// const x int = 2
 	// var y int = 0 + x
-	var k int
-	var x int
-	var enabled bool
+	var a [3]int = [3]int{"1", 2, 3}
+	// a["hello"] = 4
+	// var k int
+	// var x int
+	// var enabled bool = true
 
-	enabled = false
+	// enabled = false
 
-	k = 2
-	// println(x)
-	if true {
-		// k = 2 + 3.9
-		println(k)
-	}
-	x = 0
-	for x < 20 {
-		x += k
-	}
+	// k = 2
+	println(x)
+	// if enabled {
+	// 	// k = 2 + 3.9
+	// 	println(k)
+	// }
+	// x = 0
+	// for x < 20 {
+	// 	x += k
+	// }
 }

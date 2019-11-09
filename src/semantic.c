@@ -251,6 +251,7 @@ static void populate_vardcl(tree_ptr n)
         insert_w_typeinfo(n->kids[0], current);
         break;
     case R_TYPEDCL:
+        // TODO: CHECK
         typedclname = n->kids[0]->kids[0]->leaf->text;
         check_vardcl(n->kids[0]->kids[0]);
         populate_typedcl(n, typedclname);
@@ -533,10 +534,16 @@ void populate(tree_ptr n)
     if (n == NULL)
         return;
 
+    // TODO: fmt has a scope and builtins function (e.g. Println)
+    // math/rand, time, fmt, check vgo specs
     insert_sym(current, "fmt", alctype(IMPORT_TYPE));
+
+    // TODO: add builtins function args types and return types
+
     insert_sym(current, "Println", alctype(IMPORT_TYPE));
     insert_sym(current, "println", alctype(IMPORT_TYPE));
     insert_sym(current, "print", alctype(IMPORT_TYPE));
+
     populate_package(n->kids[0]);
     populate_imports(n->kids[1]);
     populate_xdcl(n->kids[2]);
