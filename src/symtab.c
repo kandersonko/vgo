@@ -69,6 +69,7 @@ sym_table_ptr new_st(int nbuckets)
     st->nbuckets = nbuckets;
     st->entries = 0;
     st->parent = NULL;
+    st->children = init_stack(4);
     if (buf.frag_lst == NULL)
     {
         init_sbuf(&buf);
@@ -94,6 +95,7 @@ void delete_st(sym_table_ptr st)
             free(se->text);
             free((char *)se);
         }
+
     free((char *)st);
 }
 
@@ -275,5 +277,18 @@ sym_entry_ptr lookup_st(sym_table_ptr st, char *s)
           */
             return entry;
         }
+    return NULL;
+}
+
+sym_entry_ptr lookup_in_type(type_ptr type, char *s)
+{
+    if (type->basetype == FUNC_TYPE)
+    {
+        return lookup_st(type->u.f.st, s);
+    }
+    else if (type->basetype == STRUCT_TYPE)
+    {
+        return lookup_st(type->u.s.st, s);
+    }
     return NULL;
 }

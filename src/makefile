@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-c -g -Wall
-OBJ=vgo.o lex.yy.o token.o tree.o symtab.o semantic.o type.o typecheck.o utils.o go.tab.o 
+OBJ=vgo.o lex.yy.o token.o tree.o symtab.o stack.o semantic.o type.o typecheck.o utils.o go.tab.o 
 binaries=vgo
-files=vgo.c token.c token.h symtab.c symtab.h semantic.c semantic.h type.c type.h typecheck.h typecheck.c go.tab.h go.y vgolex.l rules.h tree.c tree.h utils.c utils.h makefile
+files=vgo.c token.c token.h symtab.c symtab.h stack.c stack.h semantic.c semantic.h type.c type.h typecheck.h typecheck.c go.tab.h go.y vgolex.l rules.h tree.c tree.h utils.c utils.h makefile
 DEPS = rules.h
 zip_name=hw3
 
@@ -29,6 +29,9 @@ semantic.o: semantic.c
 
 symtab.o: symtab.c
 	$(CC) $(CFLAGS) symtab.c
+
+stack.o: stack.c
+	$(CC) $(CFLAGS) stack.c
 
 type.o: type.c
 	$(CC) $(CFLAGS) type.c

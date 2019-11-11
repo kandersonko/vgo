@@ -296,6 +296,6 @@ void typecheck(tree_ptr n)
     globals = new_st(1000); // remove this symtab
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
-    check_common_dcl(n);
-    check_expression(n);
+    // check_common_dcl(n);
+    // check_expression(n);
 }

@@ -11,6 +11,7 @@
 #define SYMTAB_H
 
 #include "type.h"
+#include "stack.h"
 
 typedef struct sym_table
 {
@@ -19,6 +20,7 @@ typedef struct sym_table
     struct sym_table *parent;   /* enclosing scope, superclass etc. */
     struct typeinfo *scope;     /* what type do we belong to? */
     struct sym_entry **buckets; /* array of buckets */
+    stack_ptr children;         /* children symtab */
     /*
     * more per-scope/per-symbol-table attributes go here
     */
@@ -47,6 +49,8 @@ char *insert_stringpool(char *);                    /* enter string into pool */
 char *install_sym(sym_table_ptr, char *, type_ptr); /* enter string into table */
 int insert_sym(sym_table_ptr, char *, type_ptr);    /* enter symbol into table */
 sym_entry_ptr lookup_st(sym_table_ptr st, char *s); /* lookup symbol */
+
+sym_entry_ptr lookup_in_type(type_ptr type, char *s);
 
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */

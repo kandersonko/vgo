@@ -39,6 +39,8 @@ void enter_newscope(char *s, int basetype)
 
     insert_sym(current, s, t);
     pushscope(new);
+    push_stack(current->children, t);
+    printf("CHILDREN: %d | %s\n", current->children->current_size, typename(peek_stack(current->children)));
 }
 
 static int is_keyword_type(char *s)
@@ -73,8 +75,24 @@ static void undeclared_error(tree_ptr n)
             return;
         sym_table_ptr temp;
         sym_entry_ptr entry;
+        // for (temp = current; temp != NULL; temp = temp->parent)
+        // {
+        //     entry = lookup_st(temp, n->leaf->text);
+
+        //     if (entry != NULL)
+        //         return;
+        // }
         for (temp = current; temp != NULL; temp = temp->parent)
         {
+            stack_ptr scopes = temp->children;
+            while (!is_stack_empty(scopes))
+            {
+                type_ptr type = peek_stack(scopes);
+                entry = lookup_in_type(type, n->leaf->text);
+                if (entry != NULL)
+                    return;
+                pop_stack(scopes);
+            }
             entry = lookup_st(temp, n->leaf->text);
 
             if (entry != NULL)
@@ -206,23 +224,19 @@ static void check_undeclared(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        if (n->prodrule == (R_PEXPR_NO_PAREN + 2))
-        {
-            check_undeclared(n->kids[0]);
-            return;
-        }
-        else
-            check_undeclared(n->kids[i]);
+        check_undeclared(n->kids[i]);
     }
 
-    switch (n->prodrule)
+    char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
+    int size = (int)ARRAY_SIZE(names);
+    int j;
+    for (j = 0; j < size; j++)
     {
-    case LNAME:
-        undeclared_error(n);
-        break;
-
-    default:
-        break;
+        if (strcmp(n->prodname, names[j]) == 0)
+        {
+            undeclared_error(n);
+            break;
+        }
     }
 }
 
@@ -294,8 +308,8 @@ static void populate_vardcl(tree_ptr n)
     default:
         break;
     }
-    if (strcmp(n->prodname, "expr") == 0)
-        check_undeclared(n);
+    // if (strcmp(n->prodname, "expr") == 0)
+    // check_undeclared(n);
 }
 
 static void check_arg_undeclared(tree_ptr n)
@@ -333,12 +347,17 @@ void populate_params(tree_ptr n)
 
     sym_entry_ptr entry = NULL;
 
+    printf(" === PRODRULES: %s\n", n->prodname);
+
     switch (n->prodrule)
     {
     case R_ARG_TYPE + 1:
         n->kids[0]->type = n->kids[1]->type;
         insert_w_typeinfo(n->kids[0], current);
         check_arg_undeclared(n->kids[1]);
+        break;
+    case R_ARG_TYPE_LIST + 1:
+        n->kids[0]->type = n->kids[2]->type;
         break;
     case R_OTHERTYPE:
         n->type = alctype(ARRAY_TYPE);
@@ -366,6 +385,12 @@ void populate_params(tree_ptr n)
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
+        // insert_w_typeinfo(n->kids[0], current);
+        printf("FOUND SYM: %s\n", n->kids[0]->leaf->text);
+
+        break;
+    case LLITERAL:
+        printf("FOUND LLITERAL: %s\n", n->leaf->text);
         break;
     case LNAME:
         entry = lookup_st(current->parent, n->leaf->text);
@@ -398,26 +423,17 @@ static void populate_body(tree_ptr n)
     {
         populate_vardcl(n);
     }
-    char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
-    int size = (int)ARRAY_SIZE(names);
-    int j;
-    for (j = 0; j < size; j++)
-    {
-        if (strcmp(n->prodname, names[j]) == 0)
-        {
-            undeclared_error(n);
-            break;
-        }
-    }
-
-    // if (strcmp(n->prodname, "pseudocall") == 0)
-    //     check_undeclared(n);
-    // else if (strcmp(n->prodname, "non_dcl_stmt") == 0)
-    //     check_undeclared(n);
-    // else if (strcmp(n->prodname, "if_stmt") == 0)
-    //     check_undeclared(n);
-    // else if (strcmp(n->prodname, "elseif") == 0)
-    //     check_undeclared(n);
+    // char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
+    // int size = (int)ARRAY_SIZE(names);
+    // int j;
+    // for (j = 0; j < size; j++)
+    // {
+    //     if (strcmp(n->prodname, names[j]) == 0)
+    //     {
+    //         undeclared_error(n);
+    //         break;
+    //     }
+    // }
 }
 
 static void get_functrettype(tree_ptr n, type_ptr *type)
@@ -457,6 +473,7 @@ static void populate_function(tree_ptr n)
         enter_func_scope(functname, returntype);
         populate_params(n->kids[1]);
         populate_body(n->kids[2]);
+        check_undeclared(n);
         popscope();
         break;
     default:
@@ -479,6 +496,7 @@ static void populate_xdcl(tree_ptr n)
         else if (strcmp(n->kids[1]->prodname, "common_dcl") == 0)
         {
             populate_vardcl(n->kids[1]);
+            undeclared_error(n->kids[1]);
         }
     default:
         break;
