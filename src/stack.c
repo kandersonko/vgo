@@ -17,7 +17,6 @@ stack_ptr init_stack(int initial_size)
     stack->elements = elements;
     stack->current_size = initial_size;
     stack->top = -1;
-    printf("STACK INIT: %p %p| %d , %d\n", stack, stack->elements, stack->current_size, stack->top);
     return stack;
 }
 

@@ -20,7 +20,6 @@
     {                                                          \
         push_stack(current->parent->children, current->scope); \
         current = current->parent;                             \
-        printf("----- POPSCOPE\n");                            \
     } while (0)
 
 extern int errors;

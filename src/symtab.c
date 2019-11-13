@@ -232,8 +232,6 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     int h;
     struct sym_entry *entry;
 
-    printf("INSERT: %s | type: %s\n", s, typename(t));
-
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
         if (strcmp(s, entry->text) == 0)
@@ -328,6 +326,7 @@ sym_entry_ptr lookup_in_type(type_ptr type, char *s)
                 else if (type->basetype == STRUCT_TYPE)
                 {
                     entry = lookup(type->u.s.st, s);
+                    // printf("LOOKING UP STRUCT ENTRY: %s TYPE: %s | entry: %s\n", s, typename(type), typename(entry->type));
                     return entry;
                 }
             }

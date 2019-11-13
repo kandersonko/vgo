@@ -5,7 +5,7 @@ type pet struct {
 	happy  int
 }
 
-var y int
+var y string
 
 func main() {
 	var a [3]int = [3]int{1, 2, 3}
@@ -13,11 +13,12 @@ func main() {
 
 	var p pet
 	p.happy = 2
-	p.age = 20
+	p.hunger = 20
 	// // println(len(b) + len(a))
-	// if true {
-	// 	println(a[0])
-	// }
+	if true {
+		println(a[0])
+
+	}
 }
 
 func add(x int, y int) int {

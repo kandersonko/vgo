@@ -39,6 +39,7 @@ void enter_newscope(char *s, int basetype)
 
     // push_stack(current->children, t);
     push_stack(new->children, current->scope);
+    // printf("CHILDREN: %d | %s\n", current->children->current_size, typename(peek_stack(current->children)));
 
     insert_sym(current, s, t);
     pushscope(new);
@@ -55,6 +56,7 @@ static void enter_func_scope(char *s, type_ptr returntype)
 
     // push_stack(current->children, t);
     push_stack(new->children, current->scope);
+    // printf("CHILDREN: %d | %s | %d\n", current->children->current_size, typename(peek_stack(current->children)), t->basetype);
 
     insert_sym(current, s, t);
     pushscope(new);
@@ -370,7 +372,6 @@ static void populate_vardcl(tree_ptr n)
         {
             n->type = alctype(UNKNOW_TYPE);
         }
-        printf("FOUND ELEMENT: %s type %s\n", n->leaf->text, typename(n->type));
         break;
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
@@ -418,8 +419,6 @@ void populate_params(tree_ptr n)
 
     sym_entry_ptr entry = NULL;
 
-    printf(" === PRODRULES: %s\n", n->prodname);
-
     switch (n->prodrule)
     {
     case R_ARG_TYPE + 1:
@@ -457,11 +456,9 @@ void populate_params(tree_ptr n)
     case R_SYM:
         n->type = n->kids[0]->type;
         // insert_w_typeinfo(n->kids[0], current);
-        printf("FOUND SYM: %s\n", n->kids[0]->leaf->text);
 
         break;
     case LLITERAL:
-        printf("FOUND LLITERAL: %s\n", n->leaf->text);
         break;
     case LNAME:
         entry = lookup_st(current->parent, n->leaf->text);
