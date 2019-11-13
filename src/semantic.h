@@ -15,10 +15,12 @@
         stp->parent = current; \
         current = stp;         \
     } while (0)
-#define popscope()                 \
-    do                             \
-    {                              \
-        current = current->parent; \
+#define popscope()                                             \
+    do                                                         \
+    {                                                          \
+        push_stack(current->parent->children, current->scope); \
+        current = current->parent;                             \
+        printf("----- POPSCOPE\n");                            \
     } while (0)
 
 extern int errors;

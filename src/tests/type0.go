@@ -1,6 +1,9 @@
 package main
 
+var x int
+
 func add(a int, b int) int {
+	var x int = 2
 	return a + b
 }
 

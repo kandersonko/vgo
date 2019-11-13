@@ -49,6 +49,7 @@ func main() {
 func add(a int, p bool, mass int, dog pet, m map[int]string, ar [5]string) string {
 	m[4] = 100
 
+	var z int
 	const x int = 4 + a + mass
 }
 

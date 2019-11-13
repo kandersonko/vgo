@@ -37,10 +37,27 @@ void enter_newscope(char *s, int basetype)
     }
     new->scope = t;
 
+    // push_stack(current->children, t);
+    push_stack(new->children, current->scope);
+
     insert_sym(current, s, t);
     pushscope(new);
-    push_stack(current->children, t);
-    printf("CHILDREN: %d | %s\n", current->children->current_size, typename(peek_stack(current->children)));
+}
+
+static void enter_func_scope(char *s, type_ptr returntype)
+{
+    sym_table_ptr new = new_st(30);
+    type_ptr t = alctype(FUNC_TYPE);
+    t->u.f.st = new;
+    t->u.f.returntype = returntype;
+    t->u.f.name = strdup(s);
+    new->scope = t;
+
+    // push_stack(current->children, t);
+    push_stack(new->children, current->scope);
+
+    insert_sym(current, s, t);
+    pushscope(new);
 }
 
 static int is_keyword_type(char *s)
@@ -84,38 +101,21 @@ static void undeclared_error(tree_ptr n)
         // }
         for (temp = current; temp != NULL; temp = temp->parent)
         {
-            stack_ptr scopes = temp->children;
-            while (!is_stack_empty(scopes))
-            {
-                type_ptr type = peek_stack(scopes);
-                entry = lookup_in_type(type, n->leaf->text);
-                if (entry != NULL)
-                    return;
-                pop_stack(scopes);
-            }
+            entry = lookup_in_type(temp->scope, n->leaf->text);
+            if (entry != NULL)
+                return;
             entry = lookup_st(temp, n->leaf->text);
 
             if (entry != NULL)
                 return;
         }
+
         if (entry == NULL)
         {
             fprintf(stderr, "ERROR: use of undeclared variable `%s` at line %d, in file %s\n", n->leaf->text, n->leaf->lineno, n->leaf->filename);
             exit(3);
         }
     }
-}
-
-static void enter_func_scope(char *s, type_ptr returntype)
-{
-    sym_table_ptr new = new_st(30);
-    type_ptr t = alctype(FUNC_TYPE);
-    t->u.f.st = new;
-    t->u.f.returntype = returntype;
-    t->u.f.name = strdup(s);
-    new->scope = t;
-    insert_sym(current, s, t);
-    pushscope(new);
 }
 
 static void check_package_main(tree_ptr n)
@@ -240,6 +240,50 @@ static void check_undeclared(tree_ptr n)
     }
 }
 
+static void get_kid_type(tree_ptr n, type_ptr *t)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        get_kid_type(n->kids[i], t);
+    }
+
+    sym_entry_ptr entry;
+
+    switch (n->prodrule)
+    {
+    case LNAME:
+        entry = lookup_st(current, n->leaf->text);
+        if (entry != NULL)
+        {
+            *t = entry->type;
+            break;
+        }
+        entry = lookup_in_type(current->scope, n->leaf->text);
+        if (entry != NULL)
+        {
+            *t = entry->type;
+        }
+        else
+        {
+            *t = alctype(UNKNOW_TYPE);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+static type_ptr kid_type(tree_ptr kid)
+{
+    type_ptr type;
+    get_kid_type(kid, &type);
+    return type;
+}
+
 static void populate_vardcl(tree_ptr n)
 {
     if (!n)
@@ -253,6 +297,7 @@ static void populate_vardcl(tree_ptr n)
     }
 
     sym_entry_ptr entry;
+    type_ptr type;
 
     switch (n->prodrule)
     {
@@ -260,7 +305,18 @@ static void populate_vardcl(tree_ptr n)
     case R_VARDCL + 1:
     case R_CONSTDCL:
     case R_CONSTDCL1 + 1:
-        n->type = n->kids[1]->type; // synthesize
+        type = kid_type(n->kids[1]);
+        if (type != NULL)
+        {
+            if (type->basetype != UNKNOW_TYPE)
+                n->type = type;
+            else
+                n->type = n->kids[1]->type; // synthesize
+        }
+        else
+        {
+            n->type = n->kids[1]->type; // synthesize
+        }
         n->kids[0]->type = n->type; // inherit
         insert_w_typeinfo(n->kids[0], current);
         break;
@@ -282,15 +338,29 @@ static void populate_vardcl(tree_ptr n)
         n->type->u.m.indextype = n->kids[2]->type;
         n->type->u.m.elemtype = n->kids[4]->type;
         break;
+    case R_DOTNAME + 1:
+        n->type = n->kids[0]->type;
+        n->kids[2]->type = n->type;
+        insert_w_typeinfo(n->kids[2], current);
+        break;
     case R_SYM:
         n->type = n->kids[0]->type;
+
         break;
     case LNAME:
+        // case LLITERAL:
         entry = lookup_st(current, n->leaf->text);
         if (entry != NULL)
         {
             n->type = entry->type;
+            break;
         }
+        // entry = lookup_in_type(current->scope, n->leaf->text);
+        // if (entry != NULL)
+        // {
+        //     n->type = entry->type;
+        //     break;
+        // }
         else if (is_keyword_type(n->leaf->text))
         {
             n->basetype = get_basetype(n->leaf->text);
@@ -300,6 +370,7 @@ static void populate_vardcl(tree_ptr n)
         {
             n->type = alctype(UNKNOW_TYPE);
         }
+        printf("FOUND ELEMENT: %s type %s\n", n->leaf->text, typename(n->type));
         break;
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
@@ -308,8 +379,8 @@ static void populate_vardcl(tree_ptr n)
     default:
         break;
     }
-    // if (strcmp(n->prodname, "expr") == 0)
-    // check_undeclared(n);
+    if (strcmp(n->prodname, "expr") == 0)
+        check_undeclared(n);
 }
 
 static void check_arg_undeclared(tree_ptr n)
@@ -422,7 +493,9 @@ static void populate_body(tree_ptr n)
     if (strcmp(n->prodname, "common_dcl") == 0)
     {
         populate_vardcl(n);
+        check_undeclared(n);
     }
+
     // char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
     // int size = (int)ARRAY_SIZE(names);
     // int j;
@@ -496,7 +569,6 @@ static void populate_xdcl(tree_ptr n)
         else if (strcmp(n->kids[1]->prodname, "common_dcl") == 0)
         {
             populate_vardcl(n->kids[1]);
-            undeclared_error(n->kids[1]);
         }
     default:
         break;
@@ -581,6 +653,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
         n->kids[i]->type = n->type;
         insert_w_typeinfo(n->kids[i], st);
     }
+
     switch (n->prodrule)
     {
     case LNAME:

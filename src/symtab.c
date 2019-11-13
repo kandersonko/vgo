@@ -69,6 +69,7 @@ sym_table_ptr new_st(int nbuckets)
     st->nbuckets = nbuckets;
     st->entries = 0;
     st->parent = NULL;
+    st->scope = NULL;
     st->children = init_stack(4);
     if (buf.frag_lst == NULL)
     {
@@ -191,7 +192,7 @@ char *install_sym(sym_table_ptr st, char *text, type_ptr type)
 
     h = hash(st, text);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
-        if (!strcmp(text, entry->text))
+        if (strcmp(text, entry->text) == 0)
         {
             /*
           * A copy of the string is already in the table.
@@ -277,18 +278,62 @@ sym_entry_ptr lookup_st(sym_table_ptr st, char *s)
           */
             return entry;
         }
+
     return NULL;
+}
+
+sym_entry_ptr lookup(sym_table_ptr st, char *s)
+{
+    sym_table_ptr temp;
+    sym_entry_ptr entry = NULL;
+
+    for (temp = st; temp != NULL; temp = temp->parent)
+    {
+        int i;
+        for (i = 0; i < temp->nbuckets; i++)
+        {
+            for (entry = temp->buckets[i]; entry != NULL; entry = entry->next)
+            {
+                if (strcmp(s, entry->text) == 0)
+                {
+                    return entry;
+                }
+            }
+        }
+    }
+    return entry;
 }
 
 sym_entry_ptr lookup_in_type(type_ptr type, char *s)
 {
-    if (type->basetype == FUNC_TYPE)
+    if (type == NULL)
+        return NULL;
+    sym_table_ptr temp = current;
+    sym_entry_ptr entry = NULL;
+
+    for (temp = current; temp != NULL; temp = temp->parent)
     {
-        return lookup_st(type->u.f.st, s);
+        stack_ptr scopes = temp->children;
+
+        while (!is_stack_empty(scopes))
+        {
+            type_ptr type = peek_stack(scopes);
+            if (type != NULL)
+            {
+                if (type->basetype == FUNC_TYPE)
+                {
+                    entry = lookup(type->u.f.st, s);
+                    return entry;
+                }
+                else if (type->basetype == STRUCT_TYPE)
+                {
+                    entry = lookup(type->u.s.st, s);
+                    return entry;
+                }
+            }
+
+            pop_stack(scopes);
+        }
     }
-    else if (type->basetype == STRUCT_TYPE)
-    {
-        return lookup_st(type->u.s.st, s);
-    }
-    return NULL;
+    return entry;
 }

@@ -36,31 +36,31 @@ type_ptr alctype(int basetype)
     switch (basetype)
     {
     case INT_TYPE:
-        return integer_type_ptr;
+        t = integer_type_ptr;
         break;
     case BOOL_TYPE:
-        return bool_type_ptr;
+        t = bool_type_ptr;
         break;
     case FLOAT64_TYPE:
-        return float64_type_ptr;
+        t = float64_type_ptr;
         break;
     case STRING_TYPE:
-        return String_type_ptr;
+        t = String_type_ptr;
         break;
     case IMPORT_TYPE:
-        return import_type_ptr;
+        t = import_type_ptr;
         break;
     case PACKAGE_TYPE:
-        return package_type_ptr;
+        t = package_type_ptr;
         break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));
         if (t == NULL)
             return t;
         t->basetype = basetype;
-        return t;
         break;
     }
+    return t;
 }
 
 type_ptr alcstructtype(char *name, sym_table_ptr st)
