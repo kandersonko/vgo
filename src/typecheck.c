@@ -233,7 +233,7 @@ static void check_expression(tree_ptr n)
         check_expression(n->kids[i]);
     }
 
-    printf("DEFAULT: %s\n", n->prodname);
+    // printf("DEFAULT: %s\n", n->prodname);
 
     type_ptr type;
 
@@ -277,19 +277,25 @@ static void check_expression(tree_ptr n)
     case LNAME:
         // printf("LNAME: %s | type: %s\n", n->leaf->text, typename(alctype(n->leaf->basetype)));
         // n->type = alctype(n->leaf->basetype);
-        entry = lookup_st(current, n->leaf->text);
-        if (entry != NULL)
-        {
-            n->type = entry->type;
-        }
-        printf("NAME TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
+        // entry = lookup_st(current, n->leaf->text);
+        // if (entry != NULL)
+        // {
+        //     n->type = entry->type;
+        //     break;
+        // }
+        // entry = lookup_scope(n->leaf->text);
+        // if (entry != NULL)
+        // {
+        //     n->type = entry->type;
+        // }
+        // printf("NAME TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
 
         break;
 
     case LLITERAL:
-        n->type = alctype(n->leaf->basetype);
-        n->basetype = n->leaf->basetype;
-        printf("LITERAL TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
+        // n->type = alctype(n->leaf->basetype);
+        // n->basetype = n->leaf->basetype;
+        // printf("LITERAL TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
         break;
 
     default:
@@ -302,5 +308,5 @@ void typecheck(tree_ptr n)
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
     check_common_dcl(n);
-    // check_expression(n);
+    check_expression(n);
 }

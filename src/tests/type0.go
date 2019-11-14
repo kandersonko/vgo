@@ -9,6 +9,7 @@ type pet struct {
 
 func add(x int, y int) int {
 	var z string = "2"
+	var a int = 2 + 4
 	// var z int
 	// var ar [3]int
 	// var m map[int]string
@@ -17,7 +18,7 @@ func add(x int, y int) int {
 	// p.hunger = 2
 	// // print(k)
 
-	return z + x
+	return 2 - x*y/2 + x
 }
 
 // func main() {

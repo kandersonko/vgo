@@ -51,9 +51,10 @@ void enter_newscope(char *s, int basetype)
         t = alctype(basetype);
         break;
     }
+    t->basetype = basetype;
     new->scope = t;
 
-    push_stack(current->children, t);
+    // push_stack(current->children, t);
     push_stack(new->children, current->scope);
     // printf("CHILDREN: %d | %s\n", current->children->current_size, typename(peek_stack(current->children)));
 
@@ -65,6 +66,7 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
 {
     sym_table_ptr new = new_st(30);
     type_ptr t = alctype(FUNC_TYPE);
+    t->basetype = FUNC_TYPE;
     t->u.f.st = new;
     t->u.f.returntype = returntype;
     t->u.f.name = strdup(s);
@@ -72,7 +74,7 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
     t->u.f.nparams = nparams;
     new->scope = t;
 
-    push_stack(current->children, t);
+    // push_stack(current->children, t);
     push_stack(new->children, current->scope);
     // printf("CHILDREN: %d | %s | %d\n", current->children->current_size, typename(peek_stack(current->children)), t->basetype);
 
@@ -281,6 +283,12 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
             *t = alctype(get_basetype(n->leaf->text));
             break;
         }
+        entry = lookup_scope(n->leaf->text);
+        if (entry != NULL)
+        {
+            *t = entry->type;
+            break;
+        }
         entry = lookup_st(current, n->leaf->text);
         if (entry != NULL)
         {
@@ -288,13 +296,6 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
             break;
         }
         entry = lookup(current, n->leaf->text);
-        if (entry != NULL)
-        {
-            *t = entry->type;
-
-            break;
-        }
-        entry = lookup_in_type(current->scope, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;

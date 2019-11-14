@@ -346,9 +346,10 @@ sym_entry_ptr lookup_scope(char *s)
         entry = lookup_in_type(temp->scope, s);
         if (entry != NULL)
             return entry;
-        while (!is_stack_empty(children))
+        while (children && !is_stack_empty(children))
         {
             type_ptr type = peek_stack(children);
+            printf("LOOKUP IN TYPE: %s for %s\n", typename(type), s);
             entry = lookup_in_type(type, s);
             if (entry != NULL)
                 return entry;

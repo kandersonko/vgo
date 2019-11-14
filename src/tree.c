@@ -81,6 +81,7 @@ tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **ki
     ast->nkids = nkids;
     ast->kids = kids;
     ast->type = alloc(1, sizeof(struct typeinfo));
+    ast->type->basetype = 0;
     ast->symtab = alloc(1, sizeof(struct sym_table));
     return ast;
 }
