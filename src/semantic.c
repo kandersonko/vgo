@@ -257,34 +257,44 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
     switch (n->prodrule)
     {
     case LNAME:
+        if (is_keyword_type(n->leaf->text))
+        {
+            *t = alctype(get_basetype(n->leaf->text));
+            printf("GET KEY TYPE: %s for %s\n", typename(*t), n->leaf->text);
+            break;
+        }
         entry = lookup_st(current, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;
+            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
             break;
         }
         entry = lookup(current, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;
+            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
+
             break;
         }
         entry = lookup_in_type(current->scope, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;
+            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
         }
         else
         {
             *t = alctype(UNKNOW_TYPE);
+            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
         }
-
-        printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
 
         break;
 
     case LLITERAL:
         *t = alctype(n->leaf->basetype);
+        printf("FOUND LITERAL TYPE: %s for %s\n", typename(*t), n->leaf->text);
 
         break;
 

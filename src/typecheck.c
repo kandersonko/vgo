@@ -56,17 +56,17 @@ static void type_error(tree_ptr n, type_ptr t)
         break;
 
     case LLITERAL:
-        if (n->leaf->basetype != t->basetype)
-        {
-            type_error_msg(n, t);
-        }
+        // if (n->leaf->basetype != t->basetype)
+        // {
+        //     type_error_msg(n, t);
+        // }
         break;
 
     case LNAME:
-        if (n->type->basetype != t->basetype)
-        {
-            type_error_msg(n, t);
-        }
+        // if (n->type->basetype != t->basetype)
+        // {
+        //     type_error_msg(n, t);
+        // }
         break;
 
     default:
@@ -77,6 +77,7 @@ static void type_error(tree_ptr n, type_ptr t)
 
 static void incompatible_types_error_msg(tree_ptr n, type_ptr type)
 {
+    printf("CHECKING TYPES: %s %s | %d %d\n", typename(n->type), typename(type), n->type->basetype, type->basetype);
     if (n->type->basetype != type->basetype)
     {
         type_error_msg(n, type);
@@ -128,12 +129,15 @@ static void check_ntype(tree_ptr n)
         check_ntype(n->kids[i]);
     }
 
-    // printf("DEFAULT: %s\n", n->prodname);
+    printf("N TYPE DEFAULT: %s\n", n->prodname);
+    type_ptr type;
 
     switch (n->prodrule)
     {
     case R_OTHERTYPE:
-        check_incompatible_types_error_msg(n->kids[1], n->kids[3]->type);
+        type = kid_type(n->kids[3]);
+        printf("OTHERTYPE FOUND %s\n", typename(type));
+        check_incompatible_types_error_msg(n->kids[1], type);
         break;
     default:
         break;
@@ -150,42 +154,51 @@ static void check_declaration(tree_ptr n)
         check_declaration(n->kids[i]);
     }
 
-    // printf("DEFAULT: %s\n", n->prodname);
+    printf("DEFAULT: %s\n", n->prodname);
 
-    // char *typedclname;
+    char *typedclname;
+
+    // type_ptr type;
 
     switch (n->prodrule)
     {
     case R_VARDCL + 1:
     case R_CONSTDCL:
         check_ntype(n->kids[1]);
+        // type = kid_type(n->kids[1]);
+        // n->type = type;
         n->type = n->kids[1]->type;
-        // type_error(n->kids[3], n->type);
+        type_error(n->kids[3], n->type);
         break;
 
     case R_VARDCL + 2:
     case R_CONSTDCL + 2:
+        // type = kid_type(n->kids[0]);
+        // n->type = type;
         n->type = n->kids[0]->type;
         type_error(n->kids[2], n->type);
         break;
 
-        // case R_TYPEDCL:
-        //     typedclname = n->kids[0]->kids[0]->leaf->text;
-        //     printf("FOUND OTHERTYPE: %s\n", typedclname);
-        //     break;
+    case R_START_COMPLIT:
+        break;
+
+    case R_TYPEDCL:
+        typedclname = n->kids[0]->kids[0]->leaf->text;
+        printf("FOUND OTHERTYPE: %s\n", typedclname);
+        break;
         // case R_PEXPR_NO_PAREN + 5:
         //     printf("FOUND ITEM: %s\n", n->prodname);
         //     break;
 
     case LNAME:
-        // printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
-        insert_sym(current, n->leaf->text, n->type);
+        printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
+        // insert_sym(current, n->leaf->text, n->type);
         break;
 
     case LLITERAL:
         n->type = alctype(n->leaf->basetype);
-        // printf("TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
-        insert_sym(current, n->leaf->text, n->type);
+        printf("TYPE: %s for %s | sval: %s | dval: %f | ival: %d\n", typename(n->type), n->leaf->text, n->leaf->sval, n->leaf->dval, n->leaf->ival);
+        // insert_sym(current, n->leaf->text, n->type);
         break;
 
     default:
@@ -288,6 +301,6 @@ void typecheck(tree_ptr n)
 {
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
-    // check_common_dcl(n);
+    check_common_dcl(n);
     check_expression(n);
 }

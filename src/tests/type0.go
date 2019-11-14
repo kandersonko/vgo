@@ -4,7 +4,8 @@ package main
 
 func add(a int, b int) int {
 	var x string = "2"
-	return a + b + x
+	var m [3]int = ["3"]int{"1", 2, 3}
+	return a + b
 }
 
 // func main() {
@@ -12,8 +13,8 @@ func add(a int, b int) int {
 // 	print(z)
 // 	// // const x int = 2
 // 	// // var y int = 0 + x
-// 	// var a [3]int = [3]int{"1", 2, 3}
-// 	// // a["hello"] = 4
+// 	var a [3]int = [3]int{"1", 2, 3}
+// 	a["hello"] = 4
 // 	// var k int
 // 	// var enabled bool = true
 
