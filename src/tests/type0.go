@@ -6,7 +6,7 @@ func add(a int, b int) int {
 	var x string = "2"
 	// var m [3]int
 
-	return a + b
+	return x + a
 }
 
 // func main() {

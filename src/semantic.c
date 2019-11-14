@@ -42,6 +42,11 @@ void enter_newscope(char *s, int basetype)
         t->u.f.st = new;
         t->u.f.name = strdup(s);
         break;
+    case PACKAGE_TYPE:
+        t = alctype(PACKAGE_TYPE);
+        t->u.f.st = new;
+        t->u.f.name = strdup(s);
+        break;
     default:
         t = alctype(basetype);
         break;
@@ -75,7 +80,7 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
     pushscope(new);
 }
 
-static int is_keyword_type(char *s)
+int is_keyword_type(char *s)
 {
     char *keywords[] = {"int", "float64", "string", "bool", "if", "else", "true", "false"};
     int size = (int)ARRAY_SIZE(keywords);
@@ -105,7 +110,6 @@ static void undeclared_error(tree_ptr n)
     {
         if (is_keyword_type(n->leaf->text))
             return;
-        sym_table_ptr temp;
         sym_entry_ptr entry;
         // for (temp = current; temp != NULL; temp = temp->parent)
         // {
@@ -114,13 +118,16 @@ static void undeclared_error(tree_ptr n)
         //     if (entry != NULL)
         //         return;
         // }
+
+        sym_table_ptr temp;
         for (temp = current; temp != NULL; temp = temp->parent)
         {
+            printf("TEMP: %s\n", typename(temp->scope));
             entry = lookup_in_type(temp->scope, n->leaf->text);
             if (entry != NULL)
                 return;
-            entry = lookup_st(temp, n->leaf->text);
 
+            entry = lookup_st(temp, n->leaf->text);
             if (entry != NULL)
                 return;
         }
@@ -414,8 +421,8 @@ static void vardcl(tree_ptr n, char *varname)
     default:
         break;
     }
-    if (strcmp(n->prodname, "expr") == 0)
-        check_undeclared(n);
+    // if (strcmp(n->prodname, "expr") == 0)
+    //     check_undeclared(n);
 }
 
 static void populate_vardcl(tree_ptr n)
@@ -552,7 +559,7 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
     case R_ARG_TYPE + 1:
         n->kids[0]->type = n->kids[1]->type;
         insert_parameters(n->kids[0], params, nparams);
-        // check_arg_undeclared(n->kids[1]);
+        check_arg_undeclared(n->kids[1]);
         break;
     case R_ARG_TYPE_LIST + 1:
         n->kids[0]->type = n->kids[2]->type;
@@ -676,10 +683,9 @@ static void populate_function(tree_ptr n)
         get_functrettype(n->kids[1]->kids[4], &returntype);
         n->type->u.f.returntype = returntype;
         populate_params(n->kids[1], &params, &nparams);
-        print_params(params, nparams);
         enter_func_scope(functname, returntype, params, nparams);
         populate_body(n->kids[2]);
-        // check_undeclared(n);
+        check_undeclared(n->kids[2]);
         popscope();
         break;
     default:
@@ -723,7 +729,7 @@ static void populate_package(tree_ptr n)
         break;
     case LNAME:
         n->type = alctype(PACKAGE_TYPE);
-        insert_sym(current, n->leaf->text, n->type);
+        // insert_sym(current, n->leaf->text, n->type);
         break;
     default:
         break;

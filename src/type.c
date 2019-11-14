@@ -16,14 +16,14 @@ struct typeinfo float64_type = {FLOAT64_TYPE};
 struct typeinfo String_type = {STRING_TYPE};
 struct typeinfo null_type = {NULL_TYPE};
 struct typeinfo import_type = {IMPORT_TYPE};
-struct typeinfo package_type = {PACKAGE_TYPE};
+// struct typeinfo package_type = {PACKAGE_TYPE};
 type_ptr null_type_ptr = &null_type;
 type_ptr integer_type_ptr = &integer_type;
 type_ptr bool_type_ptr = &bool_type;
 type_ptr float64_type_ptr = &float64_type;
 type_ptr String_type_ptr = &String_type;
 type_ptr import_type_ptr = &import_type;
-type_ptr package_type_ptr = &package_type;
+// type_ptr package_type_ptr = &package_type;
 
 /*
 #define NULL_TYPE 1000000
@@ -67,9 +67,9 @@ type_ptr alctype(int basetype)
     case IMPORT_TYPE:
         t = import_type_ptr;
         break;
-    case PACKAGE_TYPE:
-        t = package_type_ptr;
-        break;
+    // case PACKAGE_TYPE:
+    //     t = package_type_ptr;
+    //     break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));
         t->basetype = basetype;

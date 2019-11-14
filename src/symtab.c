@@ -304,36 +304,63 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
     return entry;
 }
 
+static sym_entry_ptr param_to_entry(paramlist param)
+{
+    if (param == NULL)
+        return NULL;
+    sym_entry_ptr entry = safe_malloc(sizeof(*entry));
+    entry->text = strdup(param->name);
+    entry->type = param->type;
+    entry->next = param_to_entry(param->next);
+
+    return entry;
+}
+
+sym_entry_ptr lookup_in_params(paramlist params, char *s)
+{
+    paramlist current = params;
+    sym_entry_ptr entry = NULL;
+    while (current != NULL)
+    {
+        printf("CHECKING IN TYPES: %s %s\n", current->name, s);
+        if (strcmp(s, current->name) == 0)
+        {
+            entry = param_to_entry(current);
+            break;
+        }
+        entry = lookup_in_type(current->type, s);
+        if (entry != NULL)
+            break;
+        current = current->next;
+    }
+
+    return entry;
+}
+
 sym_entry_ptr lookup_in_type(type_ptr type, char *s)
 {
     if (type == NULL)
         return NULL;
-    sym_table_ptr temp = current;
+
     sym_entry_ptr entry = NULL;
-
-    for (temp = current; temp != NULL; temp = temp->parent)
+    if (type->basetype == PACKAGE_TYPE)
     {
-        stack_ptr scopes = temp->children;
-
-        while (!is_stack_empty(scopes))
-        {
-            type_ptr type = peek_stack(scopes);
-            if (type != NULL)
-            {
-                if (type->basetype == FUNC_TYPE)
-                {
-                    entry = lookup(type->u.f.st, s);
-                    return entry;
-                }
-                else if (type->basetype == STRUCT_TYPE)
-                {
-                    entry = lookup(type->u.s.st, s);
-                    return entry;
-                }
-            }
-
-            pop_stack(scopes);
-        }
+        printf("CHECK IN PACKAGE: %s %s\n", type->u.p.name, s);
+        entry = lookup(type->u.p.st, s);
+        if (entry != NULL)
+            return entry;
+    }
+    if (type->basetype == FUNC_TYPE)
+    {
+        entry = lookup(type->u.f.st, s);
+        if (entry == NULL)
+            entry = lookup_in_params(type->u.f.parameters, s);
+        return entry;
+    }
+    else if (type->basetype == STRUCT_TYPE)
+    {
+        entry = lookup(type->u.s.st, s);
+        return entry;
     }
     return entry;
 }

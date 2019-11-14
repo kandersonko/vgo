@@ -55,6 +55,11 @@ typedef struct typeinfo
             int nparams;
             struct param *parameters;
         } f;
+        struct packageinfo
+        {
+            char *name;
+            struct sym_table *st;
+        } p;
     } u;
 } * type_ptr;
 
