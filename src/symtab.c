@@ -326,7 +326,6 @@ sym_entry_ptr lookup_in_type(type_ptr type, char *s)
                 else if (type->basetype == STRUCT_TYPE)
                 {
                     entry = lookup(type->u.s.st, s);
-                    // printf("LOOKING UP STRUCT ENTRY: %s TYPE: %s | entry: %s\n", s, typename(type), typename(entry->type));
                     return entry;
                 }
             }

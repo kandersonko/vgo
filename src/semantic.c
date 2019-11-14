@@ -371,12 +371,12 @@ static void populate_vardcl(tree_ptr n)
             n->type = entry->type;
             break;
         }
-        // entry = lookup_in_type(current->scope, n->leaf->text);
-        // if (entry != NULL)
-        // {
-        //     n->type = entry->type;
-        //     break;
-        // }
+        entry = lookup_in_type(current->scope, n->leaf->text);
+        if (entry != NULL)
+        {
+            n->type = entry->type;
+            break;
+        }
         else if (is_keyword_type(n->leaf->text))
         {
             n->basetype = get_basetype(n->leaf->text);
