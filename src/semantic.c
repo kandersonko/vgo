@@ -335,6 +335,7 @@ static void get_varname(tree_ptr n, char **name)
     {
     case LNAME:
         *name = n->leaf->text;
+        check_vardcl(n);
         break;
 
     default:
@@ -814,7 +815,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     switch (n->prodrule)
     {
     case LNAME:
-        check_vardcl(n);
+        // check_vardcl(n);
         insert_sym(st, n->leaf->text, n->type);
         break;
     }

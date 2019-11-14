@@ -1,6 +1,6 @@
 package main
 
-var z int
+// var z int
 
 type pet struct {
 	hunger int
@@ -9,10 +9,12 @@ type pet struct {
 
 func add(x int, y int) int {
 	// var x string = "2"
+	var z int
 	var ar [3]int
 	var m map[int]string
 	var p pet
 	p.happy = 2
+	print(k)
 
 	// return z + x
 }
