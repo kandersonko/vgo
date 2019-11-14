@@ -1,12 +1,20 @@
 package main
 
-// var x int
+var z int
 
-func add(a int, b int) int {
-	var x string = "2"
-	// var m [3]int
+type pet struct {
+	hunger int
+	happy  int
+}
 
-	return x + a
+func add(x int, y int) int {
+	// var x string = "2"
+	var ar [3]int
+	var m map[int]string
+	var p pet
+	p.happy = 2
+
+	// return z + x
 }
 
 // func main() {

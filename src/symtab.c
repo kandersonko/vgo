@@ -322,7 +322,6 @@ sym_entry_ptr lookup_in_params(paramlist params, char *s)
     sym_entry_ptr entry = NULL;
     while (current != NULL)
     {
-        printf("CHECKING IN TYPES: %s %s\n", current->name, s);
         if (strcmp(s, current->name) == 0)
         {
             entry = param_to_entry(current);
@@ -345,7 +344,6 @@ sym_entry_ptr lookup_in_type(type_ptr type, char *s)
     sym_entry_ptr entry = NULL;
     if (type->basetype == PACKAGE_TYPE)
     {
-        printf("CHECK IN PACKAGE: %s %s\n", type->u.p.name, s);
         entry = lookup(type->u.p.st, s);
         if (entry != NULL)
             return entry;
