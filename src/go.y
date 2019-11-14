@@ -1852,8 +1852,8 @@ complitexpr:
 |	'{' start_complit braced_keyval_list '}'
 	{
 		int nkids = 4;
-		struct tree* t1 = new_leaf_node($1->category, "bare_complitexpr", $1);
-		struct tree* t4 = new_leaf_node($4->category, "bare_complitexpr", $4);
+		struct tree* t1 = new_leaf_node($1->category, "complitexpr", $1);
+		struct tree* t4 = new_leaf_node($4->category, "complitexpr", $4);
 		struct tree** kids = create_tree_kids(nkids, t1, $2, $3, t4);
 		$$ = new_tree_node(R_COMPLITEXPR+1, "complitexpr", nkids, kids, NULL);
 	}

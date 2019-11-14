@@ -4,7 +4,8 @@ package main
 
 func add(a int, b int) int {
 	var x string = "2"
-	var m [3]int = ["3"]int{"1", 2, 3}
+	var m [3]int
+
 	return a + b
 }
 

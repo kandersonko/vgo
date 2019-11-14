@@ -4017,8 +4017,8 @@ yyreduce:
 #line 1853 "go.y" /* yacc.c:1646  */
     {
 		int nkids = 4;
-		struct tree* t1 = new_leaf_node((yyvsp[-3].t)->category, "bare_complitexpr", (yyvsp[-3].t));
-		struct tree* t4 = new_leaf_node((yyvsp[0].t)->category, "bare_complitexpr", (yyvsp[0].t));
+		struct tree* t1 = new_leaf_node((yyvsp[-3].t)->category, "complitexpr", (yyvsp[-3].t));
+		struct tree* t4 = new_leaf_node((yyvsp[0].t)->category, "complitexpr", (yyvsp[0].t));
 		struct tree** kids = create_tree_kids(nkids, t1, (yyvsp[-2].ast), (yyvsp[-1].ast), t4);
 		(yyval.ast) = new_tree_node(R_COMPLITEXPR+1, "complitexpr", nkids, kids, NULL);
 	}

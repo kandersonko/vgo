@@ -24,7 +24,24 @@ type_ptr float64_type_ptr = &float64_type;
 type_ptr String_type_ptr = &String_type;
 type_ptr import_type_ptr = &import_type;
 type_ptr package_type_ptr = &package_type;
-char *typenames[] = {"null", "unknown", "import", "package", "int", "bool", "float64", "string", "struct", "function"};
+
+/*
+#define NULL_TYPE 1000000
+#define UNKNOW_TYPE 1000001
+#define IMPORT_TYPE 1000002
+#define PACKAGE_TYPE 1000003
+#define INT_TYPE 1000004
+#define BOOL_TYPE 1000005
+#define FLOAT64_TYPE 1000006
+#define STRING_TYPE 1000007
+#define STRUCT_TYPE 1000008
+#define ARRAY_TYPE 1000009
+#define FUNC_TYPE 1000010
+#define MAP_TYPE 1000011
+#define CHAR_TYPE 1000012
+
+*/
+char *typenames[] = {"null", "unknown", "import", "package", "int", "bool", "float64", "string", "struct", "array", "function", "map", "char"};
 
 type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st);
 
@@ -55,8 +72,6 @@ type_ptr alctype(int basetype)
         break;
     default:
         t = (type_ptr)alloc(1, sizeof(struct typeinfo));
-        if (t == NULL)
-            return t;
         t->basetype = basetype;
         break;
     }

@@ -310,42 +310,40 @@ type_ptr kid_type(tree_ptr kid)
     return type;
 }
 
-static void populate_vardcl(tree_ptr n)
+static void get_varname(tree_ptr n, char **name)
 {
-    if (!n)
-        return;
-
-    char *typedclname;
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        populate_vardcl(n->kids[i]);
+        get_varname(n->kids[i], name);
     }
-
-    sym_entry_ptr entry;
-    type_ptr type;
 
     switch (n->prodrule)
     {
-    case R_VARDCL:
-    case R_VARDCL + 1:
-    case R_CONSTDCL:
-    case R_CONSTDCL1 + 1:
-        type = kid_type(n->kids[1]);
-        if (type != NULL)
-        {
-            if (type->basetype != UNKNOW_TYPE)
-                n->type = type;
-            else
-                n->type = n->kids[1]->type; // synthesize
-        }
-        else
-        {
-            n->type = n->kids[1]->type; // synthesize
-        }
-        n->kids[0]->type = n->type; // inherit
-        insert_w_typeinfo(n->kids[0], current);
+    case LNAME:
+        *name = n->leaf->text;
+        printf("NAME FOUND: %s\n", *name);
         break;
+
+    default:
+        break;
+    }
+}
+
+static void vardcl(tree_ptr n, char *varname)
+{
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        vardcl(n->kids[i], varname);
+    }
+
+    char *typedclname;
+
+    sym_entry_ptr entry;
+
+    switch (n->prodrule)
+    {
     case R_TYPEDCL:
         // TODO: CHECK
         typedclname = n->kids[0]->kids[0]->leaf->text;
@@ -353,16 +351,22 @@ static void populate_vardcl(tree_ptr n)
         populate_typedcl(n, typedclname);
         popscope();
         break;
-    case R_OTHERTYPE:
+    case R_OTHERTYPE: // array
         n->type = alctype(ARRAY_TYPE);
         n->type->u.a.elemtype = n->kids[3]->type;
         int size = get_array_size(n);
         n->type->u.a.size = size;
+        printf("FOUND ARRAY: %s size %d and eltype: %s for %s\n", typename(n->type), size, typename(n->type->u.a.elemtype), varname);
+        insert_sym(current, varname, n->type);
         break;
-    case R_OTHERTYPE + 2:
+    case R_OTHERTYPE + 2: // map
         n->type = alctype(MAP_TYPE);
         n->type->u.m.indextype = n->kids[2]->type;
         n->type->u.m.elemtype = n->kids[4]->type;
+        printf("FOUND MAP: %s\n", typename(n->type));
+        break;
+    case R_NTYPE:
+        n->type = n->kids[0]->type;
         break;
     case R_DOTNAME + 1:
         n->type = n->kids[0]->type;
@@ -406,6 +410,51 @@ static void populate_vardcl(tree_ptr n)
     }
     if (strcmp(n->prodname, "expr") == 0)
         check_undeclared(n);
+}
+
+static void populate_vardcl(tree_ptr n)
+{
+    if (!n)
+        return;
+
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        populate_vardcl(n->kids[i]);
+    }
+
+    type_ptr type;
+
+    char *varname;
+
+    // printf("DEFAULT: %s\n", n->prodname);
+
+    switch (n->prodrule)
+    {
+    case R_VARDCL:
+    case R_VARDCL + 1:
+    case R_CONSTDCL:
+    case R_CONSTDCL1 + 1:
+        get_varname(n->kids[0], &varname);
+        type = kid_type(n->kids[1]);
+        if (type != NULL)
+        {
+            if (type->basetype != UNKNOW_TYPE)
+                n->type = type;
+            else
+                n->type = n->kids[1]->type; // synthesize
+        }
+        else
+        {
+            n->type = n->kids[1]->type; // synthesize
+        }
+        n->kids[0]->type = n->type; // inherit
+        insert_w_typeinfo(n->kids[0], current);
+        vardcl(n, varname);
+        break;
+    default:
+        break;
+    }
 }
 
 static void check_arg_undeclared(tree_ptr n)

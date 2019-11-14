@@ -129,7 +129,7 @@ static void check_ntype(tree_ptr n)
         check_ntype(n->kids[i]);
     }
 
-    printf("N TYPE DEFAULT: %s\n", n->prodname);
+    // printf("N TYPE DEFAULT: %s\n", n->prodname);
     type_ptr type;
 
     switch (n->prodrule)
@@ -233,7 +233,7 @@ static void check_expression(tree_ptr n)
         check_expression(n->kids[i]);
     }
 
-    // printf("DEFAULT: %s\n", n->prodname);
+    printf("DEFAULT: %s\n", n->prodname);
 
     type_ptr type;
 
@@ -301,6 +301,6 @@ void typecheck(tree_ptr n)
 {
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
-    check_common_dcl(n);
-    check_expression(n);
+    // check_common_dcl(n);
+    // check_expression(n);
 }
