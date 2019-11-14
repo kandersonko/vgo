@@ -53,7 +53,7 @@ void enter_newscope(char *s, int basetype)
     }
     new->scope = t;
 
-    // push_stack(current->children, t);
+    push_stack(current->children, t);
     push_stack(new->children, current->scope);
     // printf("CHILDREN: %d | %s\n", current->children->current_size, typename(peek_stack(current->children)));
 
@@ -72,7 +72,7 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
     t->u.f.nparams = nparams;
     new->scope = t;
 
-    // push_stack(current->children, t);
+    push_stack(current->children, t);
     push_stack(new->children, current->scope);
     // printf("CHILDREN: %d | %s | %d\n", current->children->current_size, typename(peek_stack(current->children)), t->basetype);
 
@@ -119,13 +119,13 @@ static void undeclared_error(tree_ptr n)
         //         return;
         // }
 
+        entry = lookup_scope(n->leaf->text);
+        if (entry != NULL)
+            return;
+
         sym_table_ptr temp;
         for (temp = current; temp != NULL; temp = temp->parent)
         {
-            entry = lookup_in_type(temp->scope, n->leaf->text);
-            if (entry != NULL)
-                return;
-
             entry = lookup_st(temp, n->leaf->text);
             if (entry != NULL)
                 return;
@@ -463,7 +463,7 @@ static void populate_vardcl(tree_ptr n)
 
     static char *varname;
 
-    printf("DEFAULT: %s\n", n->prodname);
+    // printf("DEFAULT: %s\n", n->prodname);
 
     char *typedclname;
 
@@ -704,7 +704,7 @@ static void populate_function(tree_ptr n)
         populate_params(n->kids[1], &params, &nparams);
         enter_func_scope(functname, returntype, params, nparams);
         populate_body(n->kids[2]);
-        // check_undeclared(n->kids[2]);
+        check_undeclared(n->kids[2]);
         popscope();
         break;
     default:

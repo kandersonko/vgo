@@ -54,6 +54,8 @@ sym_entry_ptr lookup_in_type(type_ptr type, char *s);
 
 sym_entry_ptr lookup(sym_table_ptr st, char *s);
 
+sym_entry_ptr lookup_scope(char *s);
+
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */
 extern sym_table_ptr current;    /* current */

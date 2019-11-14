@@ -14,7 +14,8 @@ func add(x int, y int) int {
 	var m map[int]string
 	var p pet
 	p.happy = 2
-	print(k)
+	p.hunger = 2
+	// print(k)
 
 	// return z + x
 }

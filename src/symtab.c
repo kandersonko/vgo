@@ -336,6 +336,28 @@ sym_entry_ptr lookup_in_params(paramlist params, char *s)
     return entry;
 }
 
+sym_entry_ptr lookup_scope(char *s)
+{
+    sym_entry_ptr entry = NULL;
+    sym_table_ptr temp;
+    for (temp = current; temp != NULL; temp = temp->parent)
+    {
+        stack_ptr children = temp->children;
+        entry = lookup_in_type(temp->scope, s);
+        if (entry != NULL)
+            return entry;
+        while (!is_stack_empty(children))
+        {
+            type_ptr type = peek_stack(children);
+            entry = lookup_in_type(type, s);
+            if (entry != NULL)
+                return entry;
+            pop_stack(children);
+        }
+    }
+    return entry;
+}
+
 sym_entry_ptr lookup_in_type(type_ptr type, char *s)
 {
     if (type == NULL)
