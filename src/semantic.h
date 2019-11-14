@@ -31,7 +31,7 @@ void populate_symbol_tables(tree_ptr ast);
 void populatesymbols(tree_ptr t);
 
 void populate(tree_ptr n);
-void populate_params(tree_ptr n);
+void populate_params(tree_ptr n, paramlist *params, int *nparams);
 void insert_w_typeinfo(tree_ptr n, sym_table_ptr st);
 
 type_ptr kid_type(tree_ptr kid);

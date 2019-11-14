@@ -15,6 +15,17 @@
 #include "rules.h"
 #include "utils.h"
 
+static void print_params(paramlist params, int nparams)
+{
+    paramlist current = params;
+    printf("\tnumber of params: %d\n", nparams);
+    while (current != NULL)
+    {
+        printf("\tparam %s: %s\n", current->name, typename(current->type));
+        current = current->next;
+    }
+}
+
 void enter_newscope(char *s, int basetype)
 {
     sym_table_ptr new = new_st(30);
@@ -45,13 +56,15 @@ void enter_newscope(char *s, int basetype)
     pushscope(new);
 }
 
-static void enter_func_scope(char *s, type_ptr returntype)
+static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int nparams)
 {
     sym_table_ptr new = new_st(30);
     type_ptr t = alctype(FUNC_TYPE);
     t->u.f.st = new;
     t->u.f.returntype = returntype;
     t->u.f.name = strdup(s);
+    t->u.f.parameters = params;
+    t->u.f.nparams = nparams;
     new->scope = t;
 
     // push_stack(current->children, t);
@@ -260,21 +273,18 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
         if (is_keyword_type(n->leaf->text))
         {
             *t = alctype(get_basetype(n->leaf->text));
-            printf("GET KEY TYPE: %s for %s\n", typename(*t), n->leaf->text);
             break;
         }
         entry = lookup_st(current, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;
-            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
             break;
         }
         entry = lookup(current, n->leaf->text);
         if (entry != NULL)
         {
             *t = entry->type;
-            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
 
             break;
         }
@@ -282,19 +292,16 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
         if (entry != NULL)
         {
             *t = entry->type;
-            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
         }
         else
         {
             *t = alctype(UNKNOW_TYPE);
-            printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
         }
 
         break;
 
     case LLITERAL:
         *t = alctype(n->leaf->basetype);
-        printf("FOUND LITERAL TYPE: %s for %s\n", typename(*t), n->leaf->text);
 
         break;
 
@@ -322,7 +329,6 @@ static void get_varname(tree_ptr n, char **name)
     {
     case LNAME:
         *name = n->leaf->text;
-        printf("NAME FOUND: %s\n", *name);
         break;
 
     default:
@@ -356,14 +362,14 @@ static void vardcl(tree_ptr n, char *varname)
         n->type->u.a.elemtype = n->kids[3]->type;
         int size = get_array_size(n);
         n->type->u.a.size = size;
-        printf("FOUND ARRAY: %s size %d and eltype: %s for %s\n", typename(n->type), size, typename(n->type->u.a.elemtype), varname);
+        // printf("FOUND ARRAY: %s size %d and eltype: %s for %s\n", typename(n->type), size, typename(n->type->u.a.elemtype), varname);
         insert_sym(current, varname, n->type);
         break;
     case R_OTHERTYPE + 2: // map
         n->type = alctype(MAP_TYPE);
         n->type->u.m.indextype = n->kids[2]->type;
         n->type->u.m.elemtype = n->kids[4]->type;
-        printf("FOUND MAP: %s\n", typename(n->type));
+        // printf("FOUND MAP: %s\n", typename(n->type));
         break;
     case R_NTYPE:
         n->type = n->kids[0]->type;
@@ -479,7 +485,56 @@ static void check_arg_undeclared(tree_ptr n)
     }
 }
 
-void populate_params(tree_ptr n)
+static paramlist create_param(tree_ptr n)
+{
+    paramlist temp;
+    temp = safe_malloc(sizeof(*temp));
+    memset(temp, 0, sizeof(*temp));
+    temp->name = strdup(n->leaf->text);
+    temp->type = n->type;
+    temp->next = NULL;
+    return temp;
+}
+
+static paramlist add_param(paramlist root, tree_ptr n)
+{
+    paramlist temp = create_param(n);
+    if (root == NULL)
+    {
+        root = temp;
+    }
+    else
+    {
+        paramlist current = root;
+        while (current->next != NULL)
+            current = current->next;
+        current->next = temp;
+    }
+    return root;
+}
+
+static void insert_parameters(tree_ptr n, paramlist *params, int *nparams)
+{
+    if (n == NULL)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        n->kids[i]->type = n->type;
+        insert_parameters(n->kids[i], params, nparams);
+    }
+
+    switch (n->prodrule)
+    {
+    case LNAME:
+        check_vardcl(n);
+        *nparams = *nparams + 1;
+        *params = add_param(*params, n);
+        break;
+    }
+}
+
+void populate_params(tree_ptr n, paramlist *params, int *nparams)
 {
 
     if (!n)
@@ -487,7 +542,7 @@ void populate_params(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        populate_params(n->kids[i]);
+        populate_params(n->kids[i], params, nparams);
     }
 
     sym_entry_ptr entry = NULL;
@@ -496,8 +551,8 @@ void populate_params(tree_ptr n)
     {
     case R_ARG_TYPE + 1:
         n->kids[0]->type = n->kids[1]->type;
-        insert_w_typeinfo(n->kids[0], current);
-        check_arg_undeclared(n->kids[1]);
+        insert_parameters(n->kids[0], params, nparams);
+        // check_arg_undeclared(n->kids[1]);
         break;
     case R_ARG_TYPE_LIST + 1:
         n->kids[0]->type = n->kids[2]->type;
@@ -519,12 +574,13 @@ void populate_params(tree_ptr n)
     case R_DOTNAME + 1:
         n->type = n->kids[0]->type;
         n->kids[2]->type = n->type;
-        insert_w_typeinfo(n->kids[2], current);
+        insert_parameters(n->kids[2], params, nparams);
+
         break;
     case R_TYPEDCL:
         n->type = n->kids[1]->type;
         n->kids[0]->type = n->type;
-        insert_w_typeinfo(n->kids[1], current);
+        insert_parameters(n->kids[1], params, nparams);
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
@@ -534,8 +590,10 @@ void populate_params(tree_ptr n)
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
+        // printf("LLITERAL: %s %s\n", n->leaf->text, typename(n->type));
         break;
     case LNAME:
+        // printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
         entry = lookup_st(current->parent, n->leaf->text);
         if (entry != NULL)
         {
@@ -565,7 +623,7 @@ static void populate_body(tree_ptr n)
     if (strcmp(n->prodname, "common_dcl") == 0)
     {
         populate_vardcl(n);
-        check_undeclared(n);
+        // check_undeclared(n);
     }
 
     // char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
@@ -606,6 +664,8 @@ static void populate_function(tree_ptr n)
         return;
     char *functname;
     type_ptr returntype = NULL;
+    paramlist params = NULL;
+    int nparams = 0;
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_function(n->kids[i]);
@@ -615,10 +675,11 @@ static void populate_function(tree_ptr n)
         functname = get_functname(n->kids[1]);
         get_functrettype(n->kids[1]->kids[4], &returntype);
         n->type->u.f.returntype = returntype;
-        enter_func_scope(functname, returntype);
-        populate_params(n->kids[1]);
+        populate_params(n->kids[1], &params, &nparams);
+        print_params(params, nparams);
+        enter_func_scope(functname, returntype, params, nparams);
         populate_body(n->kids[2]);
-        check_undeclared(n);
+        // check_undeclared(n);
         popscope();
         break;
     default:
@@ -764,7 +825,9 @@ void printsymbols(sym_table_ptr st, int level)
                 printf("\t%s\n", typename(ste->type));
                 break;
             case FUNC_TYPE:
-                printf("\tfunction -> %s\n", typename(ste->type->u.f.returntype));
+                printf("\tfunction\n");
+                printf("\treturntype: %s\n", typename(ste->type->u.f.returntype));
+                print_params(ste->type->u.f.parameters, ste->type->u.f.nparams);
                 printsymbols(ste->type->u.f.st, level + 1);
                 break;
             case STRUCT_TYPE:
