@@ -3,8 +3,8 @@ package main
 var x int
 
 func add(a int, b int) int {
-	var x int = 2
-	return a + b
+	var x string = "2"
+	return a + 2 + b + x + 3
 }
 
 // var x int

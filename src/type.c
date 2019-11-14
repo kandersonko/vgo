@@ -86,6 +86,9 @@ char *typename(type_ptr t)
 {
     if (t == NULL)
         return "(NULL)";
+    else if (t->basetype == 0)
+        return "(NULL)";
+
     else if (t->basetype == STRUCT_TYPE)
     {
         return t->u.s.name;

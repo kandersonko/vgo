@@ -20,12 +20,12 @@ char *sval = "\0";
 int ival;
 int bval = -1;
 double dval;
-int basetype;
+int basetype = NULL_TYPE;
 
 void set_token(int category)
 {
 yylval.t = create_token(category, yyfilename, yylineno, yytext, ival, bval, dval, sval, basetype);
-    basetype = 0;
+    basetype = NULL_TYPE;
     ival = 0;
     bval = -1;
     dval = 0.0;

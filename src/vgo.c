@@ -75,12 +75,12 @@ int main(int argc, char **argv)
             populate(ast_root);
             // TODO: fix lost of prev scopes (symtabs)
             // both populate and typecheck should use the global symtab `current`
-            typecheck(ast_root);
             if (print_symtab)
             {
                 printf("============ file: %s ===========\n", yyfilename);
                 printsymbols(current, 0);
             }
+            typecheck(ast_root);
         }
         else
         {

@@ -263,6 +263,12 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
             *t = entry->type;
             break;
         }
+        entry = lookup(current, n->leaf->text);
+        if (entry != NULL)
+        {
+            *t = entry->type;
+            break;
+        }
         entry = lookup_in_type(current->scope, n->leaf->text);
         if (entry != NULL)
         {
@@ -272,6 +278,14 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
         {
             *t = alctype(UNKNOW_TYPE);
         }
+
+        printf("GET TYPE: %s for %s\n", typename(*t), n->leaf->text);
+
+        break;
+
+    case LLITERAL:
+        *t = alctype(n->leaf->basetype);
+
         break;
 
     default:
@@ -279,7 +293,7 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
     }
 }
 
-static type_ptr kid_type(tree_ptr kid)
+type_ptr kid_type(tree_ptr kid)
 {
     type_ptr type;
     get_kid_type(kid, &type);
@@ -459,6 +473,8 @@ void populate_params(tree_ptr n)
 
         break;
     case LLITERAL:
+        n->basetype = get_basetype(n->leaf->text);
+        n->type = alctype(n->basetype);
         break;
     case LNAME:
         entry = lookup_st(current->parent, n->leaf->text);
