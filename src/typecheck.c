@@ -56,17 +56,17 @@ static void type_error(tree_ptr n, type_ptr t)
         break;
 
     case LLITERAL:
-        // if (n->leaf->basetype != t->basetype)
-        // {
-        //     type_error_msg(n, t);
-        // }
+        if (n->leaf->basetype != t->basetype)
+        {
+            type_error_msg(n, t);
+        }
         break;
 
     case LNAME:
-        // if (n->type->basetype != t->basetype)
-        // {
-        //     type_error_msg(n, t);
-        // }
+        if (n->type->basetype != t->basetype)
+        {
+            type_error_msg(n, t);
+        }
         break;
 
     default:
@@ -154,7 +154,7 @@ static void check_declaration(tree_ptr n)
         check_declaration(n->kids[i]);
     }
 
-    printf("DEFAULT: %s\n", n->prodname);
+    // printf("DEFAULT: %s\n", n->prodname);
 
     char *typedclname;
 
@@ -301,6 +301,6 @@ void typecheck(tree_ptr n)
 {
     printf("TYPE CHECk: %s\n", n->prodname);
     // check_function_call(n);
-    // check_common_dcl(n);
+    check_common_dcl(n);
     // check_expression(n);
 }
