@@ -11,14 +11,17 @@ func add(x int, y int) int {
 	var z string = "2"
 	var a int = 2 + 4
 	// var z int
-	// var ar [3]int
-	// var m map[int]string
-	// var p pet
-	// p.happy = 2
-	// p.hunger = 2
-	// // print(k)
+	var ar [3]int
+	var m map[int]string
+	var p pet
+	p.happy = 2
+	p.hunger = 2
 
-	return 2 - x*y/2 + x
+	// m["2"] = "3"
+	// print(ar["3"])
+	// print(k)
+
+	// return 2 - x*y/2 + x
 }
 
 // func main() {
