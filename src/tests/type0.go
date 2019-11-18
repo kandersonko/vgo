@@ -7,17 +7,18 @@ type pet struct {
 	happy  int
 }
 
-func add(x int, y int) int {
+func add(x int, y int) float64 {
+	return 2.5
 	// var z string = "2"
 	// var a int = 2 + 4
 	// var z int
 	// var ar [3]int
-	var m map[int]string
+	// var m map[int]string
 	// var p pet
 	// p.happy = 2
 	// p.hunger = 2
 
-	m["2"] = "3"
+	// m["2"] = "3"
 	// m[3] = 3
 	// ar[3] = 3
 	// print(ar["3"])
@@ -26,26 +27,26 @@ func add(x int, y int) int {
 	// return 2 - x*y/2 + x
 }
 
-// func main() {
-// 	var z int
-// 	print(z)
-// 	// // const x int = 2
-// 	// // var y int = 0 + x
-// 	var a [3]int = [3]int{"1", 2, 3}
-// 	a["hello"] = 4
-// 	// var k int
-// 	// var enabled bool = true
+func main() {
+	var x int = add(2, 3)
+	// 	var z int
+	// 	print(z)
+	// 	// // const x int = 2
+	// 	// // var y int = 0 + x
+	// 	var a [3]int = [3]int{"1", 2, 3}
+	// 	a["hello"] = 4
+	// var k int
+	// var enabled bool = true
 
-// 	// // enabled = false
+	// // enabled = false
 
-// 	// k = 2
-// 	// // println(x)
-// 	// if enabled {
-// 	// 	// k = 2 + 3.9
-// 	// 	println(k)
-// 	// }
-// 	// // x = 0
-// 	// // for x < 20 {
-// 	// // 	x += k
-// 	// // }
-// }
+	// k = 2
+	// // println(x)
+	// if enabled {
+	// 	// k = 2 + 3.9
+	// 	println(k)
+	// }
+	// // x = 0
+	// // for x < 20 {
+	// // 	x += k
+}

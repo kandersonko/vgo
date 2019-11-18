@@ -158,8 +158,6 @@ static void check_declaration(tree_ptr n)
 
     char *typedclname;
 
-    type_ptr type;
-
     switch (n->prodrule)
     {
     case R_VARDCL + 1:
@@ -173,7 +171,6 @@ static void check_declaration(tree_ptr n)
 
     case R_VARDCL + 2:
     case R_CONSTDCL + 2:
-        type = kid_type(n->kids[0]);
         // n->type = type;
         // n->type = n->kids[0]->type;
         type_error(n->kids[2], n->type);
@@ -255,6 +252,84 @@ static void check_expr(tree_ptr n, tree_ptr other)
     }
 }
 
+static type_ptr get_return_type(sym_table_ptr st)
+{
+    type_ptr type = NULL;
+    sym_table_ptr temp;
+    for (temp = st; temp != NULL; temp = temp->parent)
+    {
+        stack_ptr children = temp->children;
+        while (!is_stack_empty(children))
+        {
+            type = peek_stack(children);
+            if (type->basetype == FUNC_TYPE)
+            {
+                printf("RETURN TYPE: %s\n", typename(type->u.f.returntype));
+                return type->u.f.returntype;
+            }
+            pop_stack(children);
+        }
+    }
+    return type;
+}
+
+static void check_return_type(tree_ptr n, type_ptr return_type)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        check_return_type(n->kids[i], return_type);
+    }
+
+    // printf("DEFAULT: %s %s\n", n->prodname, typename(return_type));
+
+    switch (n->prodrule)
+    {
+    case R_SIMPLE_STMT + 1:
+    case R_SIMPLE_STMT + 2:
+    case R_SIMPLE_STMT + 3:
+        // type = kid_type(n->kids[0]);
+        // printf("CHECK TYPES: %d %s\n", n->prodrule, typename(type));
+        check_incompatible_types_error_msg(n->kids[2], return_type);
+        // check_expr(n->kids[0], n->kids[2]);
+        break;
+
+    case R_EXPR + 1:
+    case R_EXPR + 2:
+    case R_EXPR + 3:
+    case R_EXPR + 4:
+    case R_EXPR + 5:
+    case R_EXPR + 6:
+    case R_EXPR + 7:
+    case R_EXPR + 8:
+    case R_EXPR + 9:
+    case R_EXPR + 10:
+    case R_EXPR + 11:
+    case R_EXPR + 12:
+    case R_EXPR + 13:
+    case R_EXPR + 14:
+    case R_EXPR + 15:
+    case R_EXPR + 16:
+    case R_EXPR + 17:
+    case R_EXPR + 18:
+    case R_EXPR + 19:
+        // check_expr(n->kids[0], n->kids[2]);
+        check_incompatible_types_error_msg(n->kids[2], return_type);
+
+        break;
+
+    case LLITERAL:
+        check_incompatible_types_error_msg(n, return_type);
+
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void check_expression(tree_ptr n)
 {
     if (n == NULL)
@@ -265,7 +340,7 @@ static void check_expression(tree_ptr n)
         check_expression(n->kids[i]);
     }
 
-    printf("DEFAULT: %s\n", n->prodname);
+    // printf("DEFAULT: %s\n", n->prodname);
 
     switch (n->prodrule)
     {
@@ -298,6 +373,11 @@ static void check_expression(tree_ptr n)
     case R_EXPR + 18:
     case R_EXPR + 19:
         check_expr(n->kids[0], n->kids[2]);
+
+        break;
+
+    case R_NON_DCL_STMT + 3:
+        check_return_type(n->kids[1], get_return_type(current));
 
         break;
 
