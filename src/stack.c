@@ -45,6 +45,8 @@ void resize_stack(stack_ptr stack)
 
 int is_stack_empty(stack_ptr stack)
 {
+    if (stack == NULL)
+        return 1;
     if (stack->top < 0)
         return 1;
     else

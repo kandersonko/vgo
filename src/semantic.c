@@ -548,6 +548,7 @@ static void insert_parameters(tree_ptr n, paramlist *params, int *nparams)
     for (i = 0; i < n->nkids; i++)
     {
         n->kids[i]->type = n->type;
+        n->kids[i]->type->basetype = n->type->basetype;
         insert_parameters(n->kids[i], params, nparams);
     }
 

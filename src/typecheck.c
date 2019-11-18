@@ -8,6 +8,7 @@
 #include "semantic.h"
 #include "rules.h"
 #include "go.tab.h"
+#include "utils.h"
 
 static void type_error_msg(tree_ptr n, type_ptr t)
 {
@@ -453,6 +454,106 @@ static void get_name(tree_ptr n, char **name)
     }
 }
 
+static void print_params(paramlist params)
+{
+    paramlist temp = params;
+    while (temp != NULL)
+    {
+        printf("PARAM: %s of type %s\n", temp->name, typename(temp->type));
+        temp = temp->next;
+    }
+}
+
+static void add_param(paramlist *params, type_ptr type, char *name)
+{
+    paramlist temp = safe_malloc(sizeof(*temp));
+    temp->name = strdup(name);
+    temp->type = type;
+    temp->next = *params;
+    *params = temp;
+}
+
+static void collect_params(tree_ptr n, paramlist *params)
+{
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        collect_params(n->kids[i], params);
+    }
+
+    type_ptr type = NULL;
+
+    switch (n->prodrule)
+    {
+    case LNAME:
+    case LLITERAL:
+        type = kid_type(n);
+        printf("FOUND TYPE: %s\n", typename(type));
+        add_param(params, type, n->leaf->text);
+        break;
+
+    default:
+        break;
+    }
+}
+
+static void func_error_msg(token_ptr leaf, type_ptr expected_type, type_ptr found_type)
+{
+    if (expected_type == NULL || found_type == NULL)
+        return;
+    fprintf(stderr, "ERROR: wrong argument of type `%s` for function `%s` at line %d, in file %s\n", typename(found_type), leaf->text, leaf->lineno, leaf->filename);
+    fprintf(stderr, "Expected type `%s`\n", typename(expected_type));
+    exit(3);
+}
+
+static void check_func_call_arg_type(token_ptr leaf, paramlist func_param, paramlist params)
+{
+    printf("CHECKING PARAM: %s:%s %s:%s\n", func_param->name, typename(func_param->type), params->name, typename(params->type));
+
+    if (func_param->type->basetype != params->type->basetype)
+    {
+        func_error_msg(leaf, func_param->type, params->type);
+    }
+}
+
+static void check_func_call(token_ptr leaf, type_ptr func_type, paramlist params)
+{
+    paramlist func_param = func_type->u.f.parameters;
+    int i;
+    for (i = 0; i < func_type->u.f.nparams && (func_param != NULL && params != NULL); i++)
+    {
+        // printf("CHECKING PARAM: %s:%s %s:%s\n", func_param->name, typename(func_param->type), params->name, typename(params->type));
+        check_func_call_arg_type(leaf, func_param, params);
+        params = params->next;
+        func_param = func_param->next;
+    }
+    if (func_param != NULL && params != NULL)
+        if (func_param->next != NULL || params->next != NULL)
+        {
+            check_func_call_arg_type(leaf, func_param, params);
+        }
+}
+
+static void get_leaf(tree_ptr n, token_ptr *t)
+{
+    if (n == NULL)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        get_leaf(n->kids[i], t);
+    }
+
+    switch (n->prodrule)
+    {
+    case LNAME:
+        *t = n->leaf;
+        break;
+    default:
+        break;
+    }
+}
+
 static void check_function_call(tree_ptr n)
 {
     int i;
@@ -463,16 +564,20 @@ static void check_function_call(tree_ptr n)
 
     char *func_name;
     type_ptr func_type;
+    paramlist params = NULL;
+    token_ptr leaf;
 
     switch (n->prodrule)
     {
-    case R_EXPR_OR_TYPE_LIST + 1:
-        break;
 
     case R_PSEUDOCALL + 1:
         get_name(n, &func_name);
         get_func_type(func_name, &func_type);
-        // check_func_call();
+        collect_params(n->kids[2], &params);
+        print_params(params);
+        get_leaf(n, &leaf);
+        check_func_call(leaf, func_type, params);
+        // check_in_params(n->kids[2], func_type);
         printf("FUNCTION: %s of type: %s\n", func_name, typename(func_type));
         break;
 
@@ -484,7 +589,7 @@ static void check_function_call(tree_ptr n)
         break;
 
     default:
-        printf("DEFAULT: %s\n", n->prodname);
+        // printf("DEFAULT: %s\n", n->prodname);
         break;
     }
 }
