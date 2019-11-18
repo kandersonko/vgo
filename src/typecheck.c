@@ -237,10 +237,16 @@ static void check_expr(tree_ptr n, tree_ptr other)
 
     switch (n->prodrule)
     {
-    case R_PEXPR_NO_PAREN + 2:
+    case R_PEXPR_NO_PAREN + 2: // pexpr . sym
         // get type of expr{0} and check other type
         type = kid_type(n->kids[2]);
         printf("BASE TYPES: %d %s\n", n->prodrule, typename(type));
+        check_incompatible_types_error_msg(other, type);
+        break;
+    case R_PEXPR_NO_PAREN + 5: // pexpr [ expr ]
+        // get type of expr{0} and check other type
+        type = kid_type(n->kids[2]);
+        printf("OTHER TYPES: %s\n", typename(type));
         check_incompatible_types_error_msg(other, type);
         break;
 
@@ -259,7 +265,7 @@ static void check_expression(tree_ptr n)
         check_expression(n->kids[i]);
     }
 
-    // printf("DEFAULT: %s\n", n->prodname);
+    printf("DEFAULT: %s\n", n->prodname);
 
     switch (n->prodrule)
     {

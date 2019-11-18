@@ -8,16 +8,18 @@ type pet struct {
 }
 
 func add(x int, y int) int {
-	var z string = "2"
-	var a int = 2 + 4
+	// var z string = "2"
+	// var a int = 2 + 4
 	// var z int
-	var ar [3]int
+	// var ar [3]int
 	var m map[int]string
-	var p pet
-	p.happy = 2
-	p.hunger = 2
+	// var p pet
+	// p.happy = 2
+	// p.hunger = 2
 
-	// m["2"] = "3"
+	m["2"] = "3"
+	// m[3] = 3
+	// ar[3] = 3
 	// print(ar["3"])
 	// print(k)
 
