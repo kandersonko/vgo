@@ -105,8 +105,8 @@ static void type_error(tree_ptr n, type_ptr t, int has_func_call)
         break;
 
     case LLITERAL:
-        // if (has_func_call)
-        //     break;
+        if (has_func_call)
+            break;
         if (n->leaf->basetype != t->basetype)
         {
             type_error_msg(n, t);

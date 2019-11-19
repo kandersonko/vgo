@@ -29,7 +29,7 @@ func add(x int, y int) float64 {
 
 func main() {
 	// add(2, 3)
-	var x float64 = 2.5 + add(5, 6)
+	var x float64 = add(5, 6)
 	// var y int = 2
 	// var x int = add(2, 3)
 	// 	print(z)
