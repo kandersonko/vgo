@@ -10,8 +10,50 @@
 #include "go.tab.h"
 #include "utils.h"
 
+static void get_func_type(char *func_name, type_ptr *func_type)
+{
+    type_ptr type = NULL;
+    sym_table_ptr temp;
+    for (temp = current; temp != NULL; temp = temp->parent)
+    {
+        stack_ptr children = temp->children;
+        while (!is_stack_empty(children))
+        {
+            type = peek_stack(children);
+            if (!type)
+                return;
+            if (type->basetype == FUNC_TYPE)
+            {
+                if (strcmp(type->u.f.name, func_name) == 0)
+                {
+                    printf("FUNCTION TYPE: %s\n", typename(type->u.f.returntype));
+                    *func_type = type;
+                    return;
+                }
+            }
+            pop_stack(children);
+        }
+    }
+}
+
 static void type_error_msg(tree_ptr n, type_ptr t)
 {
+    if (n->type->basetype == FUNC_TYPE || n->basetype == FUNC_TYPE)
+    {
+        type_ptr func_type = NULL;
+        get_func_type(n->leaf->text, &func_type);
+        printf("FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %s\n", typename(n->type), typename(func_type->u.f.returntype), typename(t));
+        if (func_type->u.f.returntype->basetype != t->basetype)
+        {
+            fprintf(stderr, "ERROR: unexpected `%s` of incompatible return type `%s` at line %d, in file %s\n", n->leaf->text, typename(func_type->u.f.returntype), n->leaf->lineno, n->leaf->filename);
+            fprintf(stderr, "Expected type `%s`\n", typename(t));
+            exit(3);
+        }
+        else
+        {
+            return;
+        }
+    }
     fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
     fprintf(stderr, "Expected type `%s`\n", typename(t));
     exit(3);
@@ -229,32 +271,6 @@ static void check_expr(tree_ptr n, tree_ptr other)
 
     default:
         break;
-    }
-}
-
-static void get_func_type(char *func_name, type_ptr *func_type)
-{
-    type_ptr type = NULL;
-    sym_table_ptr temp;
-    for (temp = current; temp != NULL; temp = temp->parent)
-    {
-        stack_ptr children = temp->children;
-        while (!is_stack_empty(children))
-        {
-            type = peek_stack(children);
-            if (!type)
-                return;
-            if (type->basetype == FUNC_TYPE)
-            {
-                if (strcmp(type->u.f.name, func_name) == 0)
-                {
-                    printf("FUNCTION TYPE: %s\n", typename(type->u.f.returntype));
-                    *func_type = type;
-                    return;
-                }
-            }
-            pop_stack(children);
-        }
     }
 }
 

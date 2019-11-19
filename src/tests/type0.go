@@ -7,7 +7,7 @@ package main
 // 	happy  int
 // }
 
-func add(x int, y int) int {
+func add(x float64, y float64) int {
 	// var z string = "2"
 	// var a int = 2 + 4
 	// var z int
@@ -27,7 +27,8 @@ func add(x int, y int) int {
 }
 
 func main() {
-	add(2, 3)
+	// add(2, 3)
+	var x int = add(5.3, 6.4)
 	// var x int = add(2, 3)
 	// 	var z int
 	// 	print(z)
