@@ -42,7 +42,7 @@ static void type_error_msg(tree_ptr n, type_ptr t)
     {
         type_ptr func_type = NULL;
         get_func_type(n->leaf->text, &func_type);
-        printf("FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %s\n", typename(n->type), typename(func_type->u.f.returntype), typename(t));
+        printf("FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %s | %d %d\n", typename(n->type), typename(func_type->u.f.returntype), typename(t), func_type->u.f.returntype->basetype, t->basetype);
         if (func_type->u.f.returntype->basetype != t->basetype)
         {
             fprintf(stderr, "ERROR: unexpected `%s` of incompatible return type `%s` at line %d, in file %s\n", n->leaf->text, typename(func_type->u.f.returntype), n->leaf->lineno, n->leaf->filename);
@@ -54,12 +54,35 @@ static void type_error_msg(tree_ptr n, type_ptr t)
             return;
         }
     }
-    fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
-    fprintf(stderr, "Expected type `%s`\n", typename(t));
-    exit(3);
+    else
+    {
+        printf("NOT FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %d %d\n", typename(n->type), typename(t), n->type->basetype, t->basetype);
+
+        fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
+        fprintf(stderr, "Expected type `%s`\n", typename(t));
+        exit(3);
+    }
 }
 
-static void type_error(tree_ptr n, type_ptr t)
+static void get_has_func_call(tree_ptr n, int *has_func_call)
+{
+
+    if (n == NULL)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        if (n->prodrule == (R_PSEUDOCALL + 1))
+        {
+            *has_func_call = 1;
+            return;
+        }
+        *has_func_call = 0;
+        get_has_func_call(n->kids[i], has_func_call);
+    }
+}
+
+static void type_error(tree_ptr n, type_ptr t, int has_func_call)
 {
     if (n == NULL)
         return;
@@ -67,15 +90,23 @@ static void type_error(tree_ptr n, type_ptr t)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        type_error(n->kids[i], t);
+        // if (n->prodrule == (R_PSEUDOCALL + 1))
+        //     continue;
+        type_error(n->kids[i], t, has_func_call);
     }
     switch (n->prodrule)
     {
+
+    case R_PSEUDOCALL + 1:
+        return;
+
     case R_OTHERTYPE:
-        type_error(n->kids[1], n->kids[3]->type);
+        type_error(n->kids[1], n->kids[3]->type, has_func_call);
         break;
 
     case LLITERAL:
+        // if (has_func_call)
+        //     break;
         if (n->leaf->basetype != t->basetype)
         {
             type_error_msg(n, t);
@@ -156,6 +187,8 @@ static void check_ntype(tree_ptr n)
 
     switch (n->prodrule)
     {
+    // case R_PSEUDOCALL:
+    //     return; // early exit to prevent over exploration
     case R_OTHERTYPE:
         type = kid_type(n->kids[3]);
         printf("OTHERTYPE FOUND %s\n", typename(type));
@@ -173,6 +206,8 @@ static void check_declaration(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
+        if (n->prodrule == (R_PSEUDOCALL + 1))
+            return;
         check_declaration(n->kids[i]);
     }
 
@@ -180,22 +215,28 @@ static void check_declaration(tree_ptr n)
 
     char *typedclname;
 
+    int has_func_call = 0;
+
     switch (n->prodrule)
     {
+    case R_PSEUDOCALL + 1:
+        return; // early exit to prevent over exploration
     case R_VARDCL + 1:
     case R_CONSTDCL:
         check_ntype(n->kids[1]);
         // type = kid_type(n->kids[1]);
         // n->type = type;
         // n->type = n->kids[1]->type;
-        type_error(n->kids[3], n->type);
+        get_has_func_call(n, &has_func_call);
+        type_error(n->kids[3], n->type, has_func_call);
         break;
 
     case R_VARDCL + 2:
     case R_CONSTDCL + 2:
         // n->type = type;
         // n->type = n->kids[0]->type;
-        type_error(n->kids[2], n->type);
+        get_has_func_call(n, &has_func_call);
+        type_error(n->kids[2], n->type, has_func_call);
         break;
 
     case R_START_COMPLIT:
@@ -203,15 +244,6 @@ static void check_declaration(tree_ptr n)
 
     case R_TYPEDCL:
         typedclname = n->kids[0]->kids[0]->leaf->text;
-        printf("FOUND OTHERTYPE: %s\n", typedclname);
-        break;
-        // case R_PEXPR_NO_PAREN + 5:
-        //     printf("FOUND ITEM: %s\n", n->prodname);
-        //     break;
-
-    case LNAME:
-        printf("LNAME: %s %s\n", n->leaf->text, typename(n->type));
-        // insert_sym(current, n->leaf->text, n->type);
         break;
 
     case LLITERAL:
@@ -249,13 +281,15 @@ static void check_expr(tree_ptr n, tree_ptr other)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
+        if (n->prodrule == (R_PSEUDOCALL + 1))
+            return;
         check_expr(n->kids[i], other);
     }
 
     type_ptr type = NULL;
 
     switch (n->prodrule)
-    {
+    {                          // early exit to prevent over exploration
     case R_PEXPR_NO_PAREN + 2: // pexpr . sym
         // get type of expr{0} and check other type
         type = kid_type(n->kids[2]);
@@ -288,6 +322,8 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
 
     switch (n->prodrule)
     {
+    case R_PSEUDOCALL + 1:
+        return; // early exit to prevent over exploration
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
@@ -393,6 +429,8 @@ static void check_expression(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
+        if (n->prodrule == (R_PSEUDOCALL + 1))
+            return;
         check_expression(n->kids[i]);
     }
 
@@ -400,6 +438,9 @@ static void check_expression(tree_ptr n)
 
     switch (n->prodrule)
     {
+        // case R_PSEUDOCALL + 1:
+        //     return; // early exit to prevent over exploration
+
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
@@ -593,7 +634,7 @@ static void check_function_call(tree_ptr n)
         print_params(params);
         get_leaf(n, &leaf);
         check_func_call(leaf, func_type, params);
-        // check_in_params(n->kids[2], func_type);
+        check_in_params(n->kids[2], func_type);
         printf("FUNCTION: %s of type: %s\n", func_name, typename(func_type));
         break;
 
@@ -613,7 +654,7 @@ static void check_function_call(tree_ptr n)
 void typecheck(tree_ptr n)
 {
     printf("TYPE CHECk: %s\n", n->prodname);
-    check_function_call(n);
+    // check_function_call(n);
     check_common_dcl(n);
-    check_expression(n);
+    // check_expression(n);
 }
