@@ -38,11 +38,13 @@ static void get_func_type(char *func_name, type_ptr *func_type)
 
 static void type_error_msg(tree_ptr n, type_ptr t)
 {
-    if (n->type->basetype == FUNC_TYPE || n->basetype == FUNC_TYPE)
+    if (n->type->basetype == FUNC_TYPE)
     {
         type_ptr func_type = NULL;
         get_func_type(n->leaf->text, &func_type);
-        printf("FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %s | %d %d\n", typename(n->type), typename(func_type->u.f.returntype), typename(t), func_type->u.f.returntype->basetype, t->basetype);
+        if (func_type == NULL)
+            return;
+        // printf("FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %s | %d %d\n", typename(n->type), typename(func_type->u.f.returntype), typename(t), func_type->u.f.returntype->basetype, t->basetype);
         if (func_type->u.f.returntype->basetype != t->basetype)
         {
             fprintf(stderr, "ERROR: unexpected `%s` of incompatible return type `%s` at line %d, in file %s\n", n->leaf->text, typename(func_type->u.f.returntype), n->leaf->lineno, n->leaf->filename);
@@ -54,14 +56,25 @@ static void type_error_msg(tree_ptr n, type_ptr t)
             return;
         }
     }
-    else
+    else if (n->type->basetype == STRUCT_TYPE)
     {
-        printf("NOT FOUND FUNCTION TYPE WHEN CHECKING: %s and %s | %d %d\n", typename(n->type), typename(t), n->type->basetype, t->basetype);
+        printf("STRUCT TYPE WHEN CHECKING: %s and %s | %s %s\n", typename(n->type), typename(t), n->leaf->text, n->type->u.s.name);
 
-        fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
-        fprintf(stderr, "Expected type `%s`\n", typename(t));
-        exit(3);
+        if (strcmp(n->leaf->text, n->type->u.s.name) == 0)
+            return;
     }
+    else if (n->type->basetype == UNKNOW_TYPE)
+    {
+        type_ptr type = kid_type(n);
+        n->type = type;
+        printf("UNKNOWN WHEN CHECKING: %s and %s | %s | %d %d\n", typename(n->type), typename(type), n->leaf->text, n->type->basetype, type->basetype);
+        if (n->type->basetype == t->basetype)
+            return;
+        // type_error_msg(n, t);
+    }
+    fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
+    fprintf(stderr, "Expected type `%s`\n", typename(t));
+    exit(3);
 }
 
 static void get_has_func_call(tree_ptr n, int *has_func_call)
@@ -104,6 +117,10 @@ static void type_error(tree_ptr n, type_ptr t, int has_func_call)
         type_error(n->kids[1], n->kids[3]->type, has_func_call);
         break;
 
+    case R_DOTNAME + 1:
+        type_error(n->kids[2], t, has_func_call);
+        break;
+
     case LLITERAL:
         if (has_func_call)
             break;
@@ -114,6 +131,8 @@ static void type_error(tree_ptr n, type_ptr t, int has_func_call)
         break;
 
     case LNAME:
+        if (n->type->basetype == STRUCT_TYPE)
+            break;
         if (n->type->basetype != t->basetype)
         {
             type_error_msg(n, t);
@@ -213,8 +232,6 @@ static void check_declaration(tree_ptr n)
 
     // printf("DEFAULT: %s\n", n->prodname);
 
-    char *typedclname;
-
     int has_func_call = 0;
 
     switch (n->prodrule)
@@ -243,7 +260,6 @@ static void check_declaration(tree_ptr n)
         break;
 
     case R_TYPEDCL:
-        typedclname = n->kids[0]->kids[0]->leaf->text;
         break;
 
     case LLITERAL:

@@ -2,10 +2,10 @@ package main
 
 // var z int = 2.3
 
-// type pet struct {
-// 	hunger int
-// 	happy  int
-// }
+type pet struct {
+	hunger int
+	happy  int
+}
 
 func add(x int, y int) float64 {
 	// var z string = "2"
@@ -28,9 +28,12 @@ func add(x int, y int) float64 {
 }
 
 func main() {
-	// add(2, 3)
+	var p pet
+	p.happy = 20
+	p.hunger = 34
+	add(2, 3)
 	var x float64 = add(5, 6)
-	// var y int = 2
+	var y int = p.happy + p.hunger
 	// var x int = add(2, 3)
 	// 	print(z)
 	// 	// // const x int = 2
