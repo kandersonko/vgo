@@ -3,8 +3,9 @@ package main
 // var z int = 2.3
 
 type pet struct {
-	hunger int
-	happy  int
+	power float64
+	happy int
+	name  string
 }
 
 func add(x int, y int) float64 {
@@ -29,11 +30,18 @@ func add(x int, y int) float64 {
 
 func main() {
 	var p pet
-	p.happy = 20
-	p.hunger = 34
-	add(2, 3)
-	var x float64 = add(5, 6)
-	var y int = p.happy + p.hunger
+	// p.happy = math.Sin(20)
+	var x int = p.happy
+	var y float64 = p.power
+	var z string = p.name
+
+	// add(2, 3)
+	// var x float64 = add(5, 6)
+	// var a int
+	// var b float64
+	// if a < "b" {
+	// 	print(a)
+	// }
 	// var x int = add(2, 3)
 	// 	print(z)
 	// 	// // const x int = 2

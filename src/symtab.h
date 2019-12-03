@@ -15,9 +15,11 @@
 
 typedef struct sym_table
 {
+    char* name;
     int nbuckets;               /* # of buckets */
     int entries;                /* # of symbols in the table */
     struct sym_table *parent;   /* enclosing scope, superclass etc. */
+    struct sym_table *child;   /* inner scope, subclass etc. */
     struct typeinfo *scope;     /* what type do we belong to? */
     struct sym_entry **buckets; /* array of buckets */
     stack_ptr children;         /* children symtab */
@@ -43,7 +45,7 @@ typedef struct sym_entry
 /*
  * Prototypes
  */
-sym_table_ptr new_st(int size);                     /* create symbol table */
+sym_table_ptr new_st(int size, char* name);                     /* create symbol table */
 void delete_st(sym_table_ptr st);                   /* destroy symbol table */
 char *insert_stringpool(char *);                    /* enter string into pool */
 char *install_sym(sym_table_ptr, char *, type_ptr); /* enter string into table */

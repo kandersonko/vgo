@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 var arr [128]string
@@ -24,7 +23,7 @@ type pet struct {
 
 const x int = 2
 
-var y float64 = math.Sin(30)
+// var y float64 = math.Sin(30)
 
 var z, t int
 
@@ -46,12 +45,12 @@ func main() {
 	const age int = 17
 }
 
-func add(a int, p bool, mass int, dog pet, m map[int]string, ar [5]string) string {
-	m[4] = 100
+// func add(a int, p bool, mass int, dog pet, m map[int]string, ar [5]string) string {
+// 	m[4] = 100
 
-	var z int
-	const x int = 4 + a + mass
-}
+// 	var z int
+// 	const x int = 4 + a + mass
+// }
 
 func double(n int) float64 {
 	return n * 0.2

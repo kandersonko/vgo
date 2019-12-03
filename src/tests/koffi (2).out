@@ -1,0 +1,155 @@
+CS445 HW4 test run output for koffi
+------------------------------------------------------------
+	.zip Compiles w/no warnings:         _3/3
+	Exe named vgo Runs on Basic Stuff:   _3/3
+	Valgrind OK:                         _4/4
+	Typecheck Operators:                 _0/5
+	Typecheck Functions+parameters:      _0/5
+	Typecheck structs:                   _1/5
+	Typecheck go stuff:                  _0/5
+	-----------------------------------------
+	Total:                               11/30
+
+	----------------------------------------------------------------------
+
+	(make)
+gcc -c -g -Wall vgo.c
+flex vgolex.l
+gcc -c -g -Wall   -c -o lex.yy.o lex.yy.c
+gcc -c -g -Wall token.c
+gcc -c -g -Wall tree.c
+gcc -c -g -Wall symtab.c
+gcc -c -g -Wall stack.c
+gcc -c -g -Wall semantic.c
+gcc -c -g -Wall type.c
+gcc -c -g -Wall typecheck.c
+gcc -c -g -Wall utils.c
+bison -d go.y
+gcc -c -g -Wall go.tab.c
+gcc -o vgo vgo.o lex.yy.o token.o tree.o symtab.o stack.o semantic.o type.o typecheck.o utils.o go.tab.o  rules.h
+	(make done rv=0)
+
+------------------------------------------------------------------------
+
+Executing from: /home/jeffery/submit/445/hw4/koffi
+	Test#1 Input:
+package main
+var x int
+func main() {
+   x = 5
+   x = x * x
+}
+
+	Test Output:[expect no error]
+	(testrun done rv=0)
+==31779== Memcheck, a memory error detector
+==31779== Copyright (C) 2002-2012, and GNU GPL'd, by Julian Seward et al.
+==31779== Using Valgrind-3.8.1 and LibVEX; rerun with -h for copyright info
+==31779== Command: ./vgo ../basic.go
+==31779== 
+==31779== 
+==31779== HEAP SUMMARY:
+==31779==     in use at exit: 7,197 bytes in 91 blocks
+==31779==   total heap usage: 375 allocs, 284 frees, 31,848 bytes allocated
+==31779== 
+==31779== LEAK SUMMARY:
+==31779==    definitely lost: 2,936 bytes in 58 blocks
+==31779==    indirectly lost: 1,942 bytes in 28 blocks
+==31779==      possibly lost: 0 bytes in 0 blocks
+==31779==    still reachable: 2,319 bytes in 5 blocks
+==31779==         suppressed: 0 bytes in 0 blocks
+==31779== Rerun with --leak-check=full to see details of leaked memory
+==31779== 
+==31779== For counts of detected and suppressed errors, rerun with: -v
+==31779== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 8 from 6)
+exit status: 0 expected 0
+
+------------------------------------------------------------------------
+
+Executing from: /home/jeffery/submit/445/hw4/koffi
+	Test#2 Input:
+package main
+func fib(i int) int {
+   return 11
+}
+
+func main() int {
+   var i int
+   i = 0 + fib
+   return 0
+}
+
+	Test Output:[expect type error to + on line 8]
+	(testrun done rv=0)
+
+------------------------------------------------------------------------
+
+Executing from: /home/jeffery/submit/445/hw4/koffi
+	Test#3 Input:
+package main
+func fib(i int) int {
+   return 11
+}
+
+func main() int {
+   var i int
+   i = 0 + fib(main)
+   return 0
+}
+
+	Test Output:[expect type error to param on line 8]
+	(testrun done rv=0)
+
+------------------------------------------------------------------------
+
+Executing from: /home/jeffery/submit/445/hw4/koffi
+	Test#4 Input:
+package main
+import "fmt"
+type Foo struct {
+  dd float64
+  }
+
+func mkFoo() Foo {
+  var s Foo
+  s.dd = 5.5
+  return s
+}
+
+func fib(f Foo, i int) float64 {
+   var x float64
+   x = f.dd * 2.0
+   return x
+}
+
+func main() {
+   var f Foo
+   var i float64
+   i = 0.0 + fib(f, 3)
+   i = 5.0
+   i = fib(f, "hello")
+   fmt.Println(i)
+}
+
+	Test Output:[expect type error to method param on line 24]
+ERROR: unexpected `5.5` of incompatible type `float64` at line 9, in file ../typeck-struct.go
+Expected type `unknown`
+	(testrun done rv=0)
+
+------------------------------------------------------------------------
+
+Executing from: /home/jeffery/submit/445/hw4/koffi
+	Test#4 Input:
+package main
+import "fmt"
+func main() {
+  var m map[string]float64
+  m = make(map[string]float64)
+  m["hello"] = 5.5
+  fmt.Println(m["hello"])
+}
+
+	Test Output:[expect no error]
+ERROR: use of undeclared variable `make` at line 5, in file ../gostuff.go
+	(testrun done rv=0)
+

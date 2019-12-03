@@ -1,5 +1,8 @@
 package main
 
-// func main() {
-//   "lexical error...
-// }
+var x int
+
+func main() {
+	x = 5
+	x = x * x
+}

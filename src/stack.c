@@ -79,6 +79,8 @@ type_ptr peek_stack(stack_ptr stack)
 {
     if (stack == NULL)
         return NULL;
+    if(stack->elements == NULL)
+        return NULL;
     return stack->elements[stack->top];
 }
 
