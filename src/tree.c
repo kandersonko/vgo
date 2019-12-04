@@ -44,7 +44,8 @@ void delete_tree(tree_ptr ast)
     free(ast->kids);
     free(ast->prodname);
     // free(ast->type);
-    free(ast->symtab);
+    // if (ast->symtab != NULL)
+    // free(ast->symtab);
     free(ast);
     ast = NULL;
 }

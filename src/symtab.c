@@ -60,7 +60,7 @@ void new_sbuf(struct str_buf *);   /* allocate add'l buffer */
  *  Allocate space first for the structure, then
  *  for the array of buckets.
  */
-sym_table_ptr new_st(int nbuckets)
+sym_table_ptr new_st(int nbuckets, char *name)
 {
     sym_table_ptr st;
     st = (sym_table_ptr)safe_malloc(sizeof(struct sym_table));
@@ -69,12 +69,14 @@ sym_table_ptr new_st(int nbuckets)
     st->nbuckets = nbuckets;
     st->entries = 0;
     st->parent = NULL;
+    st->child = NULL;
     st->scope = NULL;
     st->children = init_stack(4);
+    st->name = strdup(name);
     if (buf.frag_lst == NULL)
     {
         init_sbuf(&buf);
-        stringpool = new_st(149);
+        stringpool = new_st(150, name);
     }
     return st;
 }
@@ -232,8 +234,6 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     int h;
     struct sym_entry *entry;
 
-    printf("INSERT INTO SYMTAB: %s of type: %s\n", s, typename(t));
-
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
         if (strcmp(s, entry->text) == 0)
@@ -251,12 +251,12 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     entry = (sym_entry_ptr)safe_malloc((unsigned int)sizeof(struct sym_entry));
     entry->next = st->buckets[h];
     // entry->table = st;
-    st->buckets[h] = entry;
+    entry->type = t;
     if (st == stringpool)
         entry->text = insert_sbuf(&buf, s);
     else
         entry->text = strdup(s);
-    entry->type = t;
+    st->buckets[h] = entry;
     st->entries++;
     return 1;
 }
@@ -276,6 +276,7 @@ sym_entry_ptr lookup_st(sym_table_ptr st, char *s)
             /*
           *  Return a pointer to the symbol table entry.
           */
+
             return entry;
         }
 
@@ -296,11 +297,29 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
+
                     return entry;
                 }
             }
         }
     }
+
+    for (temp = st; temp != NULL; temp = temp->child)
+    {
+        int i;
+        for (i = 0; i < temp->nbuckets; i++)
+        {
+            for (entry = temp->buckets[i]; entry != NULL; entry = entry->next)
+            {
+                if (strcmp(s, entry->text) == 0)
+                {
+
+                    return entry;
+                }
+            }
+        }
+    }
+
     return entry;
 }
 
@@ -342,19 +361,23 @@ sym_entry_ptr lookup_scope(char *s)
     sym_table_ptr temp;
     for (temp = current; temp != NULL; temp = temp->parent)
     {
-        stack_ptr children = temp->children;
+        entry = lookup_st(temp, s);
+        if (entry != NULL)
+            return entry;
+
         entry = lookup_in_type(temp->scope, s);
         if (entry != NULL)
             return entry;
-        while (children && !is_stack_empty(children))
-        {
-            type_ptr type = peek_stack(children);
-            printf("LOOKUP IN TYPE: %s for %s\n", typename(type), s);
-            entry = lookup_in_type(type, s);
-            if (entry != NULL)
-                return entry;
-            pop_stack(children);
-        }
+    }
+    for (temp = current; temp != NULL; temp = temp->child)
+    {
+        entry = lookup_st(temp, s);
+        if (entry != NULL)
+            return entry;
+
+        entry = lookup_in_type(temp->scope, s);
+        if (entry != NULL)
+            return entry;
     }
     return entry;
 }

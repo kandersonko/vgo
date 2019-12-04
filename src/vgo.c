@@ -71,7 +71,7 @@ int main(int argc, char **argv)
         int failed = yyparse();
         if (!failed)
         {
-            current = new_st(149);
+            current = new_st(150, "global");
             populate(ast_root);
             // TODO: fix lost of prev scopes (symtabs)
             // both populate and typecheck should use the global symtab `current`
