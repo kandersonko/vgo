@@ -662,16 +662,17 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         n->type = alctype(n->basetype);
         break;
     case LNAME:
-        entry = lookup_st(current->parent, n->leaf->text);
-        if (entry != NULL)
-        {
-            n->type = entry->type;
-        }
-        else
-        {
-            n->basetype = get_basetype(n->leaf->text);
-            n->type = alctype(n->basetype);
-        }
+        // entry = lookup_st(current->parent, n->leaf->text);
+        // if (entry != NULL)
+        // {
+        //     n->type = entry->type;
+        // }
+        // else
+        // {
+        //     n->basetype = get_basetype(n->leaf->text);
+        //     n->type = alctype(n->basetype);
+        // }
+        n->type = kid_type(n);
         break;
     default:
         break;
@@ -744,7 +745,7 @@ static void populate_function(tree_ptr n)
     case R_XFNDCL:
         functname = get_functname(n->kids[1]);
         get_functrettype(n->kids[1]->kids[4], &returntype);
-        n->type->u.f.returntype = returntype;
+        n->type->u.f.returntype = kid_type(n->kids[1]->kids[4]);
         populate_params(n->kids[1], &params, &nparams);
         enter_func_scope(functname, returntype, params, nparams);
         populate_body(n->kids[2]);

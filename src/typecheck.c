@@ -566,15 +566,34 @@ static void print_params(paramlist params)
 
 static void add_param(paramlist *params, type_ptr type, char *name)
 {
+    // paramlist temp = safe_malloc(sizeof(*temp));
+    // temp->name = strdup(name);
+    // temp->type = type;
+    // temp->next = *params;
+    // *params = temp;
+
     paramlist temp = safe_malloc(sizeof(*temp));
+    paramlist last = *params;
+    
     temp->name = strdup(name);
     temp->type = type;
-    temp->next = *params;
-    *params = temp;
+    temp->next = NULL;
+
+    if (*params == NULL)
+    {
+        *params = temp;
+        return;
+    }
+    while(last->next != NULL)
+        last = last->next;
+    
+    last->next = temp;
 }
 
 static void collect_params(tree_ptr n, paramlist *params)
 {
+    if (!n)
+        return;
     int i;
     for (i = 0; i < n->nkids; i++)
     {
@@ -644,7 +663,7 @@ static void check_func_call_error(token_ptr leaf, paramlist params, type_ptr fun
             fprintf(stderr, "Expected type `%s`\n", typename(func_params->type));
             exit(3);
         }
-        printf("NULL CHECK: %p %p\n", temp, func_params);
+        printf("NULL CHECK: %s %s\n", temp->name, func_params->name);
         func_call_error_msg(leaf, temp, func_params);
 
         func_params = func_params->next;

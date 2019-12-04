@@ -12,9 +12,9 @@ func mkFoo() Foo {
 	return s
 }
 
-func fib(f Foo, i int) float64 {
+func fib(fun Foo, i int) float64 {
 	var x float64
-	x = f.dd * 2.0
+	x = fun.dd * 2.0
 	return x
 }
 
