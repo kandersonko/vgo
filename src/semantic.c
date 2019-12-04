@@ -110,7 +110,6 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
 
     current = add_child_scope(current, new);
 
-
     insert_sym(current, s, t);
     pushscope(new);
 }
@@ -154,17 +153,21 @@ static void undeclared_error(tree_ptr n)
         //         return;
         // }
 
-        // entry = lookup_scope(n->leaf->text);
-        // if (entry != NULL)
-        //     return;
+        entry = lookup_st(current, n->leaf->text);
+        if (entry != NULL)
+            return;
 
-        sym_table_ptr temp;
-        for (temp = current; temp != NULL; temp = temp->parent)
-        {
-            entry = lookup_st(temp, n->leaf->text);
-            if (entry != NULL)
-                return;
-        }
+        entry = lookup_scope(n->leaf->text);
+        if (entry != NULL)
+            return;
+
+        // sym_table_ptr temp;
+        // for (temp = current; temp != NULL; temp = temp->parent)
+        // {
+        //     entry = lookup_st(temp, n->leaf->text);
+        //     if (entry != NULL)
+        //         return;
+        // }
 
         if (entry == NULL)
         {
@@ -176,7 +179,6 @@ static void undeclared_error(tree_ptr n)
 
 static void check_package_main(tree_ptr n)
 {
-    
 
     switch (n->prodrule)
     {
@@ -219,8 +221,6 @@ static void populate_struct(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_struct(n->kids[i]);
-
-    
 
     switch (n->prodrule)
     {
@@ -367,8 +367,6 @@ static void get_varname(tree_ptr n, char **name)
     {
         get_varname(n->kids[i], name);
     }
-
-    
 
     switch (n->prodrule)
     {
@@ -545,8 +543,6 @@ static void check_arg_undeclared(tree_ptr n)
         check_arg_undeclared(n->kids[i]);
     }
 
-    
-
     switch (n->prodrule)
     {
     case LNAME:
@@ -598,8 +594,6 @@ static void insert_parameters(tree_ptr n, paramlist *params, int *nparams)
         insert_parameters(n->kids[i], params, nparams);
     }
 
-    
-
     switch (n->prodrule)
     {
     case LNAME:
@@ -622,8 +616,6 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
     }
 
     sym_entry_ptr entry = NULL;
-
-    
 
     switch (n->prodrule)
     {
@@ -722,8 +714,6 @@ static void get_functrettype(tree_ptr n, type_ptr *type)
     for (i = 0; i < n->nkids; i++)
         get_functrettype(n->kids[i], type);
 
-    
-
     switch (n->prodrule)
     {
     case LNAME:
@@ -749,8 +739,6 @@ static void populate_function(tree_ptr n)
     for (i = 0; i < n->nkids; i++)
         populate_function(n->kids[i]);
 
-    
-
     switch (n->prodrule)
     {
     case R_XFNDCL:
@@ -761,7 +749,7 @@ static void populate_function(tree_ptr n)
         enter_func_scope(functname, returntype, params, nparams);
         populate_body(n->kids[2]);
         check_undeclared(n->kids[2]);
-        
+
         popscope();
         break;
     default:
@@ -774,8 +762,6 @@ static void populate_xdcl(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_xdcl(n->kids[i]);
-
-    
 
     switch (n->prodrule)
     {
@@ -798,7 +784,6 @@ static void populate_package(tree_ptr n)
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_package(n->kids[i]);
-
 
     switch (n->prodrule)
     {
@@ -880,7 +865,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     {
         n->kids[i]->type = n->type;
         insert_w_typeinfo(n->kids[i], st);
-    }    
+    }
 
     switch (n->prodrule)
     {

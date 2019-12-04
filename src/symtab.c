@@ -370,10 +370,18 @@ sym_entry_ptr lookup_scope(char *s)
         entry = lookup_st(temp, s);
         if(entry != NULL)
             return entry;
+
+        entry = lookup_in_type(temp->scope, s);
+        if (entry != NULL)
+            return entry;
     }
     for (temp = current; temp != NULL; temp = temp->child)
     {
-        lookup_st(temp, s);
+        entry = lookup_st(temp, s);
+        if (entry != NULL)
+            return entry;
+
+        entry = lookup_in_type(temp->scope, s);
         if (entry != NULL)
             return entry;
     }

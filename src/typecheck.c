@@ -285,66 +285,83 @@ static void check_common_dcl(tree_ptr n)
     }
 }
 
-static void print_scope(sym_table_ptr st)
-{
-    stack_ptr children = st->children;
-    while (!is_stack_empty(children))
-    {
-        type_ptr type = peek_stack(children);
-        pop_stack(children);
-    }
-}
-
 static void check_expr(tree_ptr n, tree_ptr other, int has_func_call)
 {
     if (!n)
         return;
-    int i;
-    for (i = 0; i < n->nkids; i++)
-    {
-        // if (n->prodrule == (R_PSEUDOCALL + 1))
-        // return;
-        check_expr(n->kids[i], other, has_func_call);
-    }
 
     type_ptr type = NULL;
-
-    static int correct_func_call = 0;
 
     switch (n->prodrule)
     {
     case R_PEXPR_NO_PAREN + 2: // pexpr . sym
         // get type of expr{0} and check other type
         type = kid_type(n->kids[2]);
-        printf("TYPE: %s\n", typename(type));
+        printf("FOUND TYPE: %s for %s\n", typename(type), n->kids[2]->kids[0]->leaf->text);
         check_incompatible_types_error_msg(other, type, has_func_call);
         break;
     case R_PEXPR_NO_PAREN + 5: // pexpr [ expr ]
         // get type of expr{0} and check other type
         type = kid_type(n->kids[2]);
         printf("TYPE: %s\n", typename(type));
-        break;
-    case LNAME:
-    case LLITERAL:
-        n->type = kid_type(n);
-        other->type = kid_type(other);
-        printf("CURRENT SCOPE: %s | %s\n", current->name, n->symtab->name);
-        printf("TYPE: %s for %s | %s\n", typename(n->type), n->leaf->text, typename(other->type));
-        printf("OTHER TYPE: %s | %d\n", typename(other->type), has_func_call);
-        // if (has_func_call == 0)
-        //     type_error(other, n->type, 1);
-        // else
-        // {
-        check_incompatible_types_error_msg(other, n->type, has_func_call);
-        // }
+        check_incompatible_types_error_msg(other, type, has_func_call);
 
         break;
+    case R_PEXPR_NO_PAREN + 7: // pexpr [ expr ]
+        // get type of expr{0} and check other type
+        type = kid_type(n->kids[2]);
+        printf("FUNC CALL: %s\n", typename(type));
+        check_incompatible_types_error_msg(other, type, has_func_call);
+
+        break;
+
+    case R_PEXPR_NO_PAREN:
+    case R_SYM:
+        n->type = kid_type(n);
+        other->type = kid_type(other);
+        if (n->type->basetype == STRUCT_TYPE)
+            break;
+        printf("CURRENT SCOPE: %s | %s\n", current->name, n->symtab->name);
+        printf("OTHER TYPE: %s | %d\n", typename(other->type), has_func_call);
+
+        check_incompatible_types_error_msg(other, n->type, has_func_call);
+        break;
+        // case LNAME:
+        // case LLITERAL:
+        //     n->type = kid_type(n);
+        //     other->type = kid_type(other);
+        //     printf("CURRENT SCOPE: %s | %s\n", current->name, n->symtab->name);
+        //     printf("TYPE: %s for %s | %s\n", typename(n->type), n->leaf->text, typename(other->type));
+        //     printf("OTHER TYPE: %s | %d\n", typename(other->type), has_func_call);
+
+        //     check_incompatible_types_error_msg(other, n->type, has_func_call);
+
+        //     break;
 
     default:
         // type = kid_type(n->kids[2]);
+        // if ((n->prodrule == LNAME) || (n->prodrule == LLITERAL) || (n->prodrule == R_SYM))
+        //     break;
+        // if (n->prodrule == LLITERAL)
+        //     break;
         printf("DEFAULT: %s | %d\n", n->prodname, n->prodrule);
+        // n->type = kid_type(n);
+        // other->type = kid_type(other);
+        // printf("CURRENT SCOPE: %s | %s\n", current->name, n->symtab->name);
+        // printf("DEFAULT TYPE: %s\n", typename(n->type));
+        // printf("OTHER TYPE: %s | %d\n", typename(other->type), has_func_call);
+
+        // check_incompatible_types_error_msg(other, n->type, has_func_call);
 
         break;
+    }
+
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        // if (n->prodrule == (R_PSEUDOCALL + 1))
+        // return;
+        check_expr(n->kids[i], other, has_func_call);
     }
 }
 
@@ -365,9 +382,6 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
-        check_incompatible_types_error_msg(n->kids[2], return_type, 1);
-        break;
-
     case R_EXPR + 1:
     case R_EXPR + 2:
     case R_EXPR + 3:
@@ -393,7 +407,7 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
 
     case LLITERAL:
     case LNAME:
-        check_incompatible_types_error_msg(n, return_type, 1);
+        // check_incompatible_types_error_msg(n, return_type, 1);
 
         break;
 
@@ -464,8 +478,13 @@ static void check_expression(tree_ptr n)
 
     int has_func_call = 0;
 
+    printf("DEFAULT PROD: %s\n", n->prodname);
+
     switch (n->prodrule)
     {
+    case R_DOTNAME + 1:
+        printf("DOTNAME: %s\n", n->prodname);
+        break;
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
@@ -503,10 +522,6 @@ static void check_expression(tree_ptr n)
     case R_NON_DCL_STMT + 3:
 
         check_func_type(n->kids[1]);
-
-        break;
-
-    case LNAME:
 
         break;
 
@@ -623,7 +638,8 @@ static void check_func_call_error(token_ptr leaf, paramlist params, type_ptr fun
         // print_params(func_params);
         printf("FOUND PARAM: %s\n", func_params->name);
 
-        if(temp == NULL) {
+        if (temp == NULL)
+        {
             fprintf(stderr, "ERROR: unexpected function call with no argument at line %d, in file %s\n", leaf->lineno, leaf->filename);
             fprintf(stderr, "Expected type `%s`\n", typename(func_params->type));
             exit(3);
@@ -660,11 +676,11 @@ static void check_function_call(tree_ptr n)
         func_type = kid_type(n->kids[0]);
         get_leaf(n, &leaf);
 
-        if(func_type != NULL && leaf != NULL)
+        if (func_type != NULL && leaf != NULL)
         {
             check_func_call_error(leaf, params, func_type);
         }
-       
+
         // check_in_params(n->kids[2], func_type);
         break;
 
@@ -677,5 +693,5 @@ void typecheck(tree_ptr n)
 {
     check_function_call(n);
     // check_common_dcl(n);
-    // check_expression(n);
+    check_expression(n);
 }
