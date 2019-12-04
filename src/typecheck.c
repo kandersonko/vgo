@@ -28,7 +28,7 @@ static void get_func_type(char *func_name, type_ptr *func_type)
     }
 }
 
-static void type_error_msg(tree_ptr n, type_ptr t)
+static void type_error_msg(tree_ptr n, type_ptr t, int has_func_call)
 {
     if (n->type->basetype == FUNC_TYPE)
     {
@@ -36,6 +36,14 @@ static void type_error_msg(tree_ptr n, type_ptr t)
         get_func_type(n->leaf->text, &func_type);
         if (func_type == NULL)
             return;
+
+        printf("TYPE ERROR: %d\n", has_func_call);
+        if (has_func_call == 0)
+        {
+            fprintf(stderr, "ERROR: unexpected `%s` of incompatible type `%s` at line %d, in file %s\n", n->leaf->text, typename(func_type), n->leaf->lineno, n->leaf->filename);
+            fprintf(stderr, "Expected type `%s`\n", typename(t));
+            exit(3);
+        }
         if (func_type->u.f.returntype->basetype != t->basetype)
         {
             fprintf(stderr, "ERROR: unexpected `%s` of incompatible return type `%s` at line %d, in file %s\n", n->leaf->text, typename(func_type->u.f.returntype), n->leaf->lineno, n->leaf->filename);
@@ -74,7 +82,7 @@ static void get_has_func_call(tree_ptr n, int *has_func_call)
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        if (n->prodrule == (R_PSEUDOCALL + 1))
+        if (strcmp(n->prodname, "pseudocall") == 0)
         {
             *has_func_call = 1;
             return;
@@ -111,20 +119,27 @@ static void type_error(tree_ptr n, type_ptr t, int has_func_call)
         break;
 
     case LLITERAL:
-        if (has_func_call)
-            break;
-        if (n->leaf->basetype != t->basetype)
+        // if (!has_func_call)
+        //     break;
+        n->type = kid_type(n);
+        printf("COMPARING LLITERAL TYPES: %s %s | %s | func call: %d\n", typename(n->type), typename(t), n->leaf->text, has_func_call);
+
+        if (n->type->basetype != t->basetype)
         {
-            type_error_msg(n, t);
+            type_error_msg(n, t, has_func_call);
         }
         break;
 
     case LNAME:
+        n->type = kid_type(n);
+
         if (n->type->basetype == STRUCT_TYPE)
             break;
+
+        printf("COMPARING TYPES: %s %s | %d %d\n", typename(n->type), typename(t), n->type->basetype, t->basetype);
         if (n->type->basetype != t->basetype)
         {
-            type_error_msg(n, t);
+            type_error_msg(n, t, has_func_call);
         }
         break;
 
@@ -133,24 +148,24 @@ static void type_error(tree_ptr n, type_ptr t, int has_func_call)
     }
 }
 
-static void incompatible_types_error_msg(tree_ptr n, type_ptr type)
+static void incompatible_types_error_msg(tree_ptr n, type_ptr type, int has_func_call)
 {
-    if (!type)
+    if (type == NULL)
         return;
     if (n->type->basetype != type->basetype)
     {
-        type_error_msg(n, type);
+        type_error_msg(n, type, has_func_call);
     }
 }
 
-static void check_incompatible_types_error_msg(tree_ptr n, type_ptr type)
+static void check_incompatible_types_error_msg(tree_ptr n, type_ptr type, int has_func_call)
 {
     if (n == NULL)
         return;
     int i;
     for (i = 0; i < n->nkids; i++)
     {
-        check_incompatible_types_error_msg(n->kids[i], type);
+        check_incompatible_types_error_msg(n->kids[i], type, has_func_call);
     }
 
     type_ptr leaf_type;
@@ -162,12 +177,14 @@ static void check_incompatible_types_error_msg(tree_ptr n, type_ptr type)
         n->basetype = leaf_type->basetype;
         n->type = leaf_type;
 
-        incompatible_types_error_msg(n, type);
+        printf("FOUND TYPE: %s | %s | %s\n", typename(type), typename(n->type), n->leaf->text);
+
+        incompatible_types_error_msg(n, type, has_func_call);
         break;
     case LLITERAL:
         n->basetype = n->leaf->basetype;
         n->type = alctype(n->basetype);
-        incompatible_types_error_msg(n, type);
+        incompatible_types_error_msg(n, type, has_func_call);
 
         break;
     default:
@@ -192,7 +209,7 @@ static void check_ntype(tree_ptr n)
     {
     case R_OTHERTYPE:
         type = kid_type(n->kids[3]);
-        check_incompatible_types_error_msg(n->kids[1], type);
+        check_incompatible_types_error_msg(n->kids[1], type, 0);
         break;
     default:
         break;
@@ -278,7 +295,7 @@ static void print_scope(sym_table_ptr st)
     }
 }
 
-static void check_expr(tree_ptr n, tree_ptr other)
+static void check_expr(tree_ptr n, tree_ptr other, int has_func_call)
 {
     if (!n)
         return;
@@ -287,18 +304,20 @@ static void check_expr(tree_ptr n, tree_ptr other)
     {
         // if (n->prodrule == (R_PSEUDOCALL + 1))
         // return;
-        check_expr(n->kids[i], other);
+        check_expr(n->kids[i], other, has_func_call);
     }
 
     type_ptr type = NULL;
 
+    static int correct_func_call = 0;
+
     switch (n->prodrule)
-    {                          // early exit to prevent over exploration
+    {
     case R_PEXPR_NO_PAREN + 2: // pexpr . sym
         // get type of expr{0} and check other type
         type = kid_type(n->kids[2]);
         printf("TYPE: %s\n", typename(type));
-        check_incompatible_types_error_msg(other, type);
+        check_incompatible_types_error_msg(other, type, has_func_call);
         break;
     case R_PEXPR_NO_PAREN + 5: // pexpr [ expr ]
         // get type of expr{0} and check other type
@@ -308,9 +327,17 @@ static void check_expr(tree_ptr n, tree_ptr other)
     case LNAME:
     case LLITERAL:
         n->type = kid_type(n);
+        other->type = kid_type(other);
         printf("CURRENT SCOPE: %s | %s\n", current->name, n->symtab->name);
         printf("TYPE: %s for %s | %s\n", typename(n->type), n->leaf->text, typename(other->type));
-        check_incompatible_types_error_msg(other, n->type);
+        printf("OTHER TYPE: %s | %d\n", typename(other->type), has_func_call);
+        // if (has_func_call == 0)
+        //     type_error(other, n->type, 1);
+        // else
+        // {
+        check_incompatible_types_error_msg(other, n->type, has_func_call);
+        // }
+
         break;
 
     default:
@@ -338,7 +365,7 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
-        check_incompatible_types_error_msg(n->kids[2], return_type);
+        check_incompatible_types_error_msg(n->kids[2], return_type, 1);
         break;
 
     case R_EXPR + 1:
@@ -360,13 +387,13 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
     case R_EXPR + 17:
     case R_EXPR + 18:
     case R_EXPR + 19:
-        check_incompatible_types_error_msg(n->kids[2], return_type);
+        check_incompatible_types_error_msg(n->kids[2], return_type, 1);
 
         break;
 
     case LLITERAL:
     case LNAME:
-        check_incompatible_types_error_msg(n, return_type);
+        check_incompatible_types_error_msg(n, return_type, 1);
 
         break;
 
@@ -382,7 +409,7 @@ static void check_params_error(tree_ptr n, type_ptr func_type)
     {
         if (strcmp(n->leaf->text, params->name) == 0)
         {
-            incompatible_types_error_msg(n, params->type);
+            incompatible_types_error_msg(n, params->type, 0);
         }
         params = params->next;
     }
@@ -432,15 +459,13 @@ static void check_expression(tree_ptr n)
         check_expression(n->kids[i]);
     }
 
+    int has_func_call = 0;
+
     switch (n->prodrule)
     {
     case R_SIMPLE_STMT + 1:
     case R_SIMPLE_STMT + 2:
     case R_SIMPLE_STMT + 3:
-
-        check_expr(n->kids[0], n->kids[2]);
-        break;
-
     case R_EXPR + 1:
     case R_EXPR + 2:
     case R_EXPR + 3:
@@ -461,7 +486,15 @@ static void check_expression(tree_ptr n)
     case R_EXPR + 18:
     case R_EXPR + 19:
 
-        check_expr(n->kids[0], n->kids[2]);
+        get_has_func_call(n->kids[0], &has_func_call);
+
+        if (has_func_call == 0)
+            get_has_func_call(n->kids[2], &has_func_call);
+
+        printf("HAS FUNC CALL: %d\n", has_func_call);
+
+        check_expr(n->kids[0], n->kids[2], has_func_call);
+        // check_expr(n->kids[2], n->kids[0]);
         break;
 
     case R_NON_DCL_STMT + 3:

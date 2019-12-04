@@ -301,7 +301,7 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-                    printf("PARENT LOOKUP ENTRY: %s in %s\n", s, st->name);
+                    printf("PARENT LOOKUP ENTRY: %s of type %s in %s\n", s, typename(entry->type), st->name);
 
                     return entry;
                 }
@@ -318,7 +318,7 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-                    printf("CHILD LOOKUP ENTRY: %s in %s\n", s, st->name);
+                    printf("CHILD LOOKUP ENTRY: %s of type %s in %s\n", s, typename(entry->type), st->name);
 
                     return entry;
                 }

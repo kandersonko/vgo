@@ -324,12 +324,12 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
             *t = alctype(get_basetype(n->leaf->text));
             break;
         }
-        entry = lookup_scope(n->leaf->text);
-        if (entry != NULL)
-        {
-            *t = entry->type;
-            break;
-        }
+        // entry = lookup_scope(n->leaf->text);
+        // if (entry != NULL)
+        // {
+        //     *t = entry->type;
+        //     break;
+        // }
         entry = lookup(current, n->leaf->text);
         if (entry != NULL)
         {
