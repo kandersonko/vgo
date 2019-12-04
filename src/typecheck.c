@@ -405,8 +405,10 @@ static void check_return_type(tree_ptr n, type_ptr return_type)
 static void check_params_error(tree_ptr n, type_ptr func_type)
 {
     paramlist params = func_type->u.f.parameters;
+    printf("FUNC PARAM: %s\n", typename(func_type));
     while (params != NULL)
     {
+        printf("CHECKING PARAM: %s %s\n", params->name, n->leaf->text);
         if (strcmp(n->leaf->text, params->name) == 0)
         {
             incompatible_types_error_msg(n, params->type, 0);
@@ -427,6 +429,7 @@ static void check_in_params(tree_ptr n, type_ptr func_type)
     switch (n->prodrule)
     {
     case LNAME:
+    case LLITERAL:
         check_params_error(n, func_type);
         break;
     default:
@@ -541,6 +544,7 @@ static void print_params(paramlist params)
     paramlist temp = params;
     while (temp != NULL)
     {
+        printf("\tPARAM -> %s: %s\n", temp->name, typename(temp->type));
         temp = temp->next;
     }
 }
@@ -597,6 +601,41 @@ static void get_leaf(tree_ptr n, token_ptr *t)
     }
 }
 
+static void func_call_error_msg(token_ptr leaf, paramlist found, paramlist expected)
+{
+    if (found->type->basetype != expected->type->basetype)
+    {
+        fprintf(stderr, "ERROR: unexpected function call with `%s` of incompatible type `%s` at line %d, in file %s\n", found->name, typename(found->type), leaf->lineno, leaf->filename);
+        fprintf(stderr, "Expected type `%s`\n", typename(expected->type));
+        exit(3);
+    }
+}
+
+static void check_func_call_error(token_ptr leaf, paramlist params, type_ptr func_type)
+{
+    paramlist temp = params;
+    paramlist func_params = func_type->u.f.parameters;
+    // if ((temp != NULL) && (func_params != NULL))
+    // printf("CHECKING ERROR IN PARAMS: %s %s\n", func_params->name, temp->name);
+    print_params(func_params);
+    while (func_params != NULL)
+    {
+        // print_params(func_params);
+        printf("FOUND PARAM: %s\n", func_params->name);
+
+        if(temp == NULL) {
+            fprintf(stderr, "ERROR: unexpected function call with no argument at line %d, in file %s\n", leaf->lineno, leaf->filename);
+            fprintf(stderr, "Expected type `%s`\n", typename(func_params->type));
+            exit(3);
+        }
+        printf("NULL CHECK: %p %p\n", temp, func_params);
+        func_call_error_msg(leaf, temp, func_params);
+
+        func_params = func_params->next;
+        temp = temp->next;
+    }
+}
+
 static void check_function_call(tree_ptr n)
 {
     int i;
@@ -616,9 +655,17 @@ static void check_function_call(tree_ptr n)
     case R_PSEUDOCALL + 1:
         get_name(n, &func_name);
         collect_params(n->kids[2], &params);
-        print_params(params);
-        get_func_type(func_name, &func_type);
+        // print_params(params);
+        // get_func_type(func_name, &func_type);
+        func_type = kid_type(n->kids[0]);
         get_leaf(n, &leaf);
+
+        if(func_type != NULL && leaf != NULL)
+        {
+            check_func_call_error(leaf, params, func_type);
+        }
+       
+        // check_in_params(n->kids[2], func_type);
         break;
 
     default:
@@ -628,7 +675,7 @@ static void check_function_call(tree_ptr n)
 
 void typecheck(tree_ptr n)
 {
-    // check_function_call(n);
+    check_function_call(n);
     // check_common_dcl(n);
-    check_expression(n);
+    // check_expression(n);
 }
