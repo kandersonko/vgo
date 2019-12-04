@@ -258,7 +258,6 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
         entry->text = strdup(s);
     st->buckets[h] = entry;
     st->entries++;
-    printf("INSERTED SYM: %s of type %s into %s at %d\n", st->buckets[h]->text, typename(st->buckets[h]->type), st->name, h);
     return 1;
 }
 
@@ -277,12 +276,10 @@ sym_entry_ptr lookup_st(sym_table_ptr st, char *s)
             /*
           *  Return a pointer to the symbol table entry.
           */
-            printf("FOUND LOOKUP ST: %s in %s at %d | %p\n", s, st->name, h, st->buckets[h]);
 
             return entry;
         }
 
-    printf("LOOKUP ST: %s in %s at %d | %p\n", s, st->name, h, st->buckets[h]);
 
     return NULL;
 }
@@ -301,7 +298,6 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-                    printf("PARENT LOOKUP ENTRY: %s of type %s in %s\n", s, typename(entry->type), st->name);
 
                     return entry;
                 }
@@ -318,7 +314,6 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-                    printf("CHILD LOOKUP ENTRY: %s of type %s in %s\n", s, typename(entry->type), st->name);
 
                     return entry;
                 }

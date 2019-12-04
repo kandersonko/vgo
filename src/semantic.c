@@ -26,19 +26,6 @@ static void print_params(paramlist params, int nparams)
     }
 }
 
-static void print_scopes(sym_table_ptr scope)
-{
-    sym_table_ptr current_scope = scope;
-
-    printf("SCOPE: %s\n", scope->name);
-
-    while (current_scope != NULL)
-    {
-        printf("\tchild scope %s\n", current_scope->name);
-        current_scope = current_scope->child;
-    }
-}
-
 static sym_table_ptr add_child_scope(sym_table_ptr root, sym_table_ptr child)
 {
     if (root == NULL)
@@ -87,8 +74,6 @@ void enter_newscope(char *s, int basetype)
     // push_stack(new->children, current->scope);
 
     current = add_child_scope(current, new);
-
-    printf("ENTERING SCOPE: %s\n", current->name);
 
     insert_sym(current, s, t);
     pushscope(new);
@@ -337,7 +322,6 @@ static void get_kid_type(tree_ptr n, type_ptr *t)
         }
         else
         {
-            printf("FOUND UNKNOWN TYPE FOR: %s | %s\n", n->leaf->text, typename(n->type));
             *t = alctype(UNKNOW_TYPE);
         }
 
@@ -615,8 +599,6 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         populate_params(n->kids[i], params, nparams);
     }
 
-    sym_entry_ptr entry = NULL;
-
     switch (n->prodrule)
     {
     case R_ARG_TYPE + 1:
@@ -835,7 +817,6 @@ void populate_builtins()
     params->name = "m";
     params->type = alctype(MAP_TYPE);
     params->next = NULL;
-    type_ptr returntype = alctype(MAP_TYPE);
     
     enter_func_scope("make", alctype(MAP_TYPE), params, 1);
 }
@@ -864,7 +845,6 @@ void populate(tree_ptr n)
     populate_imports(n->kids[1]);
     populate_xdcl(n->kids[2]);
 
-    print_scopes(current);
 }
 
 /*
@@ -885,9 +865,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     switch (n->prodrule)
     {
     case LNAME:
-        // check_vardcl(n);
         n->symtab = st;
-        printf("INFO %s | %s\n", n->leaf->text, n->symtab->name);
         insert_sym(st, n->leaf->text, n->type);
         break;
     }
