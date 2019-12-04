@@ -828,6 +828,18 @@ static void populate_imports(tree_ptr n)
     }
 }
 
+void populate_builtins()
+{
+    paramlist params;
+    params = safe_malloc(sizeof(*params));
+    params->name = "m";
+    params->type = alctype(MAP_TYPE);
+    params->next = NULL;
+    type_ptr returntype = alctype(MAP_TYPE);
+    
+    enter_func_scope("make", alctype(MAP_TYPE), params, 1);
+}
+
 void populate(tree_ptr n)
 {
     if (n == NULL)
@@ -845,6 +857,8 @@ void populate(tree_ptr n)
     insert_sym(current, "Println", alctype(IMPORT_TYPE));
     insert_sym(current, "println", alctype(IMPORT_TYPE));
     insert_sym(current, "print", alctype(IMPORT_TYPE));
+
+    populate_builtins();
 
     populate_package(n->kids[0]);
     populate_imports(n->kids[1]);

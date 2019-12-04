@@ -61,6 +61,24 @@ static void type_error_msg(tree_ptr n, type_ptr t, int has_func_call)
         if (strcmp(n->leaf->text, n->type->u.s.name) == 0)
             return;
     }
+    else if (n->type->basetype == MAP_TYPE)
+    {
+        printf("TYPECHECKING FOR MAP TYPE: %s\n", typename(n->type));
+        if (strcmp(n->leaf->text, n->type->u.s.name) == 0)
+            return;
+    }
+    else if (t->basetype == MAP_TYPE)
+    {
+        printf("CHECKING FOR MAP TYPE: %s\n", typename(n->type));
+        // if (strcmp(n->leaf->text, n->type->u.s.name) == 0)
+        //     return;
+        if (t->u.m.elemtype->basetype != n->type->basetype || t->u.m.indextype->basetype != n->type->basetype)
+            return;
+        fprintf(stderr, "ERROR: unexpected `%s` of incompatible map element type `%s` at line %d, in file %s\n", n->leaf->text, typename(n->type), n->leaf->lineno, n->leaf->filename);
+        fprintf(stderr, "Expected type `%s`\n", typename(t->u.m.elemtype));
+        exit(3);
+        return;
+    }
     else if (n->type->basetype == UNKNOW_TYPE)
     {
         type_ptr type = kid_type(n);
@@ -302,9 +320,10 @@ static void check_expr(tree_ptr n, tree_ptr other, int has_func_call)
         break;
     case R_PEXPR_NO_PAREN + 5: // pexpr [ expr ]
         // get type of expr{0} and check other type
-        type = kid_type(n->kids[2]);
+        type = kid_type(n->kids[0]);
         printf("TYPE: %s\n", typename(type));
         check_incompatible_types_error_msg(other, type, has_func_call);
+        return;
 
         break;
     case R_PEXPR_NO_PAREN + 7: // pexpr [ expr ]
@@ -574,7 +593,7 @@ static void add_param(paramlist *params, type_ptr type, char *name)
 
     paramlist temp = safe_malloc(sizeof(*temp));
     paramlist last = *params;
-    
+
     temp->name = strdup(name);
     temp->type = type;
     temp->next = NULL;
@@ -584,9 +603,9 @@ static void add_param(paramlist *params, type_ptr type, char *name)
         *params = temp;
         return;
     }
-    while(last->next != NULL)
+    while (last->next != NULL)
         last = last->next;
-    
+
     last->next = temp;
 }
 
@@ -637,12 +656,19 @@ static void get_leaf(tree_ptr n, token_ptr *t)
 
 static void func_call_error_msg(token_ptr leaf, paramlist found, paramlist expected)
 {
-    if (found->type->basetype != expected->type->basetype)
+    if (expected->type->basetype == MAP_TYPE)
     {
-        fprintf(stderr, "ERROR: unexpected function call with `%s` of incompatible type `%s` at line %d, in file %s\n", found->name, typename(found->type), leaf->lineno, leaf->filename);
-        fprintf(stderr, "Expected type `%s`\n", typename(expected->type));
-        exit(3);
+        // if (!expected->type->u.m.elemtype)
+        //     return;
+        // if (expected->type->u.m.elemtype->basetype == found->type->basetype)
+        //     return;
+        return;
     }
+    if (found->type->basetype == expected->type->basetype)
+        return;
+    fprintf(stderr, "ERROR: unexpected function call with `%s` of incompatible type `%s` at line %d, in file %s\n", found->name, typename(found->type), leaf->lineno, leaf->filename);
+    fprintf(stderr, "Expected type `%s`\n", typename(expected->type));
+    exit(3);
 }
 
 static void check_func_call_error(token_ptr leaf, paramlist params, type_ptr func_type)
@@ -711,6 +737,6 @@ static void check_function_call(tree_ptr n)
 void typecheck(tree_ptr n)
 {
     check_function_call(n);
-    // check_common_dcl(n);
+    check_common_dcl(n);
     check_expression(n);
 }
