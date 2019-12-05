@@ -27,6 +27,10 @@ char *rename_go_file(char *name);
 
 sym_table_ptr current;
 
+void generate_ic_file();
+
+char *remove_ext(char *s, char ext_sep, char path_sep);
+
 int main(int argc, char **argv)
 {
     if (argc == 1)
@@ -68,6 +72,11 @@ int main(int argc, char **argv)
             return -1;
         }
 
+        char *s = remove_ext(argv[i], '.', '/');
+
+        char *ic_filename = strcat(s, ".ic");
+        FILE *ic_file = fopen(ic_filename, "w+");
+
         int failed = yyparse();
         if (!failed)
         {
@@ -81,6 +90,9 @@ int main(int argc, char **argv)
                 printsymbols(current, 0);
             }
             typecheck(ast_root);
+
+            generate_ic_file(ic_file);
+            fclose(ic_file);
         }
         else
         {
@@ -95,6 +107,12 @@ int main(int argc, char **argv)
     yylex_destroy();
 
     return 0;
+}
+
+void generate_ic_file(FILE *fp)
+{
+    fprintf(fp, "This is testing for fprintf...\n");
+    fputs("This is testing for fputs...\n", fp);
 }
 
 // code found on stackoverflow
@@ -138,4 +156,51 @@ char *rename_go_file(char *name)
     }
     fprintf(stderr, "ERROR: invalid file name \"%s\"\n", name);
     return NULL;
+}
+
+// code from stackoverflow
+// link: https://stackoverflow.com/questions/2736753/how-to-remove-extension-from-file-name
+char *remove_ext(char *s, char ext_sep, char path_sep)
+{
+    char *ret_str, *last_ext, *last_path;
+
+    // Error checks and allocate string.
+
+    if (s == NULL)
+        return NULL;
+    if ((ret_str = malloc(strlen(s) + 1)) == NULL)
+        return NULL;
+
+    // Make a copy and find the relevant characters.
+
+    strcpy(ret_str, s);
+    last_ext = strrchr(ret_str, ext_sep);
+    last_path = (path_sep == 0) ? NULL : strrchr(ret_str, path_sep);
+
+    // If it has an extension separator.
+
+    if (last_ext != NULL)
+    {
+        // and it's to the right of the path separator.
+
+        if (last_path != NULL)
+        {
+            if (last_path < last_ext)
+            {
+                // then remove it.
+
+                *last_ext = '\0';
+            }
+        }
+        else
+        {
+            // Has extension separator with no path separator.
+
+            *last_ext = '\0';
+        }
+    }
+
+    // Return the modified string.
+
+    return ret_str;
 }
