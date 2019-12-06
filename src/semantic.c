@@ -109,6 +109,7 @@ void enter_newscope(char *s, int basetype)
     pushscope(new);
 }
 
+
 static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int nparams)
 {
     sym_table_ptr new = new_st(150, s);
@@ -119,6 +120,7 @@ static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int
     t->u.f.name = strdup(s);
     t->u.f.parameters = params;
     t->u.f.nparams = nparams;
+    t->width = get_func_width(t, params);
     new->scope = t;
 
     // push_stack(new->children, current->scope);

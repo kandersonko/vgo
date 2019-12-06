@@ -230,6 +230,23 @@ char *insert_stringpool(char *s)
     return install_sym(stringpool, s, NULL);
 }
 
+static int get_symtab_size(sym_table_ptr st, type_ptr t)
+{
+    int size = 0;
+
+    switch (t->basetype)
+    {
+    case FUNC_TYPE:
+        size = get_func_width(t, t->u.f.parameters);
+        break;
+
+    default:
+        size = t->width;
+        break;
+    }
+    return size + st->size;
+}
+
 int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
     int h;
@@ -261,13 +278,13 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 
     if (st->size == 0)
     {
-        entry->offset =0;
+        entry->offset = 0;
     }
     else
     {
         entry->offset = st->size;
     }
-    st->size += t->width;
+    st->size = get_symtab_size(st, t);
 
     st->buckets[h] = entry;
     st->entries++;

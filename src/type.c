@@ -133,7 +133,6 @@ int get_basetype_width(int basetype)
     {
     case INT_TYPE:
     case STRING_TYPE:
-
         width = 4;
         break;
     case FLOAT64_TYPE:
@@ -144,4 +143,23 @@ int get_basetype_width(int basetype)
         break;
     }
     return width;
+}
+
+int get_func_width(type_ptr t, paramlist params)
+{
+    int size = 0;
+    paramlist temp = params;
+    while (temp != NULL)
+    {
+        if (params->type->basetype == FUNC_TYPE)
+        {
+            size += get_func_width(params->type, params->type->u.f.parameters);
+        }
+        else
+        {
+            size += params->type->width;
+        }
+        temp = temp->next;
+    }
+    return size;
 }

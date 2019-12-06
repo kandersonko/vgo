@@ -81,6 +81,8 @@ int get_basetype(char *s);
 
 int get_basetype_width(int basetype);
 
+int get_func_width(type_ptr t, paramlist params);
+
 int is_basic_type(int basetype);
 
 void delete_type(type_ptr t);
