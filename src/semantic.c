@@ -15,6 +15,36 @@
 #include "rules.h"
 #include "utils.h"
 
+void insert_sym_with_symtab(tree_ptr n, sym_table_ptr st, type_ptr t)
+{
+    n->symtab = st;
+    insert_sym(st, n->leaf->text, t);
+}
+
+void add_symtab(tree_ptr n, sym_table_ptr st)
+{
+    // printf("ADDING SYM %s %s\n", n->prodname, st->name);
+    if (n->prodrule == LNAME)
+    {
+        sym_table_ptr symbol_table = find_symtab(n->leaf->text);
+
+        if (symbol_table != NULL)
+        {
+            // printf("ADD SYM: %s %s\n", n->leaf->text, symbol_table->name);
+            n->symtab = symbol_table;
+        }
+        else
+        {
+            // printf("SYM LNAME: %s %s\n", n->leaf->text, st->name);
+            n->symtab = st;
+        }
+    }
+    else
+    {
+        n->symtab = st;
+    }
+}
+
 static void print_params(paramlist params, int nparams)
 {
     paramlist current = params;
@@ -216,6 +246,7 @@ static void populate_struct(tree_ptr n)
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
+
         break;
     case LNAME:
         n->basetype = get_basetype(n->leaf->text);
@@ -378,8 +409,6 @@ static void vardcl(tree_ptr n, char *varname)
 
     type_ptr type;
 
-    n->symtab = current;
-
     switch (n->prodrule)
     {
     case R_VARDCL:
@@ -399,7 +428,7 @@ static void vardcl(tree_ptr n, char *varname)
             n->type = n->kids[1]->type; // synthesize
         }
         n->kids[0]->type = n->type; // inherit
-        n->symtab = current;
+
         insert_w_typeinfo(n->kids[0], current);
         break;
     case R_TYPEDCL:
@@ -407,7 +436,7 @@ static void vardcl(tree_ptr n, char *varname)
         typedclname = n->kids[0]->kids[0]->leaf->text;
         check_vardcl(n->kids[0]->kids[0]);
         populate_typedcl(n, typedclname);
-        n->symtab = current;
+
         popscope();
         break;
     case R_OTHERTYPE: // array
@@ -415,14 +444,14 @@ static void vardcl(tree_ptr n, char *varname)
         n->type->u.a.elemtype = n->kids[3]->type;
         int size = get_array_size(n);
         n->type->u.a.size = size;
-        n->symtab = current;
+
         insert_sym(current, varname, n->type);
         break;
     case R_OTHERTYPE + 2: // map
         n->type = alctype(MAP_TYPE);
         n->type->u.m.indextype = n->kids[2]->type;
         n->type->u.m.elemtype = n->kids[4]->type;
-        n->symtab = current;
+
         insert_sym(current, varname, n->type);
         break;
     case R_NTYPE:
@@ -431,7 +460,7 @@ static void vardcl(tree_ptr n, char *varname)
     case R_DOTNAME + 1:
         n->type = n->kids[0]->type;
         n->kids[2]->type = n->type;
-        n->symtab = current;
+
         insert_w_typeinfo(n->kids[2], current);
         break;
     case R_SYM:
@@ -461,14 +490,14 @@ static void vardcl(tree_ptr n, char *varname)
         {
             n->type = alctype(UNKNOW_TYPE);
         }
-        n->symtab = current;
+
         break;
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
-        n->symtab = current;
         break;
     default:
+
         break;
     }
     // if (strcmp(n->prodname, "expr") == 0)
@@ -490,8 +519,6 @@ static void populate_vardcl(tree_ptr n)
 
     char *typedclname;
 
-    n->symtab = current;
-
     switch (n->prodrule)
     {
     case R_VARDCL:
@@ -499,6 +526,7 @@ static void populate_vardcl(tree_ptr n)
     case R_CONSTDCL:
     case R_CONSTDCL1 + 1:
         get_varname(n->kids[0], &varname);
+
         vardcl(n, varname);
         break;
     case R_TYPEDCL:
@@ -506,10 +534,8 @@ static void populate_vardcl(tree_ptr n)
         typedclname = n->kids[0]->kids[0]->leaf->text;
         check_vardcl(n->kids[0]->kids[0]);
         populate_typedcl(n, typedclname);
+
         popscope();
-        break;
-    case LLITERAL:
-        n->symtab = current;
         break;
     default:
         break;
@@ -549,6 +575,16 @@ static paramlist create_param(tree_ptr n)
     return temp;
 }
 
+static void add_params_to_sym(paramlist root, sym_table_ptr st)
+{
+    paramlist temp = root;
+    while (temp != NULL)
+    {
+        insert_sym(st, temp->name, temp->type);
+        temp = temp->next;
+    }
+}
+
 static paramlist add_param(paramlist root, tree_ptr n)
 {
     paramlist temp = create_param(n);
@@ -585,6 +621,8 @@ static void insert_parameters(tree_ptr n, paramlist *params, int *nparams)
         *nparams = *nparams + 1;
         *params = add_param(*params, n);
         break;
+    default:
+        break;
     }
 }
 
@@ -605,6 +643,7 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         n->kids[0]->type = n->kids[1]->type;
         insert_parameters(n->kids[0], params, nparams);
         check_arg_undeclared(n->kids[1]);
+
         break;
     case R_ARG_TYPE_LIST + 1:
         n->kids[0]->type = n->kids[2]->type;
@@ -614,11 +653,13 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         n->type->u.a.elemtype = n->kids[3]->type;
         int size = get_array_size(n);
         n->type->u.a.size = size;
+
         break;
     case R_OTHERTYPE + 2:
         n->type = alctype(MAP_TYPE);
         n->type->u.m.indextype = n->kids[2]->type;
         n->type->u.m.elemtype = n->kids[4]->type;
+
         break;
     case R_NTYPE:
         n->type = n->kids[0]->type;
@@ -633,15 +674,16 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         n->type = n->kids[1]->type;
         n->kids[0]->type = n->type;
         insert_parameters(n->kids[1], params, nparams);
+
         break;
     case R_SYM:
         n->type = n->kids[0]->type;
-        // insert_w_typeinfo(n->kids[0], current);
 
         break;
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
+
         break;
     case LNAME:
         // entry = lookup_st(current->parent, n->leaf->text);
@@ -657,6 +699,7 @@ void populate_params(tree_ptr n, paramlist *params, int *nparams)
         n->type = kid_type(n);
         break;
     default:
+
         break;
     }
     // if (strcmp(n->prodname, "arg_type_list") == 0)
@@ -674,20 +717,7 @@ static void populate_body(tree_ptr n)
     if (strcmp(n->prodname, "common_dcl") == 0)
     {
         populate_vardcl(n);
-        // check_undeclared(n);
     }
-
-    // char *names[] = {"pseudocall", "non_dcl_stmt", "non_dcl_stmt", "if_stmt", "else", "loop_body", "elseif_list", "stmt_list", "for_stmt", "for_body", "stmt"};
-    // int size = (int)ARRAY_SIZE(names);
-    // int j;
-    // for (j = 0; j < size; j++)
-    // {
-    //     if (strcmp(n->prodname, names[j]) == 0)
-    //     {
-    //         undeclared_error(n);
-    //         break;
-    //     }
-    // }
 }
 
 static void get_functrettype(tree_ptr n, type_ptr *type)
@@ -703,8 +733,8 @@ static void get_functrettype(tree_ptr n, type_ptr *type)
         basetype = get_basetype(n->leaf->text);
         *type = alctype(basetype);
         break;
-
     default:
+
         break;
     }
 }
@@ -725,15 +755,22 @@ static void populate_function(tree_ptr n)
     switch (n->prodrule)
     {
     case R_XFNDCL:
+        n->type->u.f.returntype = kid_type(n->kids[1]->kids[4]);
+        n->kids[1]->type = n->type;
         functname = get_functname(n->kids[1]);
         get_functrettype(n->kids[1]->kids[4], &returntype);
-        n->type->u.f.returntype = kid_type(n->kids[1]->kids[4]);
         populate_params(n->kids[1], &params, &nparams);
         enter_func_scope(functname, returntype, params, nparams);
+        add_params_to_sym(params, current);
+        // insert_sym_with_symtab(n->kids[1]->kids[0]->kids[0], current, n->type);
+
         populate_body(n->kids[2]);
         check_undeclared(n->kids[2]);
 
         popscope();
+        break;
+    case LNAME:
+
         break;
     default:
         break;
@@ -764,6 +801,8 @@ static void populate_xdcl(tree_ptr n)
 
 static void populate_package(tree_ptr n)
 {
+    if (!n)
+        return;
     int i;
     for (i = 0; i < n->nkids; i++)
         populate_package(n->kids[i]);
@@ -773,14 +812,11 @@ static void populate_package(tree_ptr n)
     case R_PACKAGE + 1:
         check_package_main(n->kids[1]);
         n->type = alctype(PACKAGE_TYPE);
-        enter_newscope("global", PACKAGE_TYPE);
-        // insert_w_typeinfo(n->kids[1], current);
-        n->symtab = current;
+        // enter_newscope("global", PACKAGE_TYPE);
         break;
     case LNAME:
         n->type = alctype(PACKAGE_TYPE);
         // insert_sym(current, n->leaf->text, n->type);
-        n->symtab = current;
         break;
     default:
         break;
@@ -803,7 +839,7 @@ static void populate_imports(tree_ptr n)
         importname = strip_chars(n->leaf->text);
         n->type = alctype(IMPORT_TYPE);
         insert_sym(current, importname, n->type);
-        n->symtab = current;
+
         break;
     default:
         break;
@@ -819,12 +855,15 @@ void populate_builtins()
     params->next = NULL;
 
     enter_func_scope("make", alctype(MAP_TYPE), params, 1);
+    popscope();
 }
 
 void populate(tree_ptr n)
 {
     if (n == NULL)
         return;
+
+    enter_newscope("global", PACKAGE_TYPE);
 
     // TODO: fmt has a scope and builtins function (e.g. Println)
     // math/rand, time, fmt, check vgo specs
@@ -864,8 +903,7 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st)
     switch (n->prodrule)
     {
     case LNAME:
-        n->symtab = st;
-        insert_sym(st, n->leaf->text, n->type);
+        insert_sym_with_symtab(n, st, n->type);
         break;
     }
 }
@@ -876,6 +914,7 @@ void printsymbols(sym_table_ptr st, int level)
     sym_entry_ptr ste;
     if (st == NULL)
         return;
+    // printf("\nSymbol table: %s | size: %d\n", st->name, st->size);
     for (i = 0; i < st->nbuckets; i++)
     {
         for (ste = st->buckets[i]; ste; ste = ste->next)

@@ -3,6 +3,12 @@
 
 #include "tree.h"
 #include "tac.h"
+#include "rules.h"
+#include "go.tab.h"
+#include "symtab.h"
+#include "semantic.h"
+#include "tac.h"
+#include "type.h"
 
 // TODO: starting
 /*
@@ -27,18 +33,6 @@
     // use tree level & node kids number to generate unique labels
 */
 
-static void generate_label(tree_ptr t)
-{
-}
-
-static void generate_location(tree_ptr t)
-{
-}
-
-static void generate_true_false(tree_ptr t)
-{
-}
-
 static int newlabel()
 {
     static int counter = 0;
@@ -46,55 +40,130 @@ static int newlabel()
     return counter;
 }
 
-static void newtemp()
+// width in bytes
+struct addr newtemp(tree_ptr n)
 {
+    struct addr temp;
+    temp.offset = n->symtab->size;
+
+    if (n->prodrule == LLITERAL)
+    {
+        // printf("LLITERAL: %s %s\n", n->leaf->text, n->symtab->name);
+
+        if (is_basic_type(n->leaf->basetype) == 1)
+        {
+            temp.region = REGION_CONST;
+        }
+        else
+        {
+            temp.region = REGION_LABEL;
+        }
+        return temp;
+    }
+    if (n->prodrule == LNAME)
+    {
+        // printf("LNAME: %s %s\n", n->leaf->text, n->symtab->name);
+    }
+
+    // printf("SYMBOL TABLE: %s\n", st->name);
+    if (strcmp(n->symtab->name, "global") == 0)
+    {
+        temp.region = REGION_GLOBAL;
+    }
+    else
+    {
+        temp.region = REGION_LOCAL;
+    }
+    return temp;
 }
 
-// for main
-static void generate_header(tree_ptr n)
+static void generate_attributes(tree_ptr n)
 {
-}
-
-static void generate_ender(tree_ptr n)
-{
-}
-
-void codegen(tree_ptr t)
-{
-    int i, j;
-    if (t == NULL)
+    if (!n)
         return;
 
-    /*
-    * this is a post-order traversal, so visit kidsren first
-    */
-    for (i = 0; i < t->nkids; i++)
-        codegen(t->kids[i]);
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        generate_attributes(n->kids[i]);
+    }
 
-    /*
-    * back from kidsren, consider what we have to do with
-    * this node. The main thing we have to do, one way or
-    * another, is assign t->code
-    */
-    switch (t->label)
+    add_symtab(n, current);
+
+    switch (n->prodrule)
     {
-    case OP_ADD:
-    {
-        struct instr *g;
-        t->code = concat(t->kids[0]->code, t->kids[1]->code);
-        g = gen(OP_ADD, t->address,
-                t->kids[0]->address, t->kids[1]->address);
-        t->code = concat(t->code, g);
+    case LNAME:
+    case LLITERAL:
+        n->leaf->label = newlabel();
+        n->leaf->place = newtemp(n);
+        break;
+
+        break;
+
+    default:
+        n->place = newtemp(n);
         break;
     }
-    /*
-    * ... really, a bazillion cases, up to one for each
-    * production rule (in the worst case)
-    */
-    default:
-        /* default is: concatenate our kids children's code */
-        t->code = NULL;
-        for (i = 0; i < t->nkids; i++)
-            t->code = concat(t->code, t->kids[i]->code);
-    }
+}
+
+// static void generate_location(tree_ptr n)
+// {
+// }
+
+// static void generate_true_false(tree_ptr n)
+// {
+// }
+
+// // for main
+// static void generate_header(tree_ptr n)
+// {
+// }
+
+// static void generate_ender(tree_ptr n)
+// {
+// }
+
+// static void generate_ic_code(tree_ptr n)
+// {
+//     int i, j;
+//     if (n == NULL)
+//         return;
+
+//     /*
+//     * this is a post-order traversal, so visit kidsren first
+//     */
+//     for (i = 0; i < n->nkids; i++)
+//         generate_ic_code(n->kids[i]);
+
+//     /*
+//     * back from kidsren, consider what we have to do with
+//     * this node. The main thing we have to do, one way or
+//     * another, is assign t->code
+//     */
+//     switch (n->label)
+//     {
+//     case OP_ADD:
+//     {
+//         struct instr *g;
+//         n->code = concat(n->kids[0]->code, n->kids[1]->code);
+//         g = gen(OP_ADD, n->place,
+//                 n->kids[0]->place, n->kids[1]->place);
+//         n->code = concat(n->code, g);
+//         break;
+//     }
+//     /*
+//     * ... really, a bazillion cases, up to one for each
+//     * production rule (in the worst case)
+//     */
+//     default:
+//         /* default is: concatenate our kids children's code */
+//         n->code = NULL;
+//         for (i = 0; i < n->nkids; i++)
+//             n->code = concat(n->code, n->kids[i]->code);
+//     }
+// }
+
+void codegen(tree_ptr n)
+{
+    generate_attributes(n);
 }

@@ -68,6 +68,7 @@ sym_table_ptr new_st(int nbuckets, char *name)
     st->buckets = buckets;
     st->nbuckets = nbuckets;
     st->entries = 0;
+    st->size = 0;
     st->parent = NULL;
     st->child = NULL;
     st->scope = NULL;
@@ -234,6 +235,8 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     int h;
     struct sym_entry *entry;
 
+    printf("INSERTING %s INTO %s\n", s, st->name);
+
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
         if (strcmp(s, entry->text) == 0)
@@ -258,7 +261,47 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
         entry->text = strdup(s);
     st->buckets[h] = entry;
     st->entries++;
+    st->size += entry->type->width;
     return 1;
+}
+
+sym_table_ptr find_symtab(char * s)
+{
+    sym_table_ptr temp;
+    sym_entry_ptr entry = NULL;
+
+    for (temp = current; temp != NULL; temp = temp->parent)
+    {
+        int i;
+        for (i = 0; i < temp->nbuckets; i++)
+        {
+            for (entry = temp->buckets[i]; entry != NULL; entry = entry->next)
+            {
+                if (strcmp(s, entry->text) == 0)
+                {
+
+                    return temp;
+                }
+            }
+        }
+    }
+
+    for (temp = current; temp != NULL; temp = temp->child)
+    {
+        int i;
+        for (i = 0; i < temp->nbuckets; i++)
+        {
+            for (entry = temp->buckets[i]; entry != NULL; entry = entry->next)
+            {
+                if (strcmp(s, entry->text) == 0)
+                {
+
+                    return temp;
+                }
+            }
+        }
+    }
+    return NULL;
 }
 
 /*

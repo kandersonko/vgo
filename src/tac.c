@@ -4,15 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tac.h"
+#include "utils.h"
+
+// TODO: create  this function
+// void print_code(struct instr * code)
 
 struct instr *gen(int op, struct addr a1, struct addr a2, struct addr a3)
 {
-    struct instr *rv = malloc(sizeof(struct instr));
-    if (rv == NULL)
-    {
-        fprintf(stderr, "out of memory\n");
-        exit(4);
-    }
+    struct instr *rv = safe_malloc(sizeof(struct instr));
     rv->opcode = op;
     rv->dest = a1;
     rv->src1 = a2;

@@ -5,19 +5,48 @@
 #include "tree.h"
 #include "type.h"
 #include "utils.h"
+#include "tac.h"
+
+char *get_region_name(int region)
+{
+    char *s;
+    switch (region)
+    {
+    case REGION_GLOBAL:
+        s = "global";
+        break;
+    case REGION_LOCAL:
+        s = "loc";
+        break;
+    case REGION_CONST:
+        s = "const";
+        break;
+    case REGION_LABEL:
+        s = "label";
+        break;
+    default:
+        s = "NULL";
+        break;
+    }
+    return s;
+}
 
 void print_tree(tree_ptr ast, int depth)
 {
     if (!ast)
         return;
 
-    printf("%*s | rule: %d | nkids: %d\n", (int)strlen(ast->prodname) + depth, ast->prodname, ast->prodrule, ast->nkids);
+    printf("%*s | rule: %d | nkids: %d | label:%d\n", (int)strlen(ast->prodname) + depth, ast->prodname, ast->prodrule, ast->nkids, ast->label);
 
     if (ast->leaf)
     {
         printf("%*s -> ", depth + 6, "leaf");
-        printf("cat: %d | text: `%s` | lineno: %d | file: %s\n", ast->leaf->category,
-               ast->leaf->text,
+        printf("cat: %d | type:%s width:%d label:%d | place: %s:%d | text: `%s` | lineno: %d | file: %s\n", ast->leaf->category,
+               typename(alctype(ast->leaf->basetype)),
+               ast->leaf->width,
+               ast->leaf->label,
+               get_region_name(ast->leaf->place.region),
+               ast->leaf->place.offset, ast->leaf->text,
                ast->leaf->lineno,
                ast->leaf->filename);
     }
@@ -83,6 +112,12 @@ tree_ptr new_tree_node(int prodrule, char *prodname, int nkids, struct tree **ki
     ast->kids = kids;
     ast->type = alloc(1, sizeof(struct typeinfo));
     ast->type->basetype = 0;
+    ast->basetype = 0;
+    ast->width = 0;
+    ast->label = 0;
+    ast->code = alloc(1, sizeof(struct instr));
+    ast->place.offset = 0;
+    ast->place.region = 0;
     ast->symtab = alloc(1, sizeof(struct sym_table));
     return ast;
 }

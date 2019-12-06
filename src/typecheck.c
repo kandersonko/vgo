@@ -632,6 +632,8 @@ static void check_func_call_error(token_ptr leaf, paramlist params, type_ptr fun
 
 static void check_function_call(tree_ptr n)
 {
+    if (!n)
+        return;
     int i;
     for (i = 0; i < n->nkids; i++)
     {

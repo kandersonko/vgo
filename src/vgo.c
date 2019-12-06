@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "token.h"
 #include "tree.h"
 #include "semantic.h"
 #include "typecheck.h"
-#include <string.h>
-#include <unistd.h>
+#include "codegen.h"
 
 extern struct tree *ast_root;
 
@@ -42,7 +44,7 @@ int main(int argc, char **argv)
     argc--;
     argv++;
 
-    int print_symtab = 0;
+    int print_symtab = 0, print_tree_enabled = 0;
 
     int j;
     for (j = 0; j < argc; j++)
@@ -51,11 +53,15 @@ int main(int argc, char **argv)
         {
             print_symtab = 1;
         }
+        if (strcmp(argv[j], "-ast") == 0)
+        {
+            print_tree_enabled = 1;
+        }
     }
     int i;
     for (i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "-symtab") == 0)
+        if (strcmp(argv[i], "-symtab") == 0 || strcmp(argv[i], "-ast") == 0)
         {
             continue;
         }
@@ -86,12 +92,19 @@ int main(int argc, char **argv)
             // both populate and typecheck should use the global symtab `current`
             if (print_symtab)
             {
-                printf("============ file: %s ===========\n", yyfilename);
+                printf("============ symbol table for file: %s ===========\n", yyfilename);
                 printsymbols(current, 0);
             }
             typecheck(ast_root);
+            codegen(ast_root);
 
-            generate_ic_file(ic_file);
+            if(print_tree_enabled)
+            {
+                printf("============ ast tree for file: %s ===========\n", yyfilename);
+                print_tree(ast_root, 0);
+            }
+
+            // generate_ic_file(ic_file);
             fclose(ic_file);
         }
         else

@@ -10,12 +10,12 @@
 #include "tree.h"
 #include "utils.h"
 
-struct typeinfo integer_type = {INT_TYPE};
-struct typeinfo bool_type = {BOOL_TYPE};
-struct typeinfo float64_type = {FLOAT64_TYPE};
-struct typeinfo String_type = {STRING_TYPE};
-struct typeinfo null_type = {NULL_TYPE};
-struct typeinfo import_type = {IMPORT_TYPE};
+struct typeinfo integer_type = {INT_TYPE, 4};
+struct typeinfo bool_type = {BOOL_TYPE, 1};
+struct typeinfo float64_type = {FLOAT64_TYPE, 8};
+struct typeinfo String_type = {STRING_TYPE, 8};
+struct typeinfo null_type = {NULL_TYPE, 0};
+struct typeinfo import_type = {IMPORT_TYPE, 1};
 // struct typeinfo package_type = {PACKAGE_TYPE};
 type_ptr null_type_ptr = &null_type;
 type_ptr integer_type_ptr = &integer_type;
@@ -25,22 +25,6 @@ type_ptr String_type_ptr = &String_type;
 type_ptr import_type_ptr = &import_type;
 // type_ptr package_type_ptr = &package_type;
 
-/*
-#define NULL_TYPE 1000000
-#define UNKNOW_TYPE 1000001
-#define IMPORT_TYPE 1000002
-#define PACKAGE_TYPE 1000003
-#define INT_TYPE 1000004
-#define BOOL_TYPE 1000005
-#define FLOAT64_TYPE 1000006
-#define STRING_TYPE 1000007
-#define STRUCT_TYPE 1000008
-#define ARRAY_TYPE 1000009
-#define FUNC_TYPE 1000010
-#define MAP_TYPE 1000011
-#define CHAR_TYPE 1000012
-
-*/
 char *typenames[] = {"null", "unknown", "import", "package", "int", "bool", "float64", "string", "struct", "array", "function", "map", "char"};
 
 type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st);
@@ -127,4 +111,37 @@ int get_basetype(char *s)
         return STRING_TYPE;
 
     return UNKNOW_TYPE;
+}
+
+int is_basic_type(int basetype)
+{
+    switch (basetype)
+    {
+    case INT_TYPE:
+    case STRING_TYPE:
+    case FLOAT64_TYPE:
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+int get_basetype_width(int basetype)
+{
+    int width = 0;
+    switch (basetype)
+    {
+    case INT_TYPE:
+    case STRING_TYPE:
+
+        width = 4;
+        break;
+    case FLOAT64_TYPE:
+        width = 8;
+        break;
+    default:
+
+        break;
+    }
+    return width;
 }

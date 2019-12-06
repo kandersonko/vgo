@@ -31,6 +31,7 @@ typedef struct param
 typedef struct typeinfo
 {
     int basetype;
+    int width;
     union {
         struct mapinfo
         {
@@ -77,6 +78,10 @@ extern char *typenames[];
 type_ptr alctype(int);
 
 int get_basetype(char *s);
+
+int get_basetype_width(int basetype);
+
+int is_basic_type(int basetype);
 
 void delete_type(type_ptr t);
 

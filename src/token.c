@@ -3,6 +3,8 @@
 #include <string.h>
 #include "token.h"
 #include "utils.h"
+#include "tac.h"
+#include "type.h"
 
 void yyerror(char *s);
 
@@ -12,6 +14,8 @@ token_ptr create_token(int category, char *filename, int lineno, char *text, int
     token_ptr temp = safe_malloc(sizeof(*temp));
     temp->category = category;
     temp->basetype = basetype;
+    temp->width = get_basetype_width(basetype);
+    temp->label = 0;
     temp->filename = strdup(filename);
     temp->lineno = lineno;
     temp->text = strdup(text);
@@ -19,6 +23,8 @@ token_ptr create_token(int category, char *filename, int lineno, char *text, int
     temp->bval = bval;
     temp->dval = dval;
     temp->sval = strdup(sval);
+    temp->place.region = 0;
+    temp->place.offset = 0;
     return temp;
 }
 

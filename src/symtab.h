@@ -16,6 +16,7 @@
 typedef struct sym_table
 {
     char *name;
+    int size;
     int nbuckets;               /* # of buckets */
     int entries;                /* # of symbols in the table */
     struct sym_table *parent;   /* enclosing scope, superclass etc. */
@@ -57,6 +58,8 @@ sym_entry_ptr lookup_in_type(type_ptr type, char *s);
 sym_entry_ptr lookup(sym_table_ptr st, char *s);
 
 sym_entry_ptr lookup_scope(char *s);
+
+sym_table_ptr find_symtab(char *s);
 
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */

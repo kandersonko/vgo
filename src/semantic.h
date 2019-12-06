@@ -37,4 +37,8 @@ void insert_w_typeinfo(tree_ptr n, sym_table_ptr st);
 int is_keyword_type(char *s);
 
 type_ptr kid_type(tree_ptr kid);
+
+void add_symtab(tree_ptr n, sym_table_ptr st);
+
+void insert_sym_with_symtab(tree_ptr n, sym_table_ptr st, type_ptr t);
 #endif // SEMANTIC_H

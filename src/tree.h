@@ -2,22 +2,27 @@
 #define TREE_H
 
 #define MAX_KIDS_SIZE 10
+#include <stdarg.h>
 
 #include "token.h"
 #include "type.h"
 #include "symtab.h"
-#include <stdarg.h>
+#include "tac.h"
 
 struct tree
 {
     int prodrule;
     char *prodname;
     int nkids;
+    int label;
     int basetype;
+    int width;
     struct typeinfo *type;
     struct sym_table *symtab;
     struct tree **kids;
     struct token *leaf;
+    struct instr * code;
+    struct addr place;
 };
 
 typedef struct tree *tree_ptr;
