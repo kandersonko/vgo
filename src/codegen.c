@@ -31,6 +31,10 @@
 
 
     // use tree level & node kids number to generate unique labels
+
+    loc -> .code region
+    const -> .static region
+    global -> global region
 */
 
 static int newlabel()
@@ -40,11 +44,25 @@ static int newlabel()
     return counter;
 }
 
+static int get_offset(tree_ptr n)
+{
+    if (n->prodrule == LNAME || n->prodrule == LLITERAL)
+    {
+        sym_entry_ptr entry = lookup_st(n->symtab, n->leaf->text);
+        if (entry != NULL)
+        {
+            printf("FOUND OFFSET: %d for %s\n", entry->offset, n->leaf->text);
+            return entry->offset;
+        }
+    }
+    return 0;
+}
+
 // width in bytes
 struct addr newtemp(tree_ptr n)
 {
     struct addr temp;
-    temp.offset = n->symtab->size;
+    temp.offset = get_offset(n);
 
     if (n->prodrule == LLITERAL)
     {
@@ -59,10 +77,6 @@ struct addr newtemp(tree_ptr n)
             temp.region = REGION_LABEL;
         }
         return temp;
-    }
-    if (n->prodrule == LNAME)
-    {
-        // printf("LNAME: %s %s\n", n->leaf->text, n->symtab->name);
     }
 
     // printf("SYMBOL TABLE: %s\n", st->name);

@@ -235,8 +235,6 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     int h;
     struct sym_entry *entry;
 
-    printf("INSERTING %s INTO %s\n", s, st->name);
-
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)
         if (strcmp(s, entry->text) == 0)
@@ -255,17 +253,31 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     entry->next = st->buckets[h];
     // entry->table = st;
     entry->type = t;
+
     if (st == stringpool)
         entry->text = insert_sbuf(&buf, s);
     else
         entry->text = strdup(s);
+
+    if (st->size == 0)
+    {
+        entry->offset =0;
+    }
+    else
+    {
+        entry->offset = st->size;
+    }
+    st->size += t->width;
+
     st->buckets[h] = entry;
     st->entries++;
-    st->size += entry->type->width;
+
+    printf("INSERTING %s of type %s:%d into %s:%d at offset %d\n", s, typename(t), t->width, st->name, st->size, entry->offset);
+
     return 1;
 }
 
-sym_table_ptr find_symtab(char * s)
+sym_table_ptr find_symtab(char *s)
 {
     sym_table_ptr temp;
     sym_entry_ptr entry = NULL;

@@ -39,6 +39,7 @@ typedef struct sym_entry
     struct typeinfo *type; /* a.k.a. type_ptr, struct c_type *... */
     /* more symbol attributes go here for code generation */
     struct sym_entry *next;
+    int offset;
 } * sym_entry_ptr;
 
 // symbol tables

@@ -495,6 +495,7 @@ static void vardcl(tree_ptr n, char *varname)
     case LLITERAL:
         n->basetype = get_basetype(n->leaf->text);
         n->type = alctype(n->basetype);
+        insert_sym(globals, n->leaf->text, n->type);
         break;
     default:
 
@@ -914,7 +915,7 @@ void printsymbols(sym_table_ptr st, int level)
     sym_entry_ptr ste;
     if (st == NULL)
         return;
-    // printf("\nSymbol table: %s | size: %d\n", st->name, st->size);
+    printf("\nSymbol table: %s | size: %d\n", st->name, st->size);
     for (i = 0; i < st->nbuckets; i++)
     {
         for (ste = st->buckets[i]; ste; ste = ste->next)
