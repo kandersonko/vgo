@@ -7,30 +7,6 @@
 #include "utils.h"
 #include "tac.h"
 
-char *get_region_name(int region)
-{
-    char *s;
-    switch (region)
-    {
-    case REGION_GLOBAL:
-        s = "global";
-        break;
-    case REGION_LOCAL:
-        s = "loc";
-        break;
-    case REGION_CONST:
-        s = "const";
-        break;
-    case REGION_LABEL:
-        s = "label";
-        break;
-    default:
-        s = "NULL";
-        break;
-    }
-    return s;
-}
-
 void print_tree(tree_ptr ast, int depth)
 {
     if (!ast)
@@ -46,7 +22,8 @@ void print_tree(tree_ptr ast, int depth)
                ast->leaf->width,
                ast->leaf->label,
                get_region_name(ast->leaf->place.region),
-               ast->leaf->place.offset, ast->leaf->text,
+               ast->leaf->place.offset, 
+               ast->leaf->text,
                ast->leaf->lineno,
                ast->leaf->filename);
     }

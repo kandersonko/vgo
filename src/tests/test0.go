@@ -2,13 +2,12 @@ package main
 
 import "fmt"
 
-func add_xy(x int, y float64) {
-	var k int = x
-}
-
 func main() {
-	var x int
-	x = 10 + 2
 	var s string = "hello"
+
+	var x int = -12
+	var y int = -45
+	var year int
+	year = x + y + 30
 	fmt.Println(x)
 }

@@ -268,6 +268,7 @@ static void check_declaration(tree_ptr n)
     case LLITERAL:
         n->type = alctype(n->leaf->basetype);
         // insert_sym(current, n->leaf->text, n->type);
+        insert_sym(globals, n->leaf->text, n->type);
         break;
 
     default:

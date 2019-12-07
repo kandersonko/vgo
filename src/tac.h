@@ -53,7 +53,11 @@ struct instr
 #define DECL_LABEL 3054
 #define DECL_END 3055
 
-struct instr *gen(int, struct addr, struct addr, struct addr);
-struct instr *concat(struct instr *, struct instr *);
+struct instr *gen(int opcode, struct addr dest, struct addr src1, struct addr src2);
+struct instr *concat(struct instr *l1, struct instr *l2);
+
+char *get_region_name(int region);
+
+char* get_opcode_name(int opcode);
 
 #endif
