@@ -56,7 +56,66 @@ char *get_opcode_name(int opcode)
     case OP_ADD:
         s = "add";
         break;
-
+    case OP_SUB:
+        s = "sub";
+        break;
+    case OP_MUL:
+        s = "mul";
+        break;
+    case OP_DIV:
+        s = "div";
+        break;
+    case OP_NEG:
+        s = "uminus";
+        break;
+    case OP_ASN:
+        s = "mov";
+        break;
+    case OP_ADDR:
+        s = "addr";
+        break;
+    case OP_LCONST:
+        s = "lconst";
+        break;
+    case OP_SCONST:
+        s = "sconst";
+        break;
+    case OP_GOTO:
+        s = "goto";
+        break;
+    case OP_BLT:
+        s = "blt";
+        break;
+    case OP_BLE:
+        s = "ble";
+        break;
+    case OP_BGT:
+        s = "bgt";
+        break;
+    case OP_BGE:
+        s = "bge";
+        break;
+    case OP_BEQ:
+        s = "beq";
+        break;
+    case OP_BNE:
+        s = "bne";
+        break;
+    case OP_BIF:
+        s = "bif";
+        break;
+    case OP_BNIF:
+        s = "bnif";
+        break;
+    case OP_PARM:
+        s = "param";
+        break;
+    case OP_CALL:
+        s = "call";
+        break;
+    case OP_RET:
+        s = "ret";
+        break;
     default:
         s = "OPCODE";
         break;

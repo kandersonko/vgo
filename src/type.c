@@ -31,6 +31,20 @@ type_ptr alcfunctype(tree_ptr return_type, tree_ptr param_type, sym_table_ptr st
 
 type_ptr alcstructtype(char *name, sym_table_ptr st);
 
+int is_castable_to(type_ptr t, type_ptr to)
+{
+    if (t->basetype == INT_TYPE || t->basetype == FLOAT64_TYPE)
+    {
+        if (to->basetype == INT_TYPE || to->basetype == FLOAT64_TYPE)
+            return 1;
+        else
+            return 0;
+    }
+    else if (t->basetype == to->basetype)
+        return 1;
+    return 0;
+}
+
 type_ptr alctype(int basetype)
 {
     type_ptr t;

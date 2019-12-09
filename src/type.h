@@ -87,4 +87,6 @@ int is_basic_type(int basetype);
 
 void delete_type(type_ptr t);
 
+int is_castable_to(type_ptr t, type_ptr to);
+
 #endif

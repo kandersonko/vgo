@@ -1,13 +1,13 @@
 package main
 
-import "fmt"
-
 func main() {
 	var s string = "hello"
 
-	var x int = -12
-	var y int = -45
-	var year int
-	year = x + y + 30
-	fmt.Println(x)
+	var x int = -12 - 5
+	var y float64 = 45 / 2.5
+	var z int = x * y
+	var w int = -x
+	// var year int
+	// year = x + y + 30
+	// fmt.Println(x)
 }

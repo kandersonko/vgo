@@ -30,6 +30,8 @@ static void get_func_type(char *func_name, type_ptr *func_type)
 
 static void type_error_msg(tree_ptr n, type_ptr t, int has_func_call)
 {
+    if (is_castable_to(n->type, t) == 1)
+        return;
     if (n->type->basetype == FUNC_TYPE)
     {
         type_ptr func_type = NULL;

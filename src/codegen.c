@@ -99,7 +99,9 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     {
         printf("FOUND SYMTAB: %s\n", st->name);
         return st->size;
-    } else {
+    }
+    else
+    {
         return n->symtab->size;
     }
     return 0;
@@ -218,6 +220,22 @@ static void get_place(tree_ptr n, struct addr *place)
     }
 }
 
+static void gen_expr_ic(tree_ptr n, int opcode)
+{
+    struct instr *g;
+    printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    n->place = newtemp(n);
+    get_place(n->kids[0], &n->kids[0]->place);
+    get_place(n->kids[2], &n->kids[2]->place);
+    printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
+    printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
+    printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
+    n->code = concat(n->kids[0]->code, n->kids[2]->code);
+    g = gen(opcode, n->place,
+            n->kids[0]->place, n->kids[2]->place);
+    n->code = concat(n->code, g);
+}
+
 static void ic_expression(tree_ptr n)
 {
     int i;
@@ -237,22 +255,49 @@ static void ic_expression(tree_ptr n)
     */
     switch (n->prodrule)
     {
+    case R_EXPR + 1: // "||"
+        break;
+    case R_EXPR + 2: // "&&"
+        break;
+    case R_EXPR + 3: // "="
+        gen_expr_ic(n, OP_ASN);
+        break;
+    case R_EXPR + 4: // "!="
+        break;
+    case R_EXPR + 5: // "<"
+        break;
+    case R_EXPR + 6: // "<="
+        break;
+    case R_EXPR + 7: // ">="
+        break;
+    case R_EXPR + 8: // ">"
+        break;
     case R_EXPR + 9: // "+"
-    {
-        struct instr *g;
-        printf("SYMTABLE FOUND: %s\n", n->symtab->name);
-        n->place = newtemp(n);
-        get_place(n->kids[0], &n->kids[0]->place);
-        get_place(n->kids[2], &n->kids[2]->place);
-        printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
-        printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
-        printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
-        n->code = concat(n->kids[0]->code, n->kids[2]->code);
-        g = gen(OP_ADD, n->place,
-                n->kids[0]->place, n->kids[2]->place);
-        n->code = concat(n->code, g);
-    }
-    break;
+        gen_expr_ic(n, OP_ADD);
+        break;
+    case R_EXPR + 10: // "-"
+        gen_expr_ic(n, OP_SUB);
+        break;
+    case R_EXPR + 11: // "|"
+        break;
+    case R_EXPR + 12: // "*"
+        gen_expr_ic(n, OP_MUL);
+        break;
+    case R_EXPR + 13: // "/"
+        gen_expr_ic(n, OP_DIV);
+        break;
+    case R_EXPR + 14: // "%"
+        break;
+    case R_EXPR + 15: // "&"
+        break;
+    case R_EXPR + 16: // "ANDNOT"
+        break;
+    case R_EXPR + 17: // "LLSH"
+        break;
+    case R_EXPR + 18: // "LRSH"
+        break;
+    case R_EXPR + 19: // "LCOMM"
+        break;
     /*
     * ... really, a bazillion cases, up to one for each
     * production rule (in the worst case)
@@ -277,15 +322,7 @@ static void print_ic_code(tree_ptr n)
     struct instr *code = n->code;
     while (code != NULL)
     {
-        switch (code->opcode)
-        {
-        case OP_ADD:
-            print_code(code);
-            break;
-
-        default:
-            break;
-        }
+        print_code(code);
         code = code->next;
     }
 }
