@@ -1,0 +1,5 @@
+sub	 const:28,const:8,const:12
+div	 const:28,const:16,const:20
+mul	 loc:28,const:8,const:12
+OPCODE	 NULL:0,NULL:0
+uminus	 loc:28,const:8

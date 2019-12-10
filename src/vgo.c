@@ -105,7 +105,7 @@ int main(int argc, char **argv)
                 print_tree(ast_root, 0);
             }
 
-            // generate_ic_file(ic_file);
+            generate_ic_file(ic_file, ast_root);
             fclose(ic_file);
         }
         else
@@ -123,10 +123,32 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void generate_ic_file(FILE *fp)
+void generate_ic_file(FILE *fp, tree_ptr n)
 {
-    fprintf(fp, "This is testing for fprintf...\n");
-    fputs("This is testing for fputs...\n", fp);
+    if (!n)
+        return;
+    struct instr *code = n->code;
+    while (code != NULL)
+    {
+        if (!code)
+            return;
+        if (code->src2.region == 0 && code->src2.offset == 0)
+        {
+            fprintf(fp, "%s\t %s:%d,%s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset,
+                   get_region_name(code->src1.region), code->src1.offset);
+        }
+        else
+        {
+            fprintf(fp, "%s\t %s:%d,%s:%d,%s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset,
+                   get_region_name(code->src1.region), code->src1.offset,
+                   get_region_name(code->src2.region), code->src2.offset);
+        }
+        code = code->next;
+    }
 }
 
 // code found on stackoverflow

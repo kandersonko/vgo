@@ -80,7 +80,7 @@ static void get_symtab(tree_ptr n, sym_table_ptr *st)
     case LNAME:
     case LLITERAL:
         *st = find_symtab(n->leaf->text, current);
-        if(*st == NULL)
+        if (*st == NULL)
         {
             *st = find_symtab(n->leaf->text, globals);
         }
@@ -353,8 +353,13 @@ static void ic_expression(tree_ptr n)
     }
 }
 
+static void generate_ic_header()
+{
+}
+
 static void generate_ic_code(tree_ptr n)
 {
+    generate_ic_header();
     ic_expression(n);
 }
 
@@ -369,6 +374,7 @@ static void print_ic_code(tree_ptr n)
         code = code->next;
     }
 }
+
 
 void codegen(tree_ptr n)
 {
