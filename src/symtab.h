@@ -40,6 +40,7 @@ typedef struct sym_entry
     /* more symbol attributes go here for code generation */
     struct sym_entry *next;
     int offset;
+    int region;
 } * sym_entry_ptr;
 
 // symbol tables
@@ -60,7 +61,7 @@ sym_entry_ptr lookup(sym_table_ptr st, char *s);
 
 sym_entry_ptr lookup_scope(char *s);
 
-sym_table_ptr find_symtab(char *s);
+sym_table_ptr find_symtab(char *s, sym_table_ptr st);
 
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */

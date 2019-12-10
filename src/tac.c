@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include "tac.h"
 #include "utils.h"
+#include "tree.h"
+#include "rules.h"
+#include "go.tab.h"
 
 // TODO: create  this function
 // void print_code(struct instr * code)
@@ -44,6 +47,29 @@ struct instr *concat(struct instr *l1, struct instr *l2)
 {
     return append(copylist(l1), l2);
 }
+
+
+// static void get_symtab(tree_ptr n, sym_table_ptr *st)
+// {
+//     if (!n)
+//         return;
+//     int i;
+//     for (i = 0; i < n->nkids; i++)
+//     {
+//         get_symtab(n->kids[i], st);
+//     }
+
+//     switch (n->prodrule)
+//     {
+//     case LNAME:
+//     case LLITERAL:
+//         *st = find_symtab(n->leaf->text);
+//         break;
+
+//     default:
+//         break;
+//     }
+// }
 
 /*
 #define OP_ADD 3001
@@ -115,6 +141,15 @@ char *get_opcode_name(int opcode)
         break;
     case OP_RET:
         s = "ret";
+        break;
+    case OP_UMINUS:
+        s = "uminus";
+        break;
+    case OP_UPLUS:
+        s = "uplus";
+        break;
+    case OP_NOT:
+        s = "unot";
         break;
     default:
         s = "OPCODE";

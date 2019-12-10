@@ -41,11 +41,21 @@ static void print_code(struct instr *code)
 {
     if (!code)
         return;
-    printf("%s\t %s:%d,%s:%d,%s:%d\n",
-           get_opcode_name(code->opcode),
-           get_region_name(code->dest.region), code->dest.offset,
-           get_region_name(code->src1.region), code->src1.offset,
-           get_region_name(code->src2.region), code->src2.offset);
+    if (code->src2.region == 0 && code->src2.offset == 0)
+    {
+        printf("%s\t %s:%d,%s:%d\n",
+               get_opcode_name(code->opcode),
+               get_region_name(code->dest.region), code->dest.offset,
+               get_region_name(code->src1.region), code->src1.offset);
+    }
+    else
+    {
+        printf("%s\t %s:%d,%s:%d,%s:%d\n",
+               get_opcode_name(code->opcode),
+               get_region_name(code->dest.region), code->dest.offset,
+               get_region_name(code->src1.region), code->src1.offset,
+               get_region_name(code->src2.region), code->src2.offset);
+    }
 }
 
 static int newlabel()
@@ -69,7 +79,11 @@ static void get_symtab(tree_ptr n, sym_table_ptr *st)
     {
     case LNAME:
     case LLITERAL:
-        *st = find_symtab(n->leaf->text);
+        *st = find_symtab(n->leaf->text, current);
+        if(*st == NULL)
+        {
+            *st = find_symtab(n->leaf->text, globals);
+        }
         break;
 
     default:
@@ -82,6 +96,9 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     sym_entry_ptr entry;
     if (n->prodrule == LNAME || n->prodrule == LLITERAL)
     {
+        printf("GETTING OFFSET FOR %s\n", n->leaf->text);
+        if (st != NULL)
+            printf("SYMTAB: %s\n", st->name);
         if (st != NULL)
             entry = lookup_st(st, n->leaf->text);
         else
@@ -97,7 +114,6 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     }
     if (st != NULL)
     {
-        printf("FOUND SYMTAB: %s\n", st->name);
         return st->size;
     }
     else
@@ -107,45 +123,44 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     return 0;
 }
 
-static int get_local_global_region(tree_ptr n, sym_table_ptr st)
+static struct addr get_addr(tree_ptr n, sym_table_ptr st)
 {
-    int region = REGION_LABEL;
-    sym_table_ptr temp = NULL;
-    if (st != NULL)
-        temp = st;
+    struct addr new_addr;
+    if (n->prodrule == LLITERAL || n->prodrule == LNAME)
+    {
+        sym_entry_ptr entry = lookup(st, n->leaf->text);
+        if (entry != NULL)
+        {
+            new_addr.offset = entry->offset;
+            new_addr.region = entry->region;
+            return new_addr;
+        }
+    }
+    if (!st)
+    {
+        new_addr.offset = 0;
+        new_addr.region = 0;
+        return new_addr;
+    }
+    if (strcmp(st->name, "global") == 0 || strcmp(st->name, "static") == 0)
+    {
+        new_addr.region = REGION_CONST;
+        new_addr.offset = get_offset(n, st);
+    }
     else
-        temp = n->symtab;
-
-    if (n->prodrule == LLITERAL)
     {
-        return REGION_CONST;
+        new_addr.region = REGION_LOCAL;
+        new_addr.offset = get_offset(n, st);
     }
-
-    if (strcmp(temp->name, "global") == 0)
-    {
-        region = REGION_CONST;
-    }
-    else if (strcmp(temp->name, "static") == 0)
-    {
-        region = REGION_CONST;
-    }
-    else
-    {
-        region = REGION_LOCAL;
-    }
-
-    return region;
+    return new_addr;
 }
 
 // width in bytes
 struct addr newtemp(tree_ptr n)
 {
-    struct addr temp;
     sym_table_ptr st = NULL;
     get_symtab(n, &st);
-
-    temp.offset = get_offset(n, st);
-    temp.region = get_local_global_region(n, st);
+    struct addr temp = get_addr(n, st);
     return temp;
 }
 
@@ -223,16 +238,31 @@ static void get_place(tree_ptr n, struct addr *place)
 static void gen_expr_ic(tree_ptr n, int opcode)
 {
     struct instr *g;
-    printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
     n->place = newtemp(n);
     get_place(n->kids[0], &n->kids[0]->place);
     get_place(n->kids[2], &n->kids[2]->place);
-    printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
-    printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
-    printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
+    // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
+    // printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
+    // printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
     n->code = concat(n->kids[0]->code, n->kids[2]->code);
     g = gen(opcode, n->place,
             n->kids[0]->place, n->kids[2]->place);
+    n->code = concat(n->code, g);
+}
+
+static void gen_unary_expr_ic(tree_ptr n, int opcode)
+{
+    struct instr *g;
+    // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    n->place = newtemp(n);
+    get_place(n->kids[1], &n->kids[1]->place);
+    // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
+    // printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
+    // printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
+    struct addr null_addr = {0, 0};
+    g = gen(opcode, n->place,
+            n->kids[1]->place, null_addr);
     n->code = concat(n->code, g);
 }
 
@@ -297,6 +327,19 @@ static void ic_expression(tree_ptr n)
     case R_EXPR + 18: // "LRSH"
         break;
     case R_EXPR + 19: // "LCOMM"
+        break;
+
+    // unary operations
+    case R_UEXPR + 1: // "pointer *id"
+        break;
+    case R_UEXPR + 2: // "+id"
+        gen_unary_expr_ic(n, OP_UPLUS);
+        break;
+    case R_UEXPR + 3: // "-id"
+        gen_unary_expr_ic(n, OP_UMINUS);
+        break;
+    case R_UEXPR + 4: // "!id"
+        gen_unary_expr_ic(n, OP_NOT);
         break;
     /*
     * ... really, a bazillion cases, up to one for each

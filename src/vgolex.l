@@ -133,10 +133,10 @@ invalid_keywords    "break"|"case"|"chan"|"fallthrough"|"continue"|"default"|"de
 
 "0"[xX][0-9a-fA-F]+			{ basetype = INT_TYPE; ival = (int)strtol(yytext, NULL, 16); return tok(LLITERAL); }
 "0"[0-7]+				{  basetype = INT_TYPE; ival = (int)strtol(yytext, NULL, 8); return tok(LLITERAL); }
-[0-9]+					{ basetype = INT_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
+[+-]?[0-9]+					{ basetype = INT_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
 
-{float}{exponent}?			{ basetype = FLOAT64_TYPE; dval = atof(yytext); return tok(LLITERAL); }
-[0-9]+{exponent}			{ basetype = FLOAT64_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
+[+-]?{float}{exponent}?			{ basetype = FLOAT64_TYPE; dval = atof(yytext); return tok(LLITERAL); }
+[+-]?[0-9]+{exponent}			{ basetype = FLOAT64_TYPE; ival = atoi(yytext); return tok(LLITERAL); }
 
 "\'"(\\.|[^\\"])"\'"			{ basetype = STRING_TYPE; sval = yytext; return tok(LLITERAL); }
 

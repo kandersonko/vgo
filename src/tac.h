@@ -45,6 +45,10 @@ struct instr
 #define OP_PARM 3019
 #define OP_CALL 3020
 #define OP_RET 3021
+#define OP_UMINUS 3022
+#define OP_UPLUS 3023
+#define OP_NOT 3024
+#define OP_POINTER 3025
 
 /* declarations/pseudo instructions */
 #define DECL_GLOB 3051

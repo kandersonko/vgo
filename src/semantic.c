@@ -109,7 +109,6 @@ void enter_newscope(char *s, int basetype)
     pushscope(new);
 }
 
-
 static void enter_func_scope(char *s, type_ptr returntype, paramlist params, int nparams)
 {
     sym_table_ptr new = new_st(150, s);
@@ -495,9 +494,17 @@ static void vardcl(tree_ptr n, char *varname)
 
         break;
     case LLITERAL:
-        n->basetype = get_basetype(n->leaf->text);
-        n->type = alctype(n->basetype);
-        insert_sym(globals, n->leaf->text, n->type);
+        if (is_basic_type(n->leaf->basetype) == 1)
+        {
+            n->basetype = (n->leaf->basetype);
+            n->type = alctype(n->leaf->basetype);
+        }
+        else
+        {
+            n->basetype = get_basetype(n->leaf->text);
+            n->type = alctype(n->basetype);
+        }
+        // insert_sym(globals, n->leaf->text, n->type);
         break;
     default:
 
@@ -861,10 +868,40 @@ void populate_builtins()
     popscope();
 }
 
+static void populate_globals(tree_ptr n)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        populate_globals(n->kids[i]);
+    }
+
+    switch (n->prodrule)
+    {
+    case LLITERAL:
+        if (is_basic_type(n->leaf->basetype) == 1)
+        {
+            n->basetype = (n->leaf->basetype);
+            n->type = alctype(n->leaf->basetype);
+        }
+        else
+        {
+            n->basetype = get_basetype(n->leaf->text);
+            n->type = alctype(n->basetype);
+        }
+        insert_sym(globals, n->leaf->text, n->type);
+    default:
+        break;
+    }
+}
+
 void populate(tree_ptr n)
 {
     if (n == NULL)
         return;
+
 
     enter_newscope("global", PACKAGE_TYPE);
 
@@ -885,6 +922,7 @@ void populate(tree_ptr n)
 
     populate_package(n->kids[0]);
     populate_imports(n->kids[1]);
+    populate_globals(n);
     populate_xdcl(n->kids[2]);
 }
 

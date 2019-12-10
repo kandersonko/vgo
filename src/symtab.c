@@ -55,6 +55,8 @@ void init_sbuf(struct str_buf *);  /* initialize an sbuf struct */
 void clear_sbuf(struct str_buf *); /* free struct buffer storage */
 void new_sbuf(struct str_buf *);   /* allocate add'l buffer */
 
+
+
 /*
  * new_st - construct symbol (hash) table.
  *  Allocate space first for the structure, then
@@ -247,6 +249,20 @@ static int get_symtab_size(sym_table_ptr st, type_ptr t)
     return size + st->size;
 }
 
+int get_entry_region(sym_table_ptr st, type_ptr t)
+{
+    int region = 0;
+    if (strcmp(st->name, "global") == 0 || strcmp(st->name, "static") == 0 || is_basic_type(t->basetype))
+    {
+        region = REGION_CONST;
+    }
+    else
+    {
+        region = REGION_LOCAL;
+    }
+    return region;
+}
+
 int insert_sym(sym_table_ptr st, char *s, type_ptr t)
 {
     int h;
@@ -286,6 +302,8 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     }
     st->size = get_symtab_size(st, t);
 
+    entry->region = get_entry_region(st, t);
+
     st->buckets[h] = entry;
     st->entries++;
 
@@ -294,12 +312,12 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     return 1;
 }
 
-sym_table_ptr find_symtab(char *s)
+sym_table_ptr find_symtab(char *s, sym_table_ptr st)
 {
     sym_table_ptr temp;
     sym_entry_ptr entry = NULL;
 
-    for (temp = current; temp != NULL; temp = temp->parent)
+    for (temp = st; temp != NULL; temp = temp->parent)
     {
         int i;
         for (i = 0; i < temp->nbuckets; i++)
@@ -308,14 +326,13 @@ sym_table_ptr find_symtab(char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-
                     return temp;
                 }
             }
         }
     }
 
-    for (temp = current; temp != NULL; temp = temp->child)
+    for (temp = st; temp != NULL; temp = temp->child)
     {
         int i;
         for (i = 0; i < temp->nbuckets; i++)
@@ -324,7 +341,6 @@ sym_table_ptr find_symtab(char *s)
             {
                 if (strcmp(s, entry->text) == 0)
                 {
-
                     return temp;
                 }
             }
