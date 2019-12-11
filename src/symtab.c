@@ -249,10 +249,10 @@ static int get_symtab_size(sym_table_ptr st, type_ptr t)
     return size + st->size;
 }
 
-int get_entry_region(sym_table_ptr st, type_ptr t)
+int get_entry_region(sym_table_ptr st, type_ptr t, char *s)
 {
     int region = 0;
-    if (strcmp(st->name, "global") == 0 || strcmp(st->name, "static") == 0 || is_basic_type(t->basetype))
+    if (strcmp(st->name, "global") == 0 || strcmp(st->name, "static") == 0 || atoi(s) == 1)
     {
         region = REGION_CONST;
     }
@@ -261,6 +261,24 @@ int get_entry_region(sym_table_ptr st, type_ptr t)
         region = REGION_LOCAL;
     }
     return region;
+}
+
+int get_entry_offset(sym_table_ptr st, type_ptr t, char * s)
+{
+    int offset = 0;
+    if(t->basetype == INT_TYPE)
+    {
+        offset = atoi(s);
+    }
+    else if (st->size == 0)
+    {
+        offset = 0;
+    }
+    else
+    {
+        offset = st->size;
+    }
+    return offset;
 }
 
 int insert_sym(sym_table_ptr st, char *s, type_ptr t)
@@ -292,22 +310,15 @@ int insert_sym(sym_table_ptr st, char *s, type_ptr t)
     else
         entry->text = strdup(s);
 
-    if (st->size == 0)
-    {
-        entry->offset = 0;
-    }
-    else
-    {
-        entry->offset = st->size;
-    }
     st->size = get_symtab_size(st, t);
 
-    entry->region = get_entry_region(st, t);
+    entry->region = get_entry_region(st, t, s);
+    entry->offset = get_entry_offset(st, t, s);
 
     st->buckets[h] = entry;
     st->entries++;
 
-    printf("INSERTING %s of type %s:%d into %s:%d at offset %d\n", s, typename(t), t->width, st->name, st->size, entry->offset);
+    printf("INSERTING %s of type %s:%d into %s:%d at addr %s:%d\n", s, typename(t), t->width, st->name, st->size, get_region_name(entry->region), entry->offset);
 
     return 1;
 }

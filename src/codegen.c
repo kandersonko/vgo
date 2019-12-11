@@ -97,6 +97,9 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     if (n->prodrule == LNAME || n->prodrule == LLITERAL)
     {
         printf("GETTING OFFSET FOR %s\n", n->leaf->text);
+
+        if (is_basic_type(n->type->basetype))
+            return get_entry_offset(st, n->type, n->leaf->text);
         if (st != NULL)
             printf("SYMTAB: %s\n", st->name);
         if (st != NULL)
@@ -126,13 +129,23 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
 static struct addr get_addr(tree_ptr n, sym_table_ptr st)
 {
     struct addr new_addr;
-    if (n->prodrule == LLITERAL || n->prodrule == LNAME)
+    if (n->prodrule == LLITERAL)
+    {
+        new_addr.offset = get_entry_offset(st, n->type, n->leaf->text);
+        new_addr.region = get_entry_region(st, n->type, n->leaf->text);
+
+        printf("FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
+        return new_addr;
+    }
+    if (n->prodrule == LNAME)
     {
         sym_entry_ptr entry = lookup(st, n->leaf->text);
         if (entry != NULL)
         {
             new_addr.offset = entry->offset;
             new_addr.region = entry->region;
+            printf("LOOKUP FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
+
             return new_addr;
         }
     }
@@ -155,6 +168,15 @@ static struct addr get_addr(tree_ptr n, sym_table_ptr st)
     return new_addr;
 }
 
+static struct addr newlocal(tree_ptr n)
+{
+    static int counter = 0;
+    struct addr temp;
+    temp.offset = counter;
+    temp.region = REGION_LOCAL;
+    counter++;
+    return temp;
+}
 // width in bytes
 struct addr newtemp(tree_ptr n)
 {
@@ -181,8 +203,11 @@ static void generate_attributes(tree_ptr n)
     {
     case LNAME:
     case LLITERAL:
+        printf("BEFORE FOUND ADDR: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(n->place.region), n->place.offset);
+
         n->label = newlabel();
         n->place = newtemp(n);
+        printf("AFTER FOUND ADDR: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(n->place.region), n->place.offset);
         n->leaf->label = n->label;
         n->leaf->place = n->place;
         break;
@@ -239,7 +264,7 @@ static void gen_expr_ic(tree_ptr n, int opcode)
 {
     struct instr *g;
     // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
-    n->place = newtemp(n);
+    n->place = newlocal(n);
     get_place(n->kids[0], &n->kids[0]->place);
     get_place(n->kids[2], &n->kids[2]->place);
     // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
@@ -374,7 +399,6 @@ static void print_ic_code(tree_ptr n)
         code = code->next;
     }
 }
-
 
 void codegen(tree_ptr n)
 {

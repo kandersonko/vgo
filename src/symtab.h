@@ -63,6 +63,9 @@ sym_entry_ptr lookup_scope(char *s);
 
 sym_table_ptr find_symtab(char *s, sym_table_ptr st);
 
+int get_entry_offset(sym_table_ptr st, type_ptr t, char *s);
+int get_entry_region(sym_table_ptr st, type_ptr t, char *s);
+
 extern sym_table_ptr stringpool; /* all idents seen in entire program */
 extern sym_table_ptr globals;    /* global symbols */
 extern sym_table_ptr current;    /* current */
