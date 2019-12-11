@@ -39,7 +39,7 @@
 
 static void print_code(struct instr *code)
 {
-    if (!code)
+    if (code->opcode == 0)
         return;
     if (code->src2.region == 0 && code->src2.offset == 0)
     {
@@ -82,7 +82,7 @@ static void get_symtab(tree_ptr n, sym_table_ptr *st)
         *st = find_symtab(n->leaf->text, current);
         if (*st == NULL)
             *st = find_symtab(n->leaf->text, globals);
-        if(*st == NULL)
+        if (*st == NULL)
             *st = find_symtab(n->leaf->text, stringpool);
         break;
 
@@ -262,8 +262,12 @@ static void get_place(tree_ptr n, struct addr *place)
 
 static void gen_expr_ic(tree_ptr n, int opcode)
 {
+    if (opcode == 0)
+        return;
+
+
     struct instr *g;
-    // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
     n->place = newlocal(n);
     get_place(n->kids[0], &n->kids[0]->place);
     get_place(n->kids[2], &n->kids[2]->place);
@@ -278,8 +282,10 @@ static void gen_expr_ic(tree_ptr n, int opcode)
 
 static void gen_unary_expr_ic(tree_ptr n, int opcode)
 {
+    if (opcode == 0)
+        return;
     struct instr *g;
-    // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    printf("UNARY SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
     n->place = newtemp(n);
     get_place(n->kids[1], &n->kids[1]->place);
     // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
@@ -331,7 +337,7 @@ static void ic_expression(tree_ptr n)
         gen_expr_ic(n, OP_ADD);
         break;
     case R_EXPR + 10: // "-"
-        gen_expr_ic(n, OP_SUB);
+        // gen_expr_ic(n, OP_SUB);
         break;
     case R_EXPR + 11: // "|"
         break;
@@ -358,13 +364,13 @@ static void ic_expression(tree_ptr n)
     case R_UEXPR + 1: // "pointer *id"
         break;
     case R_UEXPR + 2: // "+id"
-        gen_unary_expr_ic(n, OP_UPLUS);
+        // gen_unary_expr_ic(n, OP_UPLUS);
         break;
     case R_UEXPR + 3: // "-id"
         gen_unary_expr_ic(n, OP_UMINUS);
         break;
     case R_UEXPR + 4: // "!id"
-        gen_unary_expr_ic(n, OP_NOT);
+        // gen_unary_expr_ic(n, OP_NOT);
         break;
     /*
     * ... really, a bazillion cases, up to one for each

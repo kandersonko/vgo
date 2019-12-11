@@ -1,5 +1,5 @@
 add	 loc:0,const:12,const:5
 div	 loc:1,const:45,const:8
-mul	 loc:2,loc:0,loc:20
+mul	 loc:2,loc:0,loc:12
 OPCODE	 NULL:0,NULL:0
-uminus	 loc:28,loc:0
+uminus	 loc:20,loc:0

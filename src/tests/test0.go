@@ -1,7 +1,8 @@
 package main
 
 func main() {
-	var s string = "hello"
+	// var s string
+	// s = "hello"
 
 	var x int = 12 + 5
 	var y float64 = 45 / 8
