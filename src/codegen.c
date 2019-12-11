@@ -81,9 +81,9 @@ static void get_symtab(tree_ptr n, sym_table_ptr *st)
     case LLITERAL:
         *st = find_symtab(n->leaf->text, current);
         if (*st == NULL)
-        {
             *st = find_symtab(n->leaf->text, globals);
-        }
+        if(*st == NULL)
+            *st = find_symtab(n->leaf->text, stringpool);
         break;
 
     default:

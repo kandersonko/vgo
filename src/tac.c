@@ -175,6 +175,9 @@ char *get_region_name(int region)
     case REGION_LABEL:
         s = "label";
         break;
+    case REGION_STRING:
+        s = "string";
+        break;
     default:
         s = "NULL";
         break;

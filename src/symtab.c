@@ -55,8 +55,6 @@ void init_sbuf(struct str_buf *);  /* initialize an sbuf struct */
 void clear_sbuf(struct str_buf *); /* free struct buffer storage */
 void new_sbuf(struct str_buf *);   /* allocate add'l buffer */
 
-
-
 /*
  * new_st - construct symbol (hash) table.
  *  Allocate space first for the structure, then
@@ -256,6 +254,10 @@ int get_entry_region(sym_table_ptr st, type_ptr t, char *s)
     {
         region = REGION_CONST;
     }
+    else if (strcmp(st->name, "string") == 0)
+    {
+        region = REGION_STRING;
+    }
     else
     {
         region = REGION_LOCAL;
@@ -263,10 +265,10 @@ int get_entry_region(sym_table_ptr st, type_ptr t, char *s)
     return region;
 }
 
-int get_entry_offset(sym_table_ptr st, type_ptr t, char * s)
+int get_entry_offset(sym_table_ptr st, type_ptr t, char *s)
 {
     int offset = 0;
-    if(t->basetype == INT_TYPE)
+    if (t->basetype == INT_TYPE)
     {
         offset = atoi(s);
     }
@@ -281,10 +283,19 @@ int get_entry_offset(sym_table_ptr st, type_ptr t, char * s)
     return offset;
 }
 
-int insert_sym(sym_table_ptr st, char *s, type_ptr t)
+int insert_sym(sym_table_ptr symtable, char *s, type_ptr t)
 {
     int h;
     struct sym_entry *entry;
+    sym_table_ptr st;
+    if (t->basetype == STRING_TYPE && s[0] == '"')
+    {
+        st = stringpool;
+    }
+    else
+    {
+        st = symtable;
+    }
 
     h = hash(st, s);
     for (entry = st->buckets[h]; entry != NULL; entry = entry->next)

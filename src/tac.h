@@ -15,6 +15,7 @@ struct addr
 #define REGION_CLASS 2003  /* can assemble as relative to the 'this' register */
 #define REGION_LABEL 2004  /* pseudo-region for labels in the code region */
 #define REGION_CONST 2005  /* pseudo-region for immediate mode constants */
+#define REGION_STRING 2006  /* pseudo-region for immediate mode STRING */
 
 struct instr
 {
