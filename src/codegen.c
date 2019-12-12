@@ -39,7 +39,7 @@
 
 static void print_code(struct instr *code)
 {
-    if (code->opcode == 0)
+    if (code != NULL && code->opcode == 0)
         return;
     if (code->src2.region == 0 && code->src2.offset == 0)
     {
@@ -47,6 +47,13 @@ static void print_code(struct instr *code)
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src1.region), code->src1.offset);
+    }
+    else if (code->src1.region == 0 && code->src1.offset == 0)
+    {
+        printf("%s\t %s:%d,%s:%d\n",
+               get_opcode_name(code->opcode),
+               get_region_name(code->dest.region), code->dest.offset,
+               get_region_name(code->src2.region), code->src2.offset);
     }
     else
     {
@@ -134,7 +141,7 @@ static struct addr get_addr(tree_ptr n, sym_table_ptr st)
         new_addr.offset = get_entry_offset(st, n->type, n->leaf->text);
         new_addr.region = get_entry_region(st, n->type, n->leaf->text);
 
-        printf("FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
+        // printf("FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
         return new_addr;
     }
     if (n->prodrule == LNAME)
@@ -144,7 +151,7 @@ static struct addr get_addr(tree_ptr n, sym_table_ptr st)
         {
             new_addr.offset = entry->offset;
             new_addr.region = entry->region;
-            printf("LOOKUP FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
+            // printf("LOOKUP FOUND ENTRY: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(new_addr.region), new_addr.offset);
 
             return new_addr;
         }
@@ -203,11 +210,9 @@ static void generate_attributes(tree_ptr n)
     {
     case LNAME:
     case LLITERAL:
-        printf("BEFORE FOUND ADDR: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(n->place.region), n->place.offset);
 
         n->label = newlabel();
         n->place = newtemp(n);
-        printf("AFTER FOUND ADDR: %s:%s %s:%d\n", n->leaf->text, typename(n->type), get_region_name(n->place.region), n->place.offset);
         n->leaf->label = n->label;
         n->leaf->place = n->place;
         break;
@@ -265,9 +270,7 @@ static void gen_expr_ic(tree_ptr n, int opcode)
     if (opcode == 0)
         return;
 
-
-    struct instr *g;
-    printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    // printf("SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
     n->place = newlocal(n);
     get_place(n->kids[0], &n->kids[0]->place);
     get_place(n->kids[2], &n->kids[2]->place);
@@ -275,9 +278,24 @@ static void gen_expr_ic(tree_ptr n, int opcode)
     // printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
     // printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
     n->code = concat(n->kids[0]->code, n->kids[2]->code);
-    g = gen(opcode, n->place,
-            n->kids[0]->place, n->kids[2]->place);
+    struct instr *g = gen(opcode, n->place,
+                          n->kids[0]->place, n->kids[2]->place);
     n->code = concat(n->code, g);
+}
+
+static void gen_three_addr_code(int opcode, tree_ptr *dest, tree_ptr *src1, tree_ptr *src2)
+{
+    if (opcode == 0)
+        return;
+    (*dest)->place = newlocal(*dest);
+    get_place(*src1, &(*src1)->place);
+    get_place(*src2, &(*src2)->place);
+    (*dest)->code = concat((*src1)->code, (*src2)->code);
+    struct instr *g = gen(opcode, (*dest)->place,
+                          (*src1)->place, (*src2)->place);
+    (*dest)->code = concat((*dest)->code, g);
+    printf("PRINTING CODE: %s %s:%d\n", get_opcode_name(g->opcode), get_region_name(g->src1.region), g->src1.offset);
+    print_code((*dest)->code);
 }
 
 static void gen_unary_expr_ic(tree_ptr n, int opcode)
@@ -285,7 +303,7 @@ static void gen_unary_expr_ic(tree_ptr n, int opcode)
     if (opcode == 0)
         return;
     struct instr *g;
-    printf("UNARY SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
+    // printf("UNARY SYMTABLE FOUND: %s %s\n", n->symtab->name, get_opcode_name(opcode));
     n->place = newtemp(n);
     get_place(n->kids[1], &n->kids[1]->place);
     // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
@@ -295,6 +313,113 @@ static void gen_unary_expr_ic(tree_ptr n, int opcode)
     g = gen(opcode, n->place,
             n->kids[1]->place, null_addr);
     n->code = concat(n->code, g);
+}
+
+static void gen_assign_expr_ic(int opcode, tree_ptr n, tree_ptr right)
+{
+    if (opcode == 0)
+        return;
+    n->place = newlocal(n);
+    // get_place(right, &right->place);
+    right->place = newlocal(right);
+    struct addr null_addr = {0, 0};
+    struct instr *g = gen(opcode, n->place,
+                          right->place, null_addr);
+    n->code = concat(n->code, g);
+}
+
+static void get_child(tree_ptr n, tree_ptr *child)
+{
+    int i;
+    if (n == NULL)
+        return;
+
+    /*
+    * this is a post-order traversal, so visit kids first
+    */
+    for (i = 0; i < n->nkids; i++)
+        get_child(n->kids[i], child);
+
+    switch (n->prodrule)
+    {
+    case LLITERAL:
+    case LNAME:
+        *child = n;
+        break;
+
+    default:
+        break;
+    }
+}
+
+static void generate_dcl_ic_code(tree_ptr n)
+{
+    if (!n)
+        return;
+    int i;
+    for (i = 0; i < n->nkids; i++)
+    {
+        generate_dcl_ic_code(n->kids[i]);
+    }
+
+    printf("PRODNAME: %s %d\n", n->prodname, n->prodrule);
+
+    switch (n->prodrule)
+    {
+    case R_SIMPLE_STMT + 1:
+    case R_SIMPLE_STMT + 2:
+    case R_CONSTDCL + 1:
+    case R_VARDCL + 2: /* dcl_name_list '=' expr_list */
+        printf("VARDCL: \n");
+        {
+            // tree_ptr left = NULL, right = NULL;
+
+            // get_child(n->kids[0], &left);
+            // get_child(n->kids[2], &left);
+            // printf("VARDCL: %s %s\n", left->leaf->text, right->leaf->text);
+
+            gen_assign_expr_ic(OP_ASN, n, n->kids[2]);
+        }
+        break;
+
+    case R_VARDCL + 1: /* dcl_name_list '=' expr_list */
+        printf("VARDCL: \n");
+        {
+            // tree_ptr left = NULL, right = NULL;
+
+            // get_child(n->kids[0], &left);
+            // get_child(n->kids[3], &right);
+            // printf("VARDCL: %s\n", right->leaf->text);
+
+            gen_assign_expr_ic(OP_ASN, n, n->kids[3]);
+        }
+        break;
+
+    default:
+        // /* default is: concatenate our kids children's code */
+        // // n->code = NULL;
+        // // for (i = 0; i < n->nkids; i++)
+        // //     n->code = concat(n->code, n->kids[i]->code);
+        break;
+    }
+}
+
+static void ic_commondcl(tree_ptr n)
+{
+    int i;
+    if (n == NULL)
+        return;
+
+    /*
+    * this is a post-order traversal, so visit kids first
+    */
+    for (i = 0; i < n->nkids; i++)
+        ic_commondcl(n->kids[i]);
+
+    if (strcmp(n->prodname, "common_dcl") == 0)
+    {
+        generate_dcl_ic_code(n);
+    }
 }
 
 static void ic_expression(tree_ptr n)
@@ -337,7 +462,7 @@ static void ic_expression(tree_ptr n)
         gen_expr_ic(n, OP_ADD);
         break;
     case R_EXPR + 10: // "-"
-        // gen_expr_ic(n, OP_SUB);
+        gen_expr_ic(n, OP_SUB);
         break;
     case R_EXPR + 11: // "|"
         break;
@@ -364,13 +489,15 @@ static void ic_expression(tree_ptr n)
     case R_UEXPR + 1: // "pointer *id"
         break;
     case R_UEXPR + 2: // "+id"
-        // gen_unary_expr_ic(n, OP_UPLUS);
         break;
     case R_UEXPR + 3: // "-id"
         gen_unary_expr_ic(n, OP_UMINUS);
         break;
     case R_UEXPR + 4: // "!id"
-        // gen_unary_expr_ic(n, OP_NOT);
+        gen_unary_expr_ic(n, OP_NOT);
+        break;
+    case R_UEXPR + 5: // "~id"
+        gen_unary_expr_ic(n, OP_NEG);
         break;
     /*
     * ... really, a bazillion cases, up to one for each
@@ -378,7 +505,7 @@ static void ic_expression(tree_ptr n)
     */
     default:
         /* default is: concatenate our kids children's code */
-        n->code = NULL;
+        // n->code = NULL;
         for (i = 0; i < n->nkids; i++)
             n->code = concat(n->code, n->kids[i]->code);
     }
@@ -391,6 +518,7 @@ static void generate_ic_header()
 static void generate_ic_code(tree_ptr n)
 {
     generate_ic_header();
+    ic_commondcl(n);
     ic_expression(n);
 }
 

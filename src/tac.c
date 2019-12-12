@@ -145,11 +145,8 @@ char *get_opcode_name(int opcode)
     case OP_UMINUS:
         s = "uminus";
         break;
-    case OP_UPLUS:
-        s = "uplus";
-        break;
     case OP_NOT:
-        s = "unot";
+        s = "not";
         break;
     default:
         s = "OPCODE";
