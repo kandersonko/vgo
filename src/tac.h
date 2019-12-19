@@ -22,7 +22,10 @@ struct instr
     int opcode;
     struct addr dest, src1, src2;
     struct instr *next;
+    char *name;
 };
+
+extern struct instr *ic;
 
 /* Opcodes, per lecture notes */
 #define OP_ADD 3001
@@ -71,5 +74,6 @@ char *get_region_name(int region);
 
 char *get_opcode_name(int opcode);
 struct instr *gen_label(int opcode, struct addr dest);
+struct instr *gen_proc(int opcode, struct addr dest, char *name);
 
 #endif

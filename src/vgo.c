@@ -8,6 +8,7 @@
 #include "semantic.h"
 #include "typecheck.h"
 #include "codegen.h"
+#include "tac.h"
 
 extern struct tree *ast_root;
 

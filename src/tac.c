@@ -20,6 +20,7 @@ struct instr *gen(int opcode, struct addr dest, struct addr src1, struct addr sr
     code->src1 = src1;
     code->src2 = src2;
     code->next = NULL;
+    code->name = NULL;
     return code;
 }
 
@@ -34,6 +35,23 @@ struct instr *gen_label(int opcode, struct addr dest)
     new_addr.region = -1;
     code->src1 = new_addr;
     code->src2 = new_addr;
+    code->name = NULL;
+    return code;
+}
+
+struct instr *gen_proc(int opcode, struct addr dest, char* name)
+{
+    struct instr *code = safe_malloc(sizeof(struct instr));
+    code->opcode = opcode;
+    code->dest = dest;
+    code->next = NULL;
+    struct addr new_addr;
+    new_addr.offset = -1;
+    new_addr.region = -1;
+    code->src1 = new_addr;
+    code->src2 = new_addr;
+    code->name = strdup(name);
+    printf("NAME: %s\n", code->name);
     return code;
 }
 
@@ -73,31 +91,6 @@ struct instr *concat(struct instr *l1, struct instr *l2)
     return append(copylist(l1), l2);
 }
 
-// static void get_symtab(tree_ptr n, sym_table_ptr *st)
-// {
-//     if (!n)
-//         return;
-//     int i;
-//     for (i = 0; i < n->nkids; i++)
-//     {
-//         get_symtab(n->kids[i], st);
-//     }
-
-//     switch (n->prodrule)
-//     {
-//     case LNAME:
-//     case LLITERAL:
-//         *st = find_symtab(n->leaf->text);
-//         break;
-
-//     default:
-//         break;
-//     }
-// }
-
-/*
-#define OP_ADD 3001
-*/
 char *get_opcode_name(int opcode)
 {
     char *s;
