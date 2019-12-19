@@ -15,7 +15,7 @@ struct addr
 #define REGION_CLASS 2003  /* can assemble as relative to the 'this' register */
 #define REGION_LABEL 2004  /* pseudo-region for labels in the code region */
 #define REGION_CONST 2005  /* pseudo-region for immediate mode constants */
-#define REGION_STRING 2006  /* pseudo-region for immediate mode STRING */
+#define REGION_STRING 2006 /* pseudo-region for immediate mode STRING */
 
 struct instr
 {
@@ -49,6 +49,8 @@ struct instr
 #define OP_UMINUS 3022
 #define OP_NOT 3023
 #define OP_POINTER 3024
+#define OP_AND 3025
+#define OP_OR 3026
 
 /* declarations/pseudo instructions */
 #define DECL_GLOB 3051
@@ -57,11 +59,17 @@ struct instr
 #define DECL_LABEL 3054
 #define DECL_END 3055
 
+#define ATTR_FIRST 70001
+#define ATTR_FOLLOW 70002
+#define ATTR_TRUE 70003
+#define ATTR_FALSE 70004
+
 struct instr *gen(int opcode, struct addr dest, struct addr src1, struct addr src2);
 struct instr *concat(struct instr *l1, struct instr *l2);
 
 char *get_region_name(int region);
 
-char* get_opcode_name(int opcode);
+char *get_opcode_name(int opcode);
+struct instr *gen_label(int opcode, struct addr dest);
 
 #endif

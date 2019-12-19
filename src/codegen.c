@@ -41,19 +41,39 @@ static void print_code(struct instr *code)
 {
     if (code != NULL && code->opcode == 0)
         return;
-    if (code->src2.region == 0 && code->src2.offset == 0)
+
+    // printf("OPCODE: %s:%d\n", get_opcode_name(code->opcode), code->opcode);
+
+    if (code->opcode == DECL_LABEL)
     {
+        printf("L%d:\n", code->dest.offset);
+        return;
+    }
+    if (code->opcode == OP_GOTO)
+    {
+        printf("goto L%d\n", code->dest.offset);
+        return;
+    }
+    if (code->src2.region == -1 && code->src2.offset == -1)
+    {
+
         printf("%s\t %s:%d,%s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src1.region), code->src1.offset);
     }
-    else if (code->src1.region == 0 && code->src1.offset == 0)
+    else if (code->src1.region == -1 && code->src1.offset == -1)
     {
         printf("%s\t %s:%d,%s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src2.region), code->src2.offset);
+    }
+    else if (code->src1.region == -1 && code->src2.offset == -1)
+    {
+        printf("%s\t %s:%d\n",
+               get_opcode_name(code->opcode),
+               get_region_name(code->dest.region), code->dest.offset);
     }
     else
     {
@@ -65,11 +85,14 @@ static void print_code(struct instr *code)
     }
 }
 
-static int newlabel()
+static struct addr newlabel()
 {
     static int counter = 0;
+    struct addr temp;
+    temp.offset = counter;
+    temp.region = REGION_LABEL;
     ++counter;
-    return counter;
+    return temp;
 }
 
 static void get_symtab(tree_ptr n, sym_table_ptr *st)
@@ -130,7 +153,7 @@ static int get_offset(tree_ptr n, sym_table_ptr st)
     {
         return n->symtab->size;
     }
-    return 0;
+    return -1;
 }
 
 static struct addr get_addr(tree_ptr n, sym_table_ptr st)
@@ -158,8 +181,8 @@ static struct addr get_addr(tree_ptr n, sym_table_ptr st)
     }
     if (!st)
     {
-        new_addr.offset = 0;
-        new_addr.region = 0;
+        new_addr.offset = -1;
+        new_addr.region = -1;
         return new_addr;
     }
     if (strcmp(st->name, "global") == 0 || strcmp(st->name, "static") == 0)
@@ -206,19 +229,23 @@ static void generate_attributes(tree_ptr n)
 
     add_symtab(n, current);
 
+    n->place = newtemp(n);
+    n->true = newlabel();
+    n->false = newlabel();
+    n->first = newlabel();
+    n->follow = newlabel();
+
     switch (n->prodrule)
     {
     case LNAME:
     case LLITERAL:
 
         n->label = newlabel();
-        n->place = newtemp(n);
-        n->leaf->label = n->label;
-        n->leaf->place = n->place;
+        // n->place = newtemp(n);
         break;
 
     default:
-        n->place = newtemp(n);
+
         break;
     }
 }
@@ -295,7 +322,7 @@ static void gen_three_addr_code(int opcode, tree_ptr *dest, tree_ptr *src1, tree
                           (*src1)->place, (*src2)->place);
     (*dest)->code = concat((*dest)->code, g);
     printf("PRINTING CODE: %s %s:%d\n", get_opcode_name(g->opcode), get_region_name(g->src1.region), g->src1.offset);
-    print_code((*dest)->code);
+    // print_code((*dest)->code);
 }
 
 static void gen_unary_expr_ic(tree_ptr n, int opcode)
@@ -309,7 +336,7 @@ static void gen_unary_expr_ic(tree_ptr n, int opcode)
     // printf("PLACE SRC0: %s:%d\n", get_region_name(n->place.region), n->place.offset);
     // printf("PLACE SRC1: %s:%d\n", get_region_name(n->kids[0]->place.region), n->kids[0]->place.offset);
     // printf("PLACE SRC2: %s:%d\n", get_region_name(n->kids[2]->place.region), n->kids[2]->place.offset);
-    struct addr null_addr = {0, 0};
+    struct addr null_addr = {-1, -1};
     g = gen(opcode, n->place,
             n->kids[1]->place, null_addr);
     n->code = concat(n->code, g);
@@ -322,7 +349,7 @@ static void gen_assign_expr_ic(int opcode, tree_ptr n, tree_ptr right)
     n->place = newlocal(n);
     // get_place(right, &right->place);
     right->place = newlocal(right);
-    struct addr null_addr = {0, 0};
+    struct addr null_addr = {-1, -1};
     struct instr *g = gen(opcode, n->place,
                           right->place, null_addr);
     n->code = concat(n->code, g);
@@ -362,8 +389,6 @@ static void generate_dcl_ic_code(tree_ptr n)
         generate_dcl_ic_code(n->kids[i]);
     }
 
-    printf("PRODNAME: %s %d\n", n->prodname, n->prodrule);
-
     switch (n->prodrule)
     {
     case R_SIMPLE_STMT + 1:
@@ -383,23 +408,22 @@ static void generate_dcl_ic_code(tree_ptr n)
         break;
 
     case R_VARDCL + 1: /* dcl_name_list '=' expr_list */
-        printf("VARDCL: \n");
-        {
-            // tree_ptr left = NULL, right = NULL;
+    {
+        // tree_ptr left = NULL, right = NULL;
 
-            // get_child(n->kids[0], &left);
-            // get_child(n->kids[3], &right);
-            // printf("VARDCL: %s\n", right->leaf->text);
+        // get_child(n->kids[0], &left);
+        // get_child(n->kids[3], &right);
+        // printf("VARDCL: %s\n", right->leaf->text);
 
-            gen_assign_expr_ic(OP_ASN, n, n->kids[3]);
-        }
-        break;
+        gen_assign_expr_ic(OP_ASN, n, n->kids[3]);
+    }
+    break;
 
     default:
         // /* default is: concatenate our kids children's code */
-        // // n->code = NULL;
-        // // for (i = 0; i < n->nkids; i++)
-        // //     n->code = concat(n->code, n->kids[i]->code);
+        // n->code = NULL;
+        // for (i = 0; i < n->nkids; i++)
+        //     n->code = concat(n->code, n->kids[i]->code);
         break;
     }
 }
@@ -442,21 +466,28 @@ static void ic_expression(tree_ptr n)
     switch (n->prodrule)
     {
     case R_EXPR + 1: // "||"
+        gen_expr_ic(n, OP_OR);
         break;
     case R_EXPR + 2: // "&&"
+        gen_expr_ic(n, OP_AND);
         break;
-    case R_EXPR + 3: // "="
-        gen_expr_ic(n, OP_ASN);
+    case R_EXPR + 3: // "EQ "==""
+        gen_expr_ic(n, OP_BEQ);
         break;
     case R_EXPR + 4: // "!="
+        gen_expr_ic(n, OP_BNE);
         break;
     case R_EXPR + 5: // "<"
+        gen_expr_ic(n, OP_BLT);
         break;
     case R_EXPR + 6: // "<="
+        gen_expr_ic(n, OP_BLE);
         break;
     case R_EXPR + 7: // ">="
+        gen_expr_ic(n, OP_BGE);
         break;
     case R_EXPR + 8: // ">"
+        gen_expr_ic(n, OP_BGT);
         break;
     case R_EXPR + 9: // "+"
         gen_expr_ic(n, OP_ADD);
@@ -506,9 +537,156 @@ static void ic_expression(tree_ptr n)
     default:
         /* default is: concatenate our kids children's code */
         // n->code = NULL;
-        for (i = 0; i < n->nkids; i++)
-            n->code = concat(n->code, n->kids[i]->code);
+        // TODO: modified existing values instead overriding
+        // for (i = 0; i < n->nkids; i++)
+        //     n->code = concat(n->code, n->kids[i]->code);
+        break;
     }
+}
+
+static void synthesize_attributes(tree_ptr n, struct addr label, int attr_type)
+{
+    int i;
+    if (n == NULL)
+        return;
+
+    /*
+    * this is a post-order traversal, so visit kids first
+    */
+    for (i = 0; i < n->nkids; i++)
+    {
+        switch (attr_type)
+        {
+        case ATTR_FIRST:
+            n->first = label;
+            break;
+        case ATTR_FOLLOW:
+            n->follow = label;
+            break;
+        case ATTR_TRUE:
+            n->true = label;
+            break;
+        case ATTR_FALSE:
+            n->false = label;
+            break;
+
+        default:
+            break;
+        }
+        synthesize_attributes(n->kids[i], label, attr_type);
+    }
+}
+
+// static void generate_condition_ic_code(tree_ptr n)
+// {
+//     if (n == NULL)
+//         return;
+
+//     int i;
+//     for (i = 0; i < n->nkids; i++)
+//         generate_condition_ic_code(n->kids[i]);
+
+//     printf("PRODNAME: %s %d\n", n->prodname, n->prodrule);
+
+//     switch (n->prodrule)
+//     {
+//     case R_IF_STMT:
+//     {
+
+//         n->kids[1]->true = newlabel(n); // E
+//         n->kids[1]->false = newlabel(n);
+//         // synthesize_attributes(n, n->kids[2]->follow, ATTR_FOLLOW); // S1
+//         // synthesize_attributes(n, n->kids[4]->follow, ATTR_FOLLOW); // S2
+//         n->kids[2]->follow = n->follow;
+//          struct instr *g1, *g2, *g3, *g4, *g5, *g6, *g7;
+//         g1 = gen_label(DECL_LABEL, n->kids[1]->true);
+//         g2 = gen_label(OP_GOTO, n->follow);
+//         g3 = gen_label(DECL_LABEL, n->kids[1]->false);
+//         g4 = concat(n->kids[1]->code, g1);
+//         g5 = concat(n->kids[2]->code, g2);
+//         g6 = concat(g3, n->kids[4]->code);
+//         g7 = concat(g4, g5);
+//         n->code = concat(g6, g7);
+
+//         // print_code(g1);
+//         // print_code(g2);
+//         // print_code(g3);
+//         // print_code(g4);
+//         // print_code(g5);
+//         // print_code(g6);
+//         // print_code(g7);
+//         print_code(n->code);
+//     }
+//     break;
+//     default:
+//         for (i = 0; i < n->nkids; i++)
+//             n->code = concat(n->code, n->kids[i]->code);
+//         break;
+//     }
+// }
+
+static void ic_condition(tree_ptr n)
+{
+    int i;
+    if (n == NULL)
+        return;
+
+    /*
+    * this is a post-order traversal, so visit kids first
+    */
+    for (i = 0; i < n->nkids; i++)
+    {
+        ic_condition(n->kids[i]);
+    }
+    for (i = 0; i < n->nkids; i++)
+    {
+        n->code = concat(n->code, n->kids[i]->code);
+    }
+
+    if (strcmp(n->prodname, "expr") == 0)
+    {
+        ic_expression(n);
+    }
+
+    switch (n->prodrule)
+    {
+    case R_IF_STMT:
+    {
+        struct instr *g1, *g2, *g3, *g4, *g5, *g6, *g7;
+        printf("ELSE PART IS: %s %d\n", n->kids[4]->prodname, n->kids[4]->nkids);
+        if (n->kids[4]->nkids == 0)
+        {
+            n->kids[1]->true = newlabel(n); // E
+            n->kids[1]->false = n->follow;
+            n->kids[2]->follow = n->follow;
+
+            g1 = gen_label(DECL_LABEL, n->kids[1]->true);
+            g2 = gen_label(OP_GOTO, n->kids[1]->first);
+
+            g3 = concat(g1, g2);
+            printf("+CHECKING: \n");
+            print_code(n->code);
+            n->code = concat(n->code, g3);
+            printf("-CHECKING: \n");
+
+        }
+        else
+        {
+            // g3 = gen_label(DECL_LABEL, n->kids[1]->false);
+            // g4 = concat(n->kids[1]->code, g1);
+            // g5 = concat(n->kids[2]->code, g2);
+            // g6 = concat(g3, n->kids[4]->code);
+        }
+
+        // g5 = concat(g3, g4);
+        // n->code = concat(n->code, g4);
+    }
+    break;
+    default:
+
+        break;
+    }
+    
 }
 
 static void generate_ic_header()
@@ -517,9 +695,31 @@ static void generate_ic_header()
 
 static void generate_ic_code(tree_ptr n)
 {
-    generate_ic_header();
-    ic_commondcl(n);
-    ic_expression(n);
+
+    int i;
+    if (n == NULL)
+        return;
+
+    for (i = 0; i < n->nkids; i++)
+        generate_ic_code(n->kids[i]);
+
+    // ic_expression(n);
+
+    if (strcmp(n->prodname, "if_stmt") == 0)
+    {
+
+        ic_condition(n);
+    }
+    if (strcmp(n->prodname, "common_dcl") == 0)
+    {
+        ic_commondcl(n);
+    }
+    // if (strcmp(n->prodname, "expr") == 0)
+    // {
+    //     ic_expression(n);
+    // }
+    for (i = 0; i < n->nkids; i++)
+        n->code = concat(n->code, n->kids[i]->code);
 }
 
 static void print_ic_code(tree_ptr n)
@@ -537,6 +737,7 @@ static void print_ic_code(tree_ptr n)
 void codegen(tree_ptr n)
 {
     generate_attributes(n);
+    generate_ic_header();
     generate_ic_code(n);
     print_ic_code(n);
 }

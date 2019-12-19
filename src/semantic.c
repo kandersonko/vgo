@@ -26,7 +26,7 @@ void add_symtab(tree_ptr n, sym_table_ptr st)
     // printf("ADDING SYM %s %s\n", n->prodname, st->name);
     if (n->prodrule == LNAME)
     {
-        sym_table_ptr symbol_table = find_symtab(n->leaf->text);
+        sym_table_ptr symbol_table = find_symtab(n->leaf->text, st);
 
         if (symbol_table != NULL)
         {

@@ -14,7 +14,6 @@ struct tree
     int prodrule;
     char *prodname;
     int nkids;
-    int label;
     int basetype;
     int width;
     struct typeinfo *type;
@@ -22,7 +21,7 @@ struct tree
     struct tree **kids;
     struct token *leaf;
     struct instr * code;
-    struct addr place;
+    struct addr place, true, false, follow, first, label;
 };
 
 typedef struct tree *tree_ptr;
