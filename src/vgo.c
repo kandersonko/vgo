@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     argc--;
     argv++;
 
-    int print_symtab = 0, print_tree_enabled = 0;
+    int print_symtab = 0, print_tree_enabled = 0, output_ir = 0, output_asm = 0, link_object = 0;
 
     int j;
     for (j = 0; j < argc; j++)
@@ -55,15 +55,27 @@ int main(int argc, char **argv)
         {
             print_symtab = 1;
         }
-        if (strcmp(argv[j], "-ast") == 0)
+        else if (strcmp(argv[j], "-ast") == 0)
         {
             print_tree_enabled = 1;
+        }
+        else if (strcmp(argv[j], "-ir") == 0)
+        {
+            output_ir = 1;
+        }
+        else if (strcmp(argv[j], "-s") == 0)
+        {
+            output_asm = 1;
+        }
+        else if (strcmp(argv[j], "-c") == 0)
+        {
+            link_object = 1;
         }
     }
     int i;
     for (i = 0; i < argc; i++)
     {
-        if (strcmp(argv[i], "-symtab") == 0 || strcmp(argv[i], "-ast") == 0)
+        if (strcmp(argv[i], "-symtab") == 0 || strcmp(argv[i], "-ast") == 0 || strcmp(argv[i], "-ir") == 0 || strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-c") == 0)
         {
             continue;
         }
@@ -103,7 +115,6 @@ int main(int argc, char **argv)
                 printsymbols(current, 0);
             }
             typecheck(ast_root);
-            codegen(ast_root);
 
             if(print_tree_enabled)
             {
@@ -111,9 +122,12 @@ int main(int argc, char **argv)
                 print_tree(ast_root, 0);
                 printf("============ done =============================\n");
             }
+            codegen(ast_root);
+            emit_ic_code(ast_root, ic_file, yyfilename, output_ir);
+            // generate_ic_file(ic_file, ast_root, fp);
+           
 
-            generate_ic_file(ic_file, ast_root);
-            emit_final_code(ast_root->code, asm_file, argv[i]);
+            emit_final_code(ast_root->code, asm_file, argv[i], output_asm);
             fclose(ic_file);
             fclose(asm_file);
         }

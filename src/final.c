@@ -63,44 +63,51 @@ struct code *add_code(struct code *root, char *s)
     return root;
 }
 
-static void emit_expr(struct instr *ic, char *op, FILE *fp)
+static void emit_expr(struct instr *ic, char *op, FILE *fp, int output_asm)
 {
     char buffer[50];
     char *rax = "%rax";
 
     snprintf(buffer, 50, "\tmovq\t%s, %s", memref(ic->src1), rax);
-    printf("%s\n", buffer);
     fprintf(fp, "%s\n", buffer);
+    if (output_asm)
+        printf("%s\n", buffer);
 
     snprintf(buffer, 50, "\t%s\t%s, %s", op, memref(ic->src2), rax);
-    printf("%s\n", buffer);
     fprintf(fp, "%s\n", buffer);
+    if (output_asm)
+        printf("%s\n", buffer);
 
     snprintf(buffer, 50, "\tmovq\t%s, %s", rax, memref(ic->dest));
-    printf("%s\n", buffer);
-    fprintf(fp, "%s\n", buffer);
+    fprintf(fp, "%s\n\n", buffer);
+    if (output_asm)
+        printf("%s\n\n", buffer);
 }
 
-static void emit_header(FILE *fp, char* filename)
+static void emit_header(FILE *fp, char *filename, int output_asm)
 {
     fprintf(fp, "\t.file\t\"%s\"\n", filename);
-    printf("\t.file\t\"%s\"\n", filename);
+    if (output_asm)
+        printf("\t.file\t\"%s\"\n", filename);
 
     fprintf(fp, "\t.section\t.rodata\n");
-    printf("\t.section\t.rodata\n");
+    if (output_asm)
+        printf("\t.section\t.rodata\n");
 
-    fprintf(fp, "\t.text\n");
-    printf("\t.text\n");
+    fprintf(fp, "\t.text\n\n");
+    if (output_asm)
+        printf("\t.text\n\n");
 }
 
-void emit_final_code(struct instr *ic, FILE *fp, char* filename)
+void emit_final_code(struct instr *ic, FILE *fp, char *filename, int output_asm)
 {
-    printf("================= FINAL CODE:==================\n");
+    if (output_asm)
+        printf("================= Final code for %s ==================\n", filename);
     struct instr *temp = ic;
     // char *rax = "%rax";
     char buffer[50];
-    
-    emit_header(fp, filename);
+
+    emit_header(fp, filename, output_asm);
     while (temp != NULL)
     {
         switch (temp->opcode)
@@ -110,55 +117,56 @@ void emit_final_code(struct instr *ic, FILE *fp, char* filename)
         case OP_DIV:
         case OP_MUL:
         {
-            emit_expr(temp, get_opcode_name(temp->opcode), fp);
+            emit_expr(temp, get_opcode_name(temp->opcode), fp, output_asm);
         }
-            printf("\n");
-            break;
+        break;
 
-        // case DECL_LABEL:
-        // {
-        //     snprintf(buffer, 50, "\tcmpq\t%s, %s", memref(ic->dest), memref(ic->src1));
-        //     printf("%s\n", buffer);
-        //     fprintf(fp, "%s\n", buffer);
-        // }
-        //     printf("\n");
-        //     break;
+            // case DECL_LABEL:
+            // {
+            //     snprintf(buffer, 50, "\tcmpq\t%s, %s", memref(ic->dest), memref(ic->src1));
+            //     printf("%s\n", buffer);
+            //     fprintf(fp, "%s\n", buffer);
+            // }
+            //     printf("\n");
+            //     break;
 
         case OP_BEQ:
         {
             snprintf(buffer, 50, "\tcmpq\t%s, %s", memref(ic->dest), memref(ic->src1));
-            printf("%s\n", buffer);
             fprintf(fp, "%s\n", buffer);
+            if (output_asm)
+                printf("%s\n", buffer);
 
             snprintf(buffer, 50, "\tje\t%s", memref(ic->src1));
-            printf("%s\n", buffer);
-            fprintf(fp, "%s\n", buffer);
+            fprintf(fp, "%s\n\n", buffer);
+            if (output_asm)
+                printf("%s\n\n", buffer);
         }
-            printf("\n");
-            break;
+        break;
 
         case OP_GOTO:
         {
             snprintf(buffer, 50, "\tjump\t%s", memref(ic->dest));
-            printf("%s\n", buffer);
-            fprintf(fp, "%s\n", buffer);
+            fprintf(fp, "%s\n\n", buffer);
+            if (output_asm)
+                printf("%s\n\n", buffer);
         }
-            printf("\n");
-            break;
+        break;
 
         case DECL_LABEL:
         {
             snprintf(buffer, 50, "%s:", memref(ic->dest));
-            printf("%s\n", buffer);
-            fprintf(fp, "%s\n", buffer);
+            fprintf(fp, "%s\n\n", buffer);
+            if (output_asm)
+                printf("%s\n\n", buffer);
         }
-            printf("\n");
-            break;
+        break;
 
         default:
             break;
         }
         temp = temp->next;
     }
-    printf("================= DONE ==================\n");
+    if (output_asm)
+        printf("================= DONE ==================\n");
 }

@@ -39,7 +39,7 @@ struct instr *ic;
     global -> global region
 */
 
-static void print_code(struct instr *code)
+static void print_code(struct instr *code, FILE *fp, int output_ir)
 {
     if (code != NULL && code->opcode == 0)
         return;
@@ -48,47 +48,72 @@ static void print_code(struct instr *code)
 
     if (code->opcode == DECL_LABEL)
     {
-        printf("L%d:\n", code->dest.offset);
+        fprintf(fp, "L%d:\n", code->dest.offset);
+        if (output_ir)
+            printf("L%d:\n", code->dest.offset);
         return;
     }
     if (code->opcode == DECL_PROC)
     {
-        printf("%s:\n", code->name);
+        fprintf(fp,"%s:\n", code->name);
+        if (output_ir)
+            printf("%s:\n", code->name);
         return;
     }
     if (code->opcode == OP_GOTO)
     {
-        printf("goto L%d\n", code->dest.offset);
+        fprintf(fp, "goto L%d\n", code->dest.offset);
+        if (output_ir)
+            printf("goto L%d\n", code->dest.offset);
         return;
     }
     if (code->src2.region == -1 && code->src2.offset == -1)
     {
-
-        printf("%s\t %s:%d,%s:%d\n",
+        fprintf(fp, "%s\t %s:%d,%s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src1.region), code->src1.offset);
+        if (output_ir)
+            printf("%s\t %s:%d,%s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset,
+                   get_region_name(code->src1.region), code->src1.offset);
     }
     else if (code->src1.region == -1 && code->src1.offset == -1)
     {
-        printf("%s\t %s:%d,%s:%d\n",
+        fprintf(fp, "%s\t %s:%d,%s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src2.region), code->src2.offset);
+        if (output_ir)
+            printf("%s\t %s:%d,%s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset,
+                   get_region_name(code->src2.region), code->src2.offset);
     }
     else if (code->src1.region == -1 && code->src2.offset == -1)
     {
-        printf("%s\t %s:%d\n",
+        fprintf(fp, "%s\t %s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset);
+        if (output_ir)
+            printf("%s\t %s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset);
     }
     else
     {
-        printf("%s\t %s:%d,%s:%d,%s:%d\n",
+        fprintf(fp, "%s\t %s:%d,%s:%d,%s:%d\n",
                get_opcode_name(code->opcode),
                get_region_name(code->dest.region), code->dest.offset,
                get_region_name(code->src1.region), code->src1.offset,
                get_region_name(code->src2.region), code->src2.offset);
+        if (output_ir)
+            printf("%s\t %s:%d,%s:%d,%s:%d\n",
+                   get_opcode_name(code->opcode),
+                   get_region_name(code->dest.region), code->dest.offset,
+                   get_region_name(code->src1.region), code->src1.offset,
+                   get_region_name(code->src2.region), code->src2.offset);
     }
 }
 
@@ -598,9 +623,8 @@ static void ic_condition(tree_ptr n)
             g2 = gen_label(OP_GOTO, n->kids[1]->first);
 
             g3 = concat(g1, g2);
-            print_code(n->code);
             n->code = concat(n->code, g3);
-            // label + no_op 
+            // label + no_op
         }
         else
         {
@@ -684,29 +708,25 @@ static void generate_ic_code(tree_ptr n)
     }
 }
 
-void print_ic_code(tree_ptr n)
+static void print_ic_code(tree_ptr n, FILE *fp, int output_ir)
 {
     if (!n)
         return;
-    printf("--------- intermediate code -----------------\n");
     struct instr *code = n->code;
     while (code != NULL)
     {
-        print_code(code);
+        print_code(code, fp, output_ir);
         code = code->next;
     }
-    printf("--------- done -----------------------------\n");
 }
 
-static void print_ic(struct instr *ic)
+void emit_ic_code(tree_ptr n, FILE *fp, char *filename, int output_ir)
 {
-    if (!ic)
-        return;
-    struct instr *code = ic;
-    while (code != NULL)
+    if (output_ir)
     {
-        print_code(code);
-        code = code->next;
+        printf("============ intermediate code for %s ===========\n", filename);
+        print_ic_code(n, fp, output_ir);
+        printf("============ done =============================\n");
     }
 }
 
@@ -715,7 +735,6 @@ void codegen(tree_ptr n)
     generate_attributes(n);
     generate_ic_header();
     generate_ic_code(n);
-    print_ic_code(n);
     // ic = concat(ic, n->code);
     // print_ic(ic);
 }
