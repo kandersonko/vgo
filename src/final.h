@@ -3,7 +3,7 @@
 
 #include "tac.h"
 
-void emit_final_code(struct instr* ic, FILE *fp);
+void emit_final_code(struct instr* ic, FILE *fp, char* filename);
 
 struct code
 {

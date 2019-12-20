@@ -113,7 +113,7 @@ int main(int argc, char **argv)
             }
 
             generate_ic_file(ic_file, ast_root);
-            emit_final_code(ast_root->code, asm_file);
+            emit_final_code(ast_root->code, asm_file, argv[i]);
             fclose(ic_file);
             fclose(asm_file);
         }
