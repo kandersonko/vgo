@@ -31,9 +31,9 @@ char *rename_go_file(char *name);
 
 sym_table_ptr current;
 
-void generate_ic_file();
-
 char *remove_ext(char *s, char ext_sep, char path_sep);
+
+int run_cmd(char *cmd, char *filename);
 
 int main(int argc, char **argv)
 {
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
             }
             typecheck(ast_root);
 
-            if(print_tree_enabled)
+            if (print_tree_enabled)
             {
                 printf("============ ast tree for file: %s ===========\n", yyfilename);
                 print_tree(ast_root, 0);
@@ -124,10 +124,19 @@ int main(int argc, char **argv)
             }
             codegen(ast_root);
             emit_ic_code(ast_root, ic_file, yyfilename, output_ir);
-            // generate_ic_file(ic_file, ast_root, fp);
-           
 
             emit_final_code(ast_root->code, asm_file, argv[i], output_asm);
+            if (link_object)
+            {
+                char *output_file = strcat(remove_ext(argv[i], '.', '/'), ".o");
+                char buffer[100];
+                snprintf(buffer, 100, "-o %s %s", output_file, asm_filename);
+                int val = run_cmd("as --gstabs+", buffer);
+                if (!val)
+                {
+                    int value = run_cmd("g++", output_file);
+                }
+            }
             fclose(ic_file);
             fclose(asm_file);
         }
@@ -146,32 +155,13 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void generate_ic_file(FILE *fp, tree_ptr n)
+int run_cmd(char *cmd, char *filename)
 {
-    if (!n)
-        return;
-    struct instr *code = n->code;
-    while (code != NULL)
-    {
-        if (!code)
-            return;
-        if (code->src2.region == 0 && code->src2.offset == 0)
-        {
-            fprintf(fp, "%s\t %s:%d,%s:%d\n",
-                   get_opcode_name(code->opcode),
-                   get_region_name(code->dest.region), code->dest.offset,
-                   get_region_name(code->src1.region), code->src1.offset);
-        }
-        else
-        {
-            fprintf(fp, "%s\t %s:%d,%s:%d,%s:%d\n",
-                   get_opcode_name(code->opcode),
-                   get_region_name(code->dest.region), code->dest.offset,
-                   get_region_name(code->src1.region), code->src1.offset,
-                   get_region_name(code->src2.region), code->src2.offset);
-        }
-        code = code->next;
-    }
+    if (!system(NULL))
+        exit(EXIT_FAILURE);
+    char buffer[100];
+    snprintf(buffer, 100, "%s %s", cmd, filename);
+    return system(buffer);
 }
 
 // code found on stackoverflow
