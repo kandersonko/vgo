@@ -4,3 +4,7 @@ movq	 loc:3,loc:4
 subq	 loc:5,const:2,loc:0
 movq	 loc:6,loc:7
 movq	 loc:8,loc:9
+beqq	 loc:11,loc:0,const:2
+L529:
+goto L400
+beqq	 loc:11,loc:0,const:2

@@ -9,9 +9,9 @@ func main() {
 	// var z int = x * y
 	var w int = 2 - x
 	var test bool = true
-	// if x == 2 {
-	// 	fmt.println("True")
-	// }
+	if x == 2 {
+		fmt.println("True")
+	}
 	// var u int = !w
 
 	// var year int

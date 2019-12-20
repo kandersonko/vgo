@@ -132,7 +132,7 @@ void emit_final_code(struct instr *ic, FILE *fp, char *filename, int output_asm)
 
         case OP_BEQ:
         {
-            snprintf(buffer, 50, "\tcmpq\t%s, %s", memref(ic->dest), memref(ic->src1));
+            snprintf(buffer, 50, "\tcmpq\t$0, %s", memref(ic->dest));
             fprintf(fp, "%s\n", buffer);
             if (output_asm)
                 printf("%s\n", buffer);

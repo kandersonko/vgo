@@ -10,3 +10,13 @@
 	subq	-8(%rbp), %rax
 	movq	%rax, -48(%rbp)
 
+	cmpq	$0, .L0
+	je	.L0
+
+.L0:
+
+	jump	.L0
+
+	cmpq	$0, .L0
+	je	.L0
+
