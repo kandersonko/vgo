@@ -1,5 +1,6 @@
 	.file	"tests/test0.go"
 	.section	.rodata
+	.text
 	movq	$12, %rax
 	addq	$5, %rax
 	movq	%rax, -8(%rbp)

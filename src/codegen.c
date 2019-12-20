@@ -592,6 +592,7 @@ static void ic_condition(tree_ptr n)
             n->kids[1]->true = newlabel(n); // E
             n->kids[1]->false = n->follow;
             n->kids[2]->follow = n->follow;
+            // TODO: label sandwiching
 
             g1 = gen_label(DECL_LABEL, n->kids[1]->true);
             g2 = gen_label(OP_GOTO, n->kids[1]->first);
@@ -599,6 +600,7 @@ static void ic_condition(tree_ptr n)
             g3 = concat(g1, g2);
             print_code(n->code);
             n->code = concat(n->code, g3);
+            // label + no_op 
         }
         else
         {

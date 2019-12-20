@@ -88,6 +88,9 @@ static void emit_header(FILE *fp, char* filename)
 
     fprintf(fp, "\t.section\t.rodata\n");
     printf("\t.section\t.rodata\n");
+
+    fprintf(fp, "\t.text\n");
+    printf("\t.text\n");
 }
 
 void emit_final_code(struct instr *ic, FILE *fp, char* filename)
