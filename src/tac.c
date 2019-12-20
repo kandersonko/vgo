@@ -97,22 +97,22 @@ char *get_opcode_name(int opcode)
     switch (opcode)
     {
     case OP_ADD:
-        s = "add";
+        s = "addq";
         break;
     case OP_SUB:
-        s = "sub";
+        s = "subq";
         break;
     case OP_MUL:
-        s = "mul";
+        s = "mulq";
         break;
     case OP_DIV:
-        s = "div";
+        s = "divq";
         break;
     case OP_NEG:
         s = "uminus";
         break;
     case OP_ASN:
-        s = "mov";
+        s = "movq";
         break;
     case OP_ADDR:
         s = "addr";
@@ -127,28 +127,28 @@ char *get_opcode_name(int opcode)
         s = "goto";
         break;
     case OP_BLT:
-        s = "blt";
+        s = "bltq";
         break;
     case OP_BLE:
-        s = "ble";
+        s = "bleq";
         break;
     case OP_BGT:
-        s = "bgt";
+        s = "bgtq";
         break;
     case OP_BGE:
-        s = "bge";
+        s = "bgeq";
         break;
     case OP_BEQ:
-        s = "beq";
+        s = "beqq";
         break;
     case OP_BNE:
-        s = "bne";
+        s = "bneq";
         break;
     case OP_BIF:
-        s = "bif";
+        s = "bifq";
         break;
     case OP_BNIF:
-        s = "bnif";
+        s = "bnifq";
         break;
     case OP_PARM:
         s = "param";
@@ -163,10 +163,10 @@ char *get_opcode_name(int opcode)
         s = "uminus";
         break;
     case OP_AND:
-        s = "and";
+        s = "andq";
         break;
     case OP_OR:
-        s = "or";
+        s = "orq";
         break;
     default:
         s = "OPCODE";

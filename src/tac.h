@@ -7,6 +7,7 @@
 struct addr
 {
     int region, offset;
+    
 };
 
 /* Regions: */

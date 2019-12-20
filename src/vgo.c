@@ -9,6 +9,7 @@
 #include "typecheck.h"
 #include "codegen.h"
 #include "tac.h"
+#include "final.h"
 
 extern struct tree *ast_root;
 
@@ -84,6 +85,9 @@ int main(int argc, char **argv)
         char *ic_filename = strcat(s, ".ic");
         FILE *ic_file = fopen(ic_filename, "w+");
 
+        char *asm_filename = strcat(remove_ext(argv[i], '.', '/'), ".s");
+        FILE *asm_file = fopen(asm_filename, "w+");
+
         int failed = yyparse();
         if (!failed)
         {
@@ -105,10 +109,13 @@ int main(int argc, char **argv)
             {
                 printf("============ ast tree for file: %s ===========\n", yyfilename);
                 print_tree(ast_root, 0);
+                printf("============ done =============================\n");
             }
 
             generate_ic_file(ic_file, ast_root);
+            emit_final_code(ast_root->code, asm_file);
             fclose(ic_file);
+            fclose(asm_file);
         }
         else
         {

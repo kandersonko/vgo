@@ -653,13 +653,12 @@ static void generate_ic_code(tree_ptr n)
     for (i = 0; i < n->nkids; i++)
         generate_ic_code(n->kids[i]);
 
-    if (n->prodrule == R_FNDCL)
-    {
-        char *s = strdup(n->kids[0]->kids[0]->leaf->text);
-        n->code = gen_proc(DECL_PROC, n->first, s);
-        ic = concat(ic, gen_proc(DECL_PROC, n->first, s));
-    }
-    else if (strcmp(n->prodname, "if_stmt") == 0)
+    // if (n->prodrule == R_FNDCL)
+    // {
+    //     char *s = strdup(n->kids[0]->kids[0]->leaf->text);
+    //     n->code = concat(n->code,gen_proc(DECL_PROC, n->first, s));
+    // }
+    if (strcmp(n->prodname, "if_stmt") == 0)
     {
         ic_condition(n);
     }
@@ -676,7 +675,6 @@ static void generate_ic_code(tree_ptr n)
         // ic_function_dcl(n);
     }
 
-
     // ic_expression(n);
     for (i = 0; i < n->nkids; i++)
     {
@@ -684,19 +682,21 @@ static void generate_ic_code(tree_ptr n)
     }
 }
 
-static void print_ic_code(tree_ptr n)
+void print_ic_code(tree_ptr n)
 {
     if (!n)
         return;
+    printf("--------- intermediate code -----------------\n");
     struct instr *code = n->code;
     while (code != NULL)
     {
         print_code(code);
         code = code->next;
     }
+    printf("--------- done -----------------------------\n");
 }
 
-static void print_ic(struct instr* ic)
+static void print_ic(struct instr *ic)
 {
     if (!ic)
         return;
