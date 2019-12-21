@@ -329,8 +329,6 @@ int insert_sym(sym_table_ptr symtable, char *s, type_ptr t)
     st->buckets[h] = entry;
     st->entries++;
 
-    printf("INSERTING %s of type %s:%d into %s:%d at addr %s:%d\n", s, typename(t), t->width, st->name, st->size, get_region_name(entry->region), entry->offset);
-
     return 1;
 }
 

@@ -51,7 +51,6 @@ struct instr *gen_proc(int opcode, struct addr dest, char* name)
     code->src1 = new_addr;
     code->src2 = new_addr;
     code->name = strdup(name);
-    printf("NAME: %s\n", code->name);
     return code;
 }
 
