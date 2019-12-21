@@ -134,7 +134,7 @@ int main(int argc, char **argv)
                 int val = run_cmd("as --gstabs+", buffer);
                 if (!val)
                 {
-                    int value = run_cmd("g++", output_file);
+                    run_cmd("g++", output_file);
                 }
             }
             fclose(ic_file);

@@ -1,4 +1,4 @@
-	.file	"tests/test0.go"
+	.file	"../tests/test0.go"
 	.section	.rodata
 	.text
 
